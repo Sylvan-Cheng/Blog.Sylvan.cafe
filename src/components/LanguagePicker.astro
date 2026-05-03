@@ -92,7 +92,9 @@ const items = locales.map(({ code, label }) => ({
     }
     const win = window as TranslationWindow;
 
-    if (win.__translations) {
+    // Only use translation data on post detail pages
+    const isPostPage = /^\/[a-z]{2}\/posts\/.+/.test(window.location.pathname);
+    if (win.__translations && isPostPage) {
       const translations = win.__translations;
       const currentLocale = win.__currentLocale || "";
 

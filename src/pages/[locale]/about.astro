@@ -1,4 +1,5 @@
 ---
+import { getEntry, render } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
@@ -14,26 +15,27 @@ export function getStaticPaths() {
 }
 
 const locale = Astro.currentLocale ?? "zh";
-
-const i18n = {
-  title: locale === "zh" ? "关于" : locale === "ja" ? "概要" : locale === "ru" ? "О сайте" : "About",
-  content: locale === "zh"
-    ? "这是 Sylvan 的个人博客。使用 Astro 和 Tailwind CSS 构建，支持中英日俄四语言。"
-    : locale === "ja"
-    ? "Sylvan の個人ブログです。Astro と Tailwind CSS で構築され、日中英露の4言語に対応しています。"
-    : locale === "ru"
-    ? "Личный блог Sylvan. Создан с помощью Astro и Tailwind CSS, поддерживает четыре языка."
-    : "Sylvan's personal blog. Built with Astro and Tailwind CSS, supporting four languages.",
-};
+const page = await getEntry("pages", `${locale}/about`);
+const { Content } = page ? await render(page) : { Content: null };
 ---
 
-<Layout title={`${i18n.title} | ${SITE.title}`}>
+<Layout title={`${page?.data.title ?? "About"} | ${SITE.title}`}>
   <Header />
-  <main id="main-content" class="app-layout">
-    <section class="app-prose mb-28 max-w-app prose-img:border-0">
-      <h1 class="text-2xl tracking-wider sm:text-3xl">{i18n.title}</h1>
-      <p>{i18n.content}</p>
-    </section>
-  </main>
+  {
+    Content ? (
+      <main id="main-content" class="app-layout">
+        <article class="app-prose mb-28 max-w-app prose-img:border-0">
+          <Content />
+        </article>
+      </main>
+    ) : (
+      <main id="main-content" class="app-layout">
+        <section class="app-prose mb-28 max-w-app prose-img:border-0">
+          <h1 class="text-2xl tracking-wider sm:text-3xl">About</h1>
+          <p>Page not found.</p>
+        </section>
+      </main>
+    )
+  }
   <Footer />
 </Layout>
