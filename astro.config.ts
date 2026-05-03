@@ -35,7 +35,13 @@ export default defineConfig({
     remarkPlugins: [remarkToc, remarkMath, [remarkCollapse, { test: "Table of contents" }]],
     rehypePlugins: [rehypeKatex],
     shikiConfig: {
-      // Multi-theme: generates CSS variables selectable by data-scheme + data-theme
+      /*
+      Shiki 在构建时静态编译，不支持运行时跟随 data-scheme 切换。
+      换色板后需重新构建。备选主题对:
+        Default:  { light: "github-light",  dark: "github-dark" }
+        Nord:     { light: "github-light",  dark: "nord" }
+        Gruvbox:  { light: "gruvbox-light-hard", dark: "gruvbox-dark-hard" }  // ← 当前
+      */
       themes: { light: "gruvbox-light-hard", dark: "gruvbox-dark-hard" },
       defaultColor: false,
       wrap: false,

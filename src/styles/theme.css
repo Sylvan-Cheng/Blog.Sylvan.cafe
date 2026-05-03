@@ -1,8 +1,46 @@
 /* =========================================================
    Theme Color Palettes
-   Set active scheme via data-scheme on <html>
-   Currently active: Gruvbox
+   Switch scheme by setting data-scheme on <html>
+   Currently active: Gruvbox (set in Layout.astro)
    ========================================================= */
+
+/* ----- Default (原 AstroPaper) ----- */
+html[data-scheme="default"] {
+  &,
+  &[data-theme="light"] {
+    --background: #fdfdfd;
+    --foreground: #282728;
+    --accent: #006cac;
+    --muted: #e6e6e6;
+    --border: #ece9e9;
+  }
+  &[data-theme="dark"] {
+    --background: #212737;
+    --foreground: #eaedf3;
+    --accent: #ff6b01;
+    --muted: #343f60;
+    --border: #ab4b08;
+  }
+}
+
+/* ----- Nord ----- */
+html[data-scheme="nord"] {
+  &,
+  &[data-theme="light"] {
+    --background: #eceff4;
+    --foreground: #2e3440;
+    --accent: #5e81ac;
+    --muted: #d8dee9;
+    --border: #81a1c1;
+  }
+  &[data-theme="dark"] {
+    --background: #2e3440;
+    --foreground: #eceff4;
+    --accent: #88c0d0;
+    --muted: #3b4252;
+    --border: #4c566a;
+  }
+}
 
 /* ----- Gruvbox (active) ----- */
 :root,
@@ -24,41 +62,3 @@ html:not([data-scheme]) {
     --border: #504945;
   }
 }
-
-/* ----- Default (原 AstroPaper, 暂未使用) -----
-html[data-scheme="default"] {
-  &, &[data-theme="light"] {
-    --background: #fdfdfd;
-    --foreground: #282728;
-    --accent: #006cac;
-    --muted: #e6e6e6;
-    --border: #ece9e9;
-  }
-  &[data-theme="dark"] {
-    --background: #212737;
-    --foreground: #eaedf3;
-    --accent: #ff6b01;
-    --muted: #343f60;
-    --border: #ab4b08;
-  }
-}
-*/
-
-/* ----- Nord (暂未使用) -----
-html[data-scheme="nord"] {
-  &, &[data-theme="light"] {
-    --background: #eceff4;
-    --foreground: #2e3440;
-    --accent: #5e81ac;
-    --muted: #d8dee9;
-    --border: #81a1c1;
-  }
-  &[data-theme="dark"] {
-    --background: #2e3440;
-    --foreground: #eceff4;
-    --accent: #88c0d0;
-    --muted: #3b4252;
-    --border: #4c566a;
-  }
-}
-*/
