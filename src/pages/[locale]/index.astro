@@ -60,7 +60,7 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
       </h1>
       <a
         target="_blank"
-        href={"/" + locale + "/rss.xml"}
+        href="/rss.xml"
         class="inline-block"
         aria-label="rss feed"
         title="RSS Feed"
@@ -114,7 +114,7 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
           <ul>
             {recentPosts.map(
               (data, index) =>
-                index < SITE.postPerIndex && <Card variant="h3" {...data} />
+                index < SITE.postPerIndex && <Card variant="h3" {...data} locale={locale} />
             )}
           </ul>
         </section>
