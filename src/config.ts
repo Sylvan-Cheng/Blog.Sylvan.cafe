@@ -16,6 +16,21 @@ export const SITE = {
     text: "Edit page",
     url: "https://github.com/satnaing/astro-paper/edit/main/",
   },
+  giscus: {
+    enabled: true,
+    repo: "giscus/giscus-component",
+    repoId: "MDEwOlJlcG9zaXRvcnkzOTEzMTMwMjA=",
+    category: "Announcements",
+    categoryId: "DIC_kwDOF1kCJM4CWMMY",
+    mapping: "pathname",
+    strict: true,
+    reactionsEnabled: "1",
+    emitMetadata: false,
+    inputPosition: "bottom",
+    lang: "zh-CN",
+    lightTheme: "light",
+    darkTheme: "dark",
+  },
   dynamicOgImage: true,
   dir: "ltr", // "rtl" | "auto"
   lang: "en", // html lang code. Set this empty and default will be "en"

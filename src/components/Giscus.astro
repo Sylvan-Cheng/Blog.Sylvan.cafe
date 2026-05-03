@@ -1,0 +1,49 @@
+---
+import { SITE } from "@/config";
+
+const giscus = SITE.giscus;
+---
+
+{
+  giscus.enabled && (
+    <div class="mt-8">
+      <script
+        src="https://giscus.app/client.js"
+        data-repo={giscus.repo}
+        data-repo-id={giscus.repoId}
+        data-category={giscus.category}
+        data-category-id={giscus.categoryId}
+        data-mapping={giscus.mapping}
+        data-strict={giscus.strict.toString()}
+        data-reactions-enabled={giscus.reactionsEnabled}
+        data-emit-metadata={giscus.emitMetadata.toString()}
+        data-input-position={giscus.inputPosition}
+        data-theme={giscus.lightTheme}
+        data-lang={giscus.lang}
+        data-loading="lazy"
+        crossorigin="anonymous"
+        async
+      />
+    </div>
+  )
+}
+
+{
+  giscus.enabled && (
+    <script is:inline>
+      function updateGiscusTheme() {
+        const theme = document.documentElement.dataset.theme || "light";
+        const iframe = document.querySelector<HTMLIFrameElement>("iframe.giscus-frame");
+        if (iframe) {
+          iframe.contentWindow?.postMessage(
+            { giscus: { setConfig: { theme: theme === "dark" ? "dark" : "light" } } },
+            "https://giscus.app"
+          );
+        }
+      }
+      const observer = new MutationObserver(updateGiscusTheme);
+      observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+      document.addEventListener("astro:after-swap", updateGiscusTheme);
+    </script>
+  )
+}

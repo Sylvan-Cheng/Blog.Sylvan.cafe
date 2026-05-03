@@ -1,5 +1,5 @@
 ---
-import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
+import Icon from "@/components/Icon.astro";
 import LinkButton from "./LinkButton.astro";
 import { SITE } from "@/config";
 
@@ -17,7 +17,7 @@ const i18n = {
         href="/"
         class="focus-outline -ms-2 mt-8 mb-2 hover:text-foreground/75"
       >
-        <IconChevronLeft class="inline-block size-6 rtl:rotate-180" />
+        <Icon name="tabler:chevron-left" class="inline-block size-6 rtl:rotate-180" />
         <span>{i18n.goBack}</span>
       </LinkButton>
     </div>

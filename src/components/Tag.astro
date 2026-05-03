@@ -1,5 +1,5 @@
 ---
-import IconHash from "@/assets/icons/IconHash.svg";
+import Icon from "@/components/Icon.astro";
 
 type Props = {
   tag: string;
@@ -24,7 +24,7 @@ const locale = Astro.currentLocale ?? "zh";
       { "text-lg": size === "lg" },
     ]}
   >
-    <IconHash
+    <Icon name="tabler:hash"
       class:list={[
         "opacity-80",
         { "size-5": size === "lg" },
