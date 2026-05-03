@@ -1,0 +1,58 @@
+---
+const locale = Astro.currentLocale ?? "zh";
+const i18nHome = locale === "zh" ? "首页" : locale === "ja" ? "ホーム" : locale === "ru" ? "Главная" : "Home";
+
+// Remove current url path and remove trailing slash if exists
+const currentUrlPath = Astro.url.pathname.replace(/\/+$/, "");
+
+// Get url array from path (skip first 2 segments: /locale/...)
+// eg: /zh/tags/tailwindcss => ['zh', 'tags', 'tailwindcss']
+const breadcrumbList = currentUrlPath.split("/").slice(2);
+
+// if breadcrumb is Home > Posts > 1 <etc>
+if (breadcrumbList[0] === "posts") {
+  const pageLabel = locale === "zh" ? "文章" : locale === "ja" ? "記事" : locale === "ru" ? "Записи" : "Posts";
+  breadcrumbList.splice(0, 2, `${pageLabel} (page ${breadcrumbList[1] || 1})`);
+}
+
+// if breadcrumb is Home > Tags > [tag] > [page] <etc>
+if (breadcrumbList[0] === "tags" && !isNaN(Number(breadcrumbList[2]))) {
+  breadcrumbList.splice(
+    1,
+    3,
+    `${breadcrumbList[1]} ${Number(breadcrumbList[2]) === 1 ? "" : "(page " + breadcrumbList[2] + ")"}`
+  );
+}
+---
+
+<nav class="app-layout mt-8 mb-1" aria-label="breadcrumb">
+  <ul
+    class="font-light [&>li]:inline [&>li:not(:last-child)>a]:hover:opacity-100"
+  >
+    <li>
+      <a href={`/${locale}/`} class="opacity-80">{i18nHome}</a>
+      <span aria-hidden="true" class="opacity-80">&raquo;</span>
+    </li>
+    {
+      breadcrumbList.map((breadcrumb, index) =>
+        index + 1 === breadcrumbList.length ? (
+          <li>
+            <span
+              class:list={["capitalize opacity-75", { lowercase: index > 0 }]}
+              aria-current="page"
+            >
+              {decodeURIComponent(breadcrumb)}
+            </span>
+          </li>
+        ) : (
+          <li>
+            <a href={`/${locale}/${breadcrumb}/`} class="capitalize opacity-70">
+              {breadcrumb}
+            </a>
+            <span aria-hidden="true">&raquo;</span>
+          </li>
+        )
+      )
+    }
+  </ul>
+</nav>

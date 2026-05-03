@@ -1,0 +1,90 @@
+---
+const locales = [
+  { code: "zh", label: "中文" },
+  { code: "en", label: "English" },
+  { code: "ja", label: "日本語" },
+  { code: "ru", label: "Русский" },
+];
+
+const currentLocale = Astro.currentLocale ?? "zh";
+const pathname = Astro.url.pathname;
+
+function switchLocale(path: string, to: string): string {
+  if (path === "/") return `/${to}/`;
+
+  const segments = path.replace(/^\//, "").split("/");
+  const knownLocales = ["zh", "en", "ja", "ru"];
+
+  // Replace locale prefix
+  if (knownLocales.includes(segments[0])) {
+    segments[0] = to;
+  } else {
+    segments.unshift(to);
+  }
+
+  // Tag detail page: go to tags index instead (tag names differ per language)
+  if (segments[1] === "tags" && segments[2]) {
+    return `/${to}/tags/`;
+  }
+
+  const newPath = "/" + segments.join("/");
+  return newPath.endsWith("/") ? newPath : newPath + "/";
+}
+---
+
+<select
+  id="language-picker"
+  class="focus-outline cursor-pointer rounded border border-border bg-background px-2 py-1 text-sm font-medium text-foreground hover:border-accent"
+  aria-label="Select language"
+>
+  {
+    locales.map(({ code, label }) => (
+      <option
+        value={switchLocale(pathname, code)}
+        data-locale={code}
+        selected={code === currentLocale}
+      >
+        {label}
+      </option>
+    ))
+  }
+</select>
+
+<script>
+  function initLanguagePicker() {
+    const picker = document.getElementById("language-picker") as HTMLSelectElement | null;
+    if (!picker) return;
+
+    interface TranslationWindow extends Window {
+      __translations?: Record<string, string>;
+      __currentLocale?: string;
+    }
+    const win = window as TranslationWindow;
+
+    if (win.__translations) {
+      const translations = win.__translations;
+      const currentLocale = win.__currentLocale || "";
+
+      picker.querySelectorAll("option").forEach(opt => {
+        const el = opt as HTMLOptionElement;
+        const locale = el.dataset.locale || "";
+        if (locale === currentLocale) return;
+        if (translations[locale]) {
+          el.value = translations[locale];
+        } else {
+          el.value = `/${locale}/404`;
+        }
+      });
+    }
+
+    picker.addEventListener("change", () => {
+      const url = picker.value;
+      if (url && url !== window.location.pathname) {
+        window.location.href = url;
+      }
+    });
+  }
+
+  initLanguagePicker();
+  document.addEventListener("astro:after-swap", initLanguagePicker);
+</script>

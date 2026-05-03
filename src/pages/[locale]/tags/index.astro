@@ -1,0 +1,36 @@
+---
+import { getCollection } from "astro:content";
+import Main from "@/layouts/Main.astro";
+import Layout from "@/layouts/Layout.astro";
+import Tag from "@/components/Tag.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import getUniqueTags from "@/utils/getUniqueTags";
+import { SITE } from "@/config";
+
+export function getStaticPaths() {
+  return [
+    { params: { locale: "zh" } },
+    { params: { locale: "en" } },
+    { params: { locale: "ja" } },
+    { params: { locale: "ru" } },
+  ];
+}
+
+const locale = Astro.currentLocale ?? "zh";
+const i18nTitle = locale === "zh" ? "标签" : locale === "ja" ? "タグ" : locale === "ru" ? "Теги" : "Tags";
+const i18nDesc = locale === "zh" ? "文章所使用的所有标签。" : locale === "ja" ? "記事で使用されている全てのタグです。" : locale === "ru" ? "Все теги, используемые в записях." : "All the tags used in posts.";
+const allPosts = await getCollection("blog");
+const posts = allPosts.filter(p => p.data.locale === locale);
+let tags = getUniqueTags(posts);
+---
+
+<Layout title={`${i18nTitle} | ${SITE.title}`}>
+  <Header />
+  <Main pageTitle={i18nTitle} pageDesc={i18nDesc}>
+    <ul class="flex flex-wrap gap-6">
+      {tags.map(({ tag, tagName }) => <Tag {tag} {tagName} />)}
+    </ul>
+  </Main>
+  <Footer />
+</Layout>

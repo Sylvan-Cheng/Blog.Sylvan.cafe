@@ -1,0 +1,46 @@
+---
+import type { GetStaticPaths } from "astro";
+import { getCollection } from "astro:content";
+import Main from "@/layouts/Main.astro";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import Card from "@/components/Card.astro";
+import Pagination from "@/components/Pagination.astro";
+import getSortedPosts from "@/utils/getSortedPosts";
+import { SITE } from "@/config";
+
+const locale = Astro.currentLocale ?? "zh";
+const i18nTitle = locale === "zh" ? "文章" : locale === "ja" ? "記事" : locale === "ru" ? "Записи" : "Posts";
+const i18nDesc = locale === "zh" ? "所有已发布的文章。" : locale === "ja" ? "公開された全ての記事です。" : locale === "ru" ? "Все опубликованные записи." : "All the articles I've posted.";
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const locales = ["zh", "en", "ja", "ru"];
+  const allPosts = await getCollection("blog", ({ data }) => !data.draft);
+  const results = [];
+  for (const loc of locales) {
+    const localePosts = allPosts.filter(p => p.data.locale === loc);
+    const pages = await paginate(getSortedPosts(localePosts), {
+      params: { locale: loc },
+      pageSize: SITE.postPerPage,
+    });
+    results.push(...pages);
+  }
+  return results;
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props;
+---
+
+<Layout title={`${i18nTitle} | ${SITE.title}`}>
+  <Header />
+  <Main pageTitle={i18nTitle} pageDesc={i18nDesc}>
+    <ul>
+      {page.data.map(data => <Card {...data} locale={locale} />)}
+    </ul>
+  </Main>
+
+  <Pagination {page} />
+
+  <Footer noMarginTop={page.lastPage > 1} />
+</Layout>
