@@ -1,5 +1,8 @@
 ---
 import Icon from "@/components/Icon.astro";
+
+const locale = Astro.currentLocale ?? "zh";
+const i18nBTT = locale === "zh" ? "回到顶部" : locale === "ja" ? "トップへ" : locale === "ru" ? "Наверх" : "Back To Top";
 ---
 
 <div
@@ -26,7 +29,7 @@ import Icon from "@/components/Icon.astro";
     <Icon name="tabler:chevron-left" class="inline-block rotate-90 md:hidden" />
     <span class="sr-only text-sm group-hover:text-accent md:not-sr-only">
       <Icon name="tabler:arrow-up" class="inline-block size-4" />
-      Back To Top
+      {i18nBTT}
     </span>
   </button>
 </div>

@@ -2,6 +2,8 @@
 import { SITE } from "@/config";
 
 const giscus = SITE.giscus;
+const locale = Astro.currentLocale ?? "zh";
+const giscusLang = { zh: "zh-CN", en: "en", ja: "ja", ru: "ru" }[locale] ?? "en";
 ---
 
 {
@@ -19,7 +21,7 @@ const giscus = SITE.giscus;
         data-emit-metadata={giscus.emitMetadata.toString()}
         data-input-position={giscus.inputPosition}
         data-theme={giscus.lightTheme}
-        data-lang={giscus.lang}
+        data-lang={giscusLang}
         data-loading="lazy"
         crossorigin="anonymous"
         async

@@ -8,6 +8,9 @@ import { SITE } from "@/config";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+const locale = Astro.currentLocale ?? "zh";
+const updatedLabel = locale === "zh" ? "更新：" : locale === "ja" ? "更新：" : locale === "ru" ? "Обновлено:" : "Updated:";
+
 type Props = {
   class?: string;
   size?: "sm" | "lg";
@@ -44,7 +47,7 @@ const date = datetime.format("D MMM, YYYY"); // e.g., '22 Mar, 2025'
   {
     isModified && (
       <span class:list={["text-sm", { "sm:text-base": size === "lg" }]}>
-        Updated:
+        {updatedLabel}
       </span>
     )
   }

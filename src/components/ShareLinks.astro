@@ -4,12 +4,14 @@ import LinkButton from "./LinkButton.astro";
 import Icon from "./Icon.astro";
 
 const URL = Astro.url;
+const locale = Astro.currentLocale ?? "zh";
+const shareLabel = locale === "zh" ? "分享到：" : locale === "ja" ? "共有：" : locale === "ru" ? "Поделиться:" : "Share this post on:";
 ---
 
 {
   SHARE_LINKS.length > 0 && (
     <div class="flex flex-none flex-col items-center justify-center gap-1 md:items-start">
-      <span class="italic">Share this post on:</span>
+      <span class="italic">{shareLabel}</span>
       <div class="text-center">
         {SHARE_LINKS.map(social => (
           <LinkButton
