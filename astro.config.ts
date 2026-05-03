@@ -35,8 +35,8 @@ export default defineConfig({
     remarkPlugins: [remarkToc, remarkMath, [remarkCollapse, { test: "Table of contents" }]],
     rehypePlugins: [rehypeKatex],
     shikiConfig: {
-      // For more themes, visit https://shiki.style/themes
-      themes: { light: "github-light", dark: "github-dark" },
+      // Multi-theme: generates CSS variables selectable by data-scheme + data-theme
+      themes: { light: "gruvbox-light-hard", dark: "gruvbox-dark-hard" },
       defaultColor: false,
       wrap: false,
       transformers: [

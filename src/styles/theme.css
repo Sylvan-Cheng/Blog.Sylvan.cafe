@@ -1,12 +1,31 @@
 /* =========================================================
    Theme Color Palettes
-   To activate a scheme, set data-scheme on <html>
-   e.g. <html data-scheme="nord">
-   The light/dark mode is controlled by data-theme ("light"|"dark")
+   Set active scheme via data-scheme on <html>
+   Currently active: Gruvbox
    ========================================================= */
 
-/* ----- Default (原 AstroPaper 色板) ----- */
+/* ----- Gruvbox (active) ----- */
 :root,
+html[data-scheme="gruvbox"],
+html:not([data-scheme]) {
+  &,
+  &[data-theme="light"] {
+    --background: #fbf1c7;
+    --foreground: #3c3836;
+    --accent: #af3a03;
+    --muted: #ebdbb2;
+    --border: #d5c4a1;
+  }
+  &[data-theme="dark"] {
+    --background: #282828;
+    --foreground: #ebdbb2;
+    --accent: #fe8019;
+    --muted: #3c3836;
+    --border: #504945;
+  }
+}
+
+/* ----- Default (原 AstroPaper, 暂未使用) -----
 html[data-scheme="default"] {
   &, &[data-theme="light"] {
     --background: #fdfdfd;
@@ -15,7 +34,6 @@ html[data-scheme="default"] {
     --muted: #e6e6e6;
     --border: #ece9e9;
   }
-
   &[data-theme="dark"] {
     --background: #212737;
     --foreground: #eaedf3;
@@ -24,8 +42,9 @@ html[data-scheme="default"] {
     --border: #ab4b08;
   }
 }
+*/
 
-/* ----- Nord 色板 ----- */
+/* ----- Nord (暂未使用) -----
 html[data-scheme="nord"] {
   &, &[data-theme="light"] {
     --background: #eceff4;
@@ -34,7 +53,6 @@ html[data-scheme="nord"] {
     --muted: #d8dee9;
     --border: #81a1c1;
   }
-
   &[data-theme="dark"] {
     --background: #2e3440;
     --foreground: #eceff4;
@@ -42,11 +60,5 @@ html[data-scheme="nord"] {
     --muted: #3b4252;
     --border: #4c566a;
   }
-}
-
-/* ===== Add new schemes below =====
-html[data-scheme="catppuccin"] {
-  &, &[data-theme="light"] { ... }
-  &[data-theme="dark"] { ... }
 }
 */
