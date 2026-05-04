@@ -1,29 +1,47 @@
 ---
 import { Icon } from "astro-icon/components";
+import { LOCALES, LOCALE_META } from "@/i18n/config";
+import type { Locale } from "@/i18n/config";
+import { UI } from "@/i18n/ui";
+import { resolveLocale, t } from "@/i18n/utils";
+import { translateTag } from "@/i18n/tags";
 
-const locales = [
-  { code: "zh", label: "中文" },
-  { code: "en", label: "English" },
-  { code: "ja", label: "日本語" },
-  { code: "ru", label: "Русский" },
-];
-
-const currentLocale = Astro.currentLocale ?? "zh";
+const currentLocale = resolveLocale(Astro.currentLocale);
 const pathname = Astro.url.pathname;
+
+const locales = LOCALES.map(code => ({
+  code,
+  label: LOCALE_META[code].label,
+}));
 
 function switchLocale(path: string, to: string): string {
   if (path === "/") return `/${to}/`;
 
   const segments = path.replace(/^\//, "").split("/");
-  const knownLocales = ["zh", "en", "ja", "ru"];
 
-  if (knownLocales.includes(segments[0])) {
+  if ((LOCALES as readonly string[]).includes(segments[0])) {
     segments[0] = to;
   } else {
     segments.unshift(to);
   }
 
+  // Tag page: try to translate the tag slug when switching languages
   if (segments[1] === "tags" && segments[2]) {
+    const raw = segments[2];
+    let tag: string;
+    try {
+      tag = decodeURIComponent(raw);
+    } catch {
+      tag = raw;
+    }
+    // Try decoded first, fall back to raw
+    const translated =
+      translateTag(tag, currentLocale, to as Locale) ??
+      translateTag(raw, currentLocale, to as Locale);
+    if (translated) {
+      return `/${to}/tags/${translated}/`;
+    }
+    // No translation found — fall back to tag index
     return `/${to}/tags/`;
   }
 
@@ -42,7 +60,7 @@ const items = locales.map(({ code, label }) => ({
   <button
     id="lang-trigger"
     class="focus-outline flex p-3 sm:p-1 hover:text-accent text-foreground"
-    aria-label="Select language"
+    aria-label={t(UI.selectLanguage, currentLocale)}
     aria-expanded="false"
     aria-haspopup="listbox"
   >

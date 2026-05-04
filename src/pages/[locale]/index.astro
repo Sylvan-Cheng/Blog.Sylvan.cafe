@@ -1,5 +1,9 @@
 ---
 import { getCollection } from "astro:content";
+import { LOCALES } from "@/i18n/config";
+import { resolveLocale } from "@/i18n/utils";
+import { UI } from "@/i18n/ui";
+import type { Locale } from "@/i18n/config";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
@@ -12,16 +16,10 @@ import { SITE } from "@/config";
 import { SOCIALS } from "@/constants";
 
 export function getStaticPaths() {
-  return [
-    { params: { locale: "zh" } },
-    { params: { locale: "en" } },
-    { params: { locale: "ja" } },
-    { params: { locale: "ru" } },
-  ];
+  return LOCALES.map(locale => ({ params: { locale } }));
 }
 
-const locale = Astro.currentLocale ?? "zh";
-
+const locale = resolveLocale(Astro.currentLocale);
 const t = (dict: Record<string, string>) => dict[locale] ?? dict.zh ?? "";
 
 const i18n = {

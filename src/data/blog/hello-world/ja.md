@@ -1,6 +1,5 @@
 ---
 locale: ja
-translationKey: hello-world
 author: テスト著者
 pubDatetime: 2026-05-01T00:00:00Z
 title: こんにちは、世界！

@@ -1,5 +1,7 @@
 ---
 import { getCollection } from "astro:content";
+import { LOCALES } from "@/i18n/config";
+import { resolveLocale } from "@/i18n/utils";
 import Main from "@/layouts/Main.astro";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
@@ -9,12 +11,7 @@ import getPostsByGroupCondition from "@/utils/getPostsByGroupCondition";
 import { SITE } from "@/config";
 
 export function getStaticPaths() {
-  return [
-    { params: { locale: "zh" } },
-    { params: { locale: "en" } },
-    { params: { locale: "ja" } },
-    { params: { locale: "ru" } },
-  ];
+  return LOCALES.map(locale => ({ params: { locale } }));
 }
 
 // Redirect to 404 page if `showArchives` config is false
@@ -22,7 +19,7 @@ if (!SITE.showArchives) {
   return Astro.redirect("/404");
 }
 
-const locale = Astro.currentLocale ?? "zh";
+const locale = resolveLocale(Astro.currentLocale);
 const i18nTitle = locale === "zh" ? "归档" : locale === "ja" ? "アーカイブ" : locale === "ru" ? "Архив" : "Archives";
 const i18nDesc = locale === "zh" ? "所有归档的文章。" : locale === "ja" ? "アーカイブされた全ての記事です。" : locale === "ru" ? "Все архивные записи." : "All the articles I've archived.";
 

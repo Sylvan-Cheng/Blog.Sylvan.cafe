@@ -1,6 +1,5 @@
 ---
 locale: zh
-translationKey: hello-world
 author: 测试作者
 pubDatetime: 2026-05-01T00:00:00Z
 title: 你好，世界！

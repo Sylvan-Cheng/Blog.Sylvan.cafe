@@ -1,6 +1,5 @@
 ---
 locale: en
-translationKey: hello-world
 author: Test Author
 pubDatetime: 2026-05-01T00:00:00Z
 title: Hello, World!

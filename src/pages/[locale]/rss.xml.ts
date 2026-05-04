@@ -1,27 +1,17 @@
 import rss from "@astrojs/rss";
 import { getCollection } from "astro:content";
+import { LOCALE_META, LOCALES } from "@/i18n/config";
+import type { Locale } from "@/i18n/config";
 import { getPath } from "@/utils/getPath";
 import getSortedPosts from "@/utils/getSortedPosts";
 import { SITE } from "@/config";
 
-const LOCALE_META: Record<string, { lang: string; label: string }> = {
-  zh: { lang: "zh-CN", label: "中文" },
-  en: { lang: "en-US", label: "English" },
-  ja: { lang: "ja", label: "日本語" },
-  ru: { lang: "ru", label: "Русский" },
-};
-
 export async function getStaticPaths() {
-  return [
-    { params: { locale: "zh" } },
-    { params: { locale: "en" } },
-    { params: { locale: "ja" } },
-    { params: { locale: "ru" } },
-  ];
+  return LOCALES.map(locale => ({ params: { locale } }));
 }
 
 export async function GET({ params }: { params: { locale: string } }) {
-  const { locale } = params;
+  const locale = params.locale as Locale;
   const meta = LOCALE_META[locale] ?? { lang: locale, label: locale };
 
   const allPosts = await getCollection("blog", ({ data }) => !data.draft);

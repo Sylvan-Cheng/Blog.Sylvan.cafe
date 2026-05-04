@@ -2,6 +2,7 @@ import { z } from "astro:schema";
 import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { SITE } from "@/config";
+import { LOCALES } from "@/i18n/config";
 
 export const BLOG_PATH = "src/data/blog";
 
@@ -9,19 +10,26 @@ const blog = defineCollection({
   loader: glob({ pattern: "**/[^_]*.md", base: `./${BLOG_PATH}` }),
   schema: ({ image }) =>
     z.object({
-      locale: z.enum(["zh", "en", "ja", "ru"]).default("zh"),
-      translationKey: z.string().optional(),
+      // === Required ===
+      locale: z.enum(LOCALES).default("zh"),
+      title: z.string().min(1, "Title is required"),
+      pubDatetime: z.coerce.date(),
+      description: z
+        .string()
+        .min(10, "Description must be at least 10 characters")
+        .max(320, "Description too long for SEO"),
+
+      // === Optional ===
       author: z.string().default(SITE.author),
-      pubDatetime: z.date(),
-      modDatetime: z.date().optional().nullable(),
-      title: z.string(),
-      featured: z.boolean().optional(),
-      draft: z.boolean().optional(),
-      tags: z.array(z.string()).default(["others"]),
+      modDatetime: z.coerce.date().optional().nullable(),
+      image: image().or(z.string()).optional(),
       ogImage: image().or(z.string()).optional(),
-      description: z.string(),
-      canonicalURL: z.string().optional(),
-      hideEditPost: z.boolean().optional(),
+      canonicalURL: z.string().url().optional(),
+      tags: z.array(z.string()).default(["others"]),
+      keywords: z.array(z.string()).optional(),
+      featured: z.boolean().optional().default(false),
+      draft: z.boolean().optional().default(false),
+      hideEditPost: z.boolean().optional().default(false),
       timezone: z.string().optional(),
     }),
 });
@@ -30,7 +38,7 @@ const pages = defineCollection({
   loader: glob({ pattern: "**/[^_]*.md", base: "./src/data/pages" }),
   schema: z.object({
     title: z.string(),
-    locale: z.enum(["zh", "en", "ja", "ru"]),
+    locale: z.enum(LOCALES),
   }),
 });
 

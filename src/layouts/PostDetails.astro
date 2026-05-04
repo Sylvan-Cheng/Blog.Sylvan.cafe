@@ -1,5 +1,5 @@
 ---
-import { render, type CollectionEntry, getCollection } from "astro:content";
+import { render, type CollectionEntry } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
@@ -13,23 +13,20 @@ import { getPath } from "@/utils/getPath";
 import { slugifyStr } from "@/utils/slugify";
 import Icon from "@/components/Icon.astro";
 import { SITE } from "@/config";
+import { UI } from "@/i18n/ui";
+import { resolveLocale, t } from "@/i18n/utils";
 
 type Props = {
   post: CollectionEntry<"blog">;
   posts: CollectionEntry<"blog">[];
+  translationMap: Record<string, string>;
 };
 
-const { post, posts } = Astro.props;
-const locale = Astro.currentLocale ?? "zh";
+const { post, posts, translationMap } = Astro.props;
+const locale = resolveLocale(Astro.currentLocale);
 
 const localizePostPath = (id: string, filePath?: string) =>
   `/${locale}${getPath(id, filePath)}`;
-
-const i18nPost = {
-  prev: locale === "zh" ? "上一篇" : locale === "ja" ? "前の記事" : locale === "ru" ? "Предыдущая" : "Previous Post",
-  next: locale === "zh" ? "下一篇" : locale === "ja" ? "次の記事" : locale === "ru" ? "Следующая" : "Next Post",
-  goBack: locale === "zh" ? "返回" : locale === "ja" ? "戻る" : locale === "ru" ? "Назад" : "Go back",
-};
 
 const {
   title,
@@ -45,19 +42,6 @@ const {
 } = post.data;
 
 const { Content } = await render(post);
-
-/* ========== Translations ========== */
-
-const translationMap: Record<string, string> = {};
-
-if (post.data.translationKey) {
-  const allPosts = await getCollection("blog");
-  for (const p of allPosts) {
-    if (p.data.translationKey === post.data.translationKey && p.data.locale) {
-      translationMap[p.data.locale] = `/${p.data.locale}${getPath(p.id, p.filePath)}`;
-    }
-  }
-}
 
 let ogImageUrl: string | undefined;
 
@@ -87,6 +71,7 @@ const layoutProps = {
   canonicalURL,
   ogImage,
   scrollSmooth: true,
+  hreflangs: translationMap,
 };
 
 /* ========== Prev/Next Posts ========== */
@@ -120,7 +105,7 @@ const nextPost =
     data-pagefind-body
   >
     <h1
-      transition:name={slugifyStr(title.replaceAll(".", "-"))}
+      transition:name={`p-${slugifyStr(title)}`}
       class="inline-block text-2xl font-bold text-accent sm:text-3xl"
     >
       {title}
@@ -167,7 +152,7 @@ const nextPost =
           >
             <Icon name="tabler:chevron-left" class="inline-block flex-none rtl:rotate-180" />
             <div>
-              <span>{i18nPost.prev}</span>
+              <span>{t(UI.post.prev, locale)}</span>
               <div class="text-sm text-accent/85">{prevPost.title}</div>
             </div>
           </a>
@@ -180,7 +165,7 @@ const nextPost =
             class="flex w-full justify-end gap-1 text-end hover:opacity-75 sm:col-start-2"
           >
             <div>
-              <span>{i18nPost.next}</span>
+              <span>{t(UI.post.next, locale)}</span>
               <div class="text-sm text-accent/85">{nextPost.title}</div>
             </div>
             <Icon name="tabler:chevron-right" class="inline-block flex-none rtl:rotate-180" />

@@ -3,20 +3,16 @@ import Icon from "@/components/Icon.astro";
 import LinkButton from "./LinkButton.astro";
 import LanguagePicker from "./LanguagePicker.astro";
 import { SITE } from "@/config";
+import { UI } from "@/i18n/ui";
+import { resolveLocale, t } from "@/i18n/utils";
 
-const locale = Astro.currentLocale ?? "zh";
+const locale = resolveLocale(Astro.currentLocale);
 const { pathname } = Astro.url;
 
 const localizePath = (path: string) => `/${locale}${path}`;
 
-const i18n = {
-  skipToContent: locale === "zh" ? "跳转到内容" : locale === "ja" ? "コンテンツへスキップ" : locale === "ru" ? "Перейти к содержимому" : "Skip to content",
-  posts: locale === "zh" ? "文章" : locale === "ja" ? "記事" : locale === "ru" ? "Записи" : "Posts",
-  tags: locale === "zh" ? "标签" : locale === "ja" ? "タグ" : locale === "ru" ? "Теги" : "Tags",
-  about: locale === "zh" ? "关于" : locale === "ja" ? "概要" : locale === "ru" ? "О сайте" : "About",
-  archives: locale === "zh" ? "归档" : locale === "ja" ? "アーカイブ" : locale === "ru" ? "Архив" : "Archives",
-  search: locale === "zh" ? "搜索" : locale === "ja" ? "検索" : locale === "ru" ? "Поиск" : "Search",
-};
+const openLabel = t(UI.openMenu, locale);
+const closeLabel = t(UI.closeMenu, locale);
 
 const currentPath =
   pathname.endsWith("/") && pathname !== "/" ? pathname.slice(0, -1) : pathname;
@@ -34,7 +30,7 @@ const isActive = (path: string) => {
   href="#main-content"
   class="absolute start-16 -top-full z-50 bg-background px-3 py-2 text-accent backdrop-blur-lg transition-all focus:top-4"
 >
-  {i18n.skipToContent}
+  {t(UI.nav.skipToContent, locale)}
 </a>
 
 <header class="app-layout">
@@ -53,11 +49,11 @@ const isActive = (path: string) => {
       <LinkButton
         href={localizePath("/search")}
         class="focus-outline flex p-3 sm:p-1"
-        title={i18n.search}
+          title={t(UI.nav.search, locale)}
         aria-label="search"
       >
         <Icon name="tabler:search" />
-        <span class="sr-only">{i18n.search}</span>
+        <span class="sr-only">{t(UI.nav.search, locale)}</span>
       </LinkButton>
       <LanguagePicker />
       {
@@ -65,7 +61,7 @@ const isActive = (path: string) => {
           <button
             id="theme-btn"
             class="focus-outline relative size-12 p-4 sm:size-8"
-            title="Toggles light & dark"
+            title={t(UI.themeToggle, locale)}
             aria-label="auto"
             aria-live="polite"
           >
@@ -77,7 +73,9 @@ const isActive = (path: string) => {
       <button
         id="menu-btn"
         class="focus-outline p-2 sm:hidden"
-        aria-label="Open Menu"
+        aria-label={t(UI.openMenu, locale)}
+        data-open-label={t(UI.openMenu, locale)}
+        data-close-label={t(UI.closeMenu, locale)}
         aria-expanded="false"
         aria-controls="nav-menu"
       >
@@ -93,24 +91,24 @@ const isActive = (path: string) => {
       <ul class="flex flex-col items-center gap-1 sm:flex-row sm:gap-x-5">
         <li class="w-full sm:w-auto">
           <a href={localizePath("/posts")} class="block px-4 py-3 text-center font-medium hover:text-accent sm:px-2 sm:py-1" class:list={{ "active-nav": isActive(localizePath("/posts")) }}>
-            {i18n.posts}
+            {t(UI.nav.posts, locale)}
           </a>
         </li>
         <li class="w-full sm:w-auto">
           <a href={localizePath("/tags")} class="block px-4 py-3 text-center font-medium hover:text-accent sm:px-2 sm:py-1" class:list={{ "active-nav": isActive(localizePath("/tags")) }}>
-            {i18n.tags}
+            {t(UI.nav.tags, locale)}
           </a>
         </li>
         <li class="w-full sm:w-auto">
           <a href={localizePath("/about")} class="block px-4 py-3 text-center font-medium hover:text-accent sm:px-2 sm:py-1" class:list={{ "active-nav": isActive(localizePath("/about")) }}>
-            {i18n.about}
+            {t(UI.nav.about, locale)}
           </a>
         </li>
         {
           SITE.showArchives && (
             <li class="w-full sm:w-auto">
               <a href={localizePath("/archives")} class="block px-4 py-3 text-center font-medium hover:text-accent sm:px-2 sm:py-1" class:list={{ "active-nav": isActive(localizePath("/archives")) }}>
-                {i18n.archives}
+                {t(UI.nav.archives, locale)}
               </a>
             </li>
           )
@@ -129,10 +127,13 @@ const isActive = (path: string) => {
 
     if (!menuBtn || !navMenu || !menuIcon || !closeIcon) return;
 
+    const openLabel = menuBtn.getAttribute("data-open-label") || "Open Menu";
+    const closeLabel = menuBtn.getAttribute("data-close-label") || "Close Menu";
+
     menuBtn.addEventListener("click", () => {
       const openMenu = menuBtn.getAttribute("aria-expanded") === "true";
       menuBtn.setAttribute("aria-expanded", openMenu ? "false" : "true");
-      menuBtn.setAttribute("aria-label", openMenu ? "Open Menu" : "Close Menu");
+      menuBtn.setAttribute("aria-label", openMenu ? openLabel : closeLabel);
       navMenu.classList.toggle("hidden");
       menuIcon.classList.toggle("hidden");
       closeIcon.classList.toggle("hidden");

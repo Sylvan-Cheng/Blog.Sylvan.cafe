@@ -1,5 +1,6 @@
 import { BLOG_PATH } from "@/content.config";
 import { slugifyStr } from "./slugify";
+import { LOCALES } from "@/i18n/config";
 
 /**
  * Get full path of a blog post
@@ -13,7 +14,7 @@ export function getPath(
   filePath: string | undefined,
   includeBase = true
 ) {
-  const KNOWN_LOCALES = ["zh", "en", "ja", "ru"];
+  const KNOWN_LOCALES: readonly string[] = LOCALES;
 
   const pathSegments = filePath
     ?.replace(BLOG_PATH, "")

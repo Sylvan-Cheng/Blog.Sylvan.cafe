@@ -1,0 +1,266 @@
+import type { Locale } from "./config";
+
+type Dict = Record<Locale, string>;
+type TemplateDict = Record<Locale, (arg: string) => string>;
+
+export const UI = {
+  /** Header / Navigation */
+  nav: {
+    skipToContent: {
+      zh: "跳转到内容",
+      en: "Skip to content",
+      ja: "コンテンツへスキップ",
+      ru: "Перейти к содержимому",
+    } satisfies Dict,
+    posts: {
+      zh: "文章",
+      en: "Posts",
+      ja: "記事",
+      ru: "Записи",
+    } satisfies Dict,
+    tags: {
+      zh: "标签",
+      en: "Tags",
+      ja: "タグ",
+      ru: "Теги",
+    } satisfies Dict,
+    about: {
+      zh: "关于",
+      en: "About",
+      ja: "概要",
+      ru: "О сайте",
+    } satisfies Dict,
+    archives: {
+      zh: "归档",
+      en: "Archives",
+      ja: "アーカイブ",
+      ru: "Архив",
+    } satisfies Dict,
+    search: {
+      zh: "搜索",
+      en: "Search",
+      ja: "検索",
+      ru: "Поиск",
+    } satisfies Dict,
+  },
+
+  /** Footer */
+  footer: {
+    copyright: {
+      zh: "版权所有",
+      en: "Copyright",
+      ja: "著作権",
+      ru: "Авторские права",
+    } satisfies Dict,
+    allRightsReserved: {
+      zh: "保留所有权利。",
+      en: "All rights reserved.",
+      ja: "無断転載を禁じます。",
+      ru: "Все права защищены.",
+    } satisfies Dict,
+  },
+
+  /** Post detail */
+  post: {
+    prev: {
+      zh: "上一篇",
+      en: "Previous Post",
+      ja: "前の記事",
+      ru: "Предыдущая",
+    } satisfies Dict,
+    next: {
+      zh: "下一篇",
+      en: "Next Post",
+      ja: "次の記事",
+      ru: "Следующая",
+    } satisfies Dict,
+    goBack: {
+      zh: "返回",
+      en: "Go back",
+      ja: "戻る",
+      ru: "Назад",
+    } satisfies Dict,
+    updated: {
+      zh: "更新：",
+      en: "Updated:",
+      ja: "更新：",
+      ru: "Обновлено:",
+    } satisfies Dict,
+  },
+
+  /** Home page */
+  home: {
+    greeting: {
+      zh: "你好，欢迎来访 👋",
+      en: "Hello, welcome! 👋",
+      ja: "こんにちは、ようこそ！👋",
+      ru: "Привет, добро пожаловать! 👋",
+    } satisfies Dict,
+    desc: {
+      zh: "这是 Sylvan 的个人博客。这里记录关于技术、代码和生活的思考。",
+      en: "Sylvan's personal blog. Thoughts on technology, code, and life.",
+      ja: "Sylvan の個人ブログです。技術、コード、そして生活についての考えを綴っています。",
+      ru: "Личный блог Sylvan. Мысли о технологиях, коде и жизни.",
+    } satisfies Dict,
+    featured: {
+      zh: "精选文章",
+      en: "Featured",
+      ja: "注目記事",
+      ru: "Избранное",
+    } satisfies Dict,
+    recent: {
+      zh: "最近文章",
+      en: "Recent Posts",
+      ja: "最近の記事",
+      ru: "Недавние записи",
+    } satisfies Dict,
+    allPosts: {
+      zh: "全部文章",
+      en: "All Posts",
+      ja: "全ての記事",
+      ru: "Все записи",
+    } satisfies Dict,
+    socialLinks: {
+      zh: "社交链接：",
+      en: "Social Links:",
+      ja: "ソーシャルリンク:",
+      ru: "Соцсети:",
+    } satisfies Dict,
+  },
+
+  /** RSS */
+  rss: {
+    subscribe: {
+      zh: "欢迎订阅 RSS 以获取最新文章。",
+      en: "Subscribe to RSS for the latest posts.",
+      ja: "RSSで最新記事を購読してください。",
+      ru: "Подпишитесь на RSS, чтобы получать новые записи.",
+    } satisfies Dict,
+  },
+
+  /** Search */
+  search: {
+    title: {
+      zh: "搜索",
+      en: "Search",
+      ja: "検索",
+      ru: "Поиск",
+    } satisfies Dict,
+    desc: {
+      zh: "搜索任意文章 ...",
+      en: "Search any article ...",
+      ja: "記事を検索 ...",
+      ru: "Поиск статей ...",
+    } satisfies Dict,
+  },
+
+  /** Posts list */
+  posts: {
+    title: {
+      zh: "文章",
+      en: "Posts",
+      ja: "記事",
+      ru: "Записи",
+    } satisfies Dict,
+    desc: {
+      zh: "所有已发布的文章。",
+      en: "All the articles I've posted.",
+      ja: "公開された全ての記事です。",
+      ru: "Все опубликованные записи.",
+    } satisfies Dict,
+  },
+
+  /** Tags */
+  tags: {
+    title: {
+      zh: "标签",
+      en: "Tags",
+      ja: "タグ",
+      ru: "Теги",
+    } satisfies Dict,
+    desc: {
+      zh: "文章所使用的所有标签。",
+      en: "All the tags used in posts.",
+      ja: "記事で使用されている全てのタグです。",
+      ru: "Все теги, используемые в записях.",
+    } satisfies Dict,
+    label: {
+      zh: "标签",
+      en: "Tag",
+      ja: "タグ",
+      ru: "Тег",
+    } satisfies Dict,
+    descFiltered: {
+      zh: (tag: string) => `所有带有 "${tag}" 标签的文章。`,
+      en: (tag: string) => `All the articles with the tag "${tag}".`,
+      ja: (tag: string) => `「${tag}」タグの付いた全ての記事です。`,
+      ru: (tag: string) => `Все записи с тегом "${tag}".`,
+    } satisfies TemplateDict,
+  },
+
+  /** Archives */
+  archives: {
+    title: {
+      zh: "归档",
+      en: "Archives",
+      ja: "アーカイブ",
+      ru: "Архив",
+    } satisfies Dict,
+    desc: {
+      zh: "所有归档的文章。",
+      en: "All the articles I've archived.",
+      ja: "アーカイブされた全ての記事です。",
+      ru: "Все архивные записи.",
+    } satisfies Dict,
+  },
+
+  /** About page */
+  about: {
+    notFound: {
+      zh: "页面未找到。",
+      en: "Page not found.",
+      ja: "ページが見つかりません。",
+      ru: "Страница не найдена.",
+    } satisfies Dict,
+  },
+
+  /** Theme toggle */
+  themeToggle: {
+    zh: "切换亮色/暗色模式",
+    en: "Toggle light & dark mode",
+    ja: "ライト/ダークモード切替",
+    ru: "Переключить светлую/тёмную тему",
+  } satisfies Dict,
+
+  /** Misc */
+  openMenu: {
+    zh: "打开菜单",
+    en: "Open Menu",
+    ja: "メニューを開く",
+    ru: "Открыть меню",
+  } satisfies Dict,
+  closeMenu: {
+    zh: "关闭菜单",
+    en: "Close Menu",
+    ja: "メニューを閉じる",
+    ru: "Закрыть меню",
+  } satisfies Dict,
+  selectLanguage: {
+    zh: "选择语言",
+    en: "Select language",
+    ja: "言語を選択",
+    ru: "Выбрать язык",
+  } satisfies Dict,
+  rssFeed: {
+    zh: "RSS 订阅",
+    en: "RSS Feed",
+    ja: "RSSフィード",
+    ru: "RSS-лента",
+  } satisfies Dict,
+  backToTop: {
+    zh: "回到顶部",
+    en: "Back to top",
+    ja: "トップへ戻る",
+    ru: "Наверх",
+  } satisfies Dict,
+};

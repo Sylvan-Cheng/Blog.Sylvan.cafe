@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { getCollection, type CollectionEntry } from "astro:content";
+import { LOCALES } from "@/i18n/config";
 import { getPath } from "@/utils/getPath";
 import { generateOgImageForPost } from "@/utils/generateOgImages";
 import { SITE } from "@/config";
@@ -9,7 +10,7 @@ export async function getStaticPaths() {
     return [];
   }
 
-  const locales = ["zh", "en", "ja", "ru"];
+  const locales = LOCALES;
   const posts = await getCollection("blog").then(p =>
     p.filter(({ data }) => !data.draft && !data.ogImage)
   );

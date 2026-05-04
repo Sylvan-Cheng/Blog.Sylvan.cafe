@@ -1,4 +1,7 @@
 import { SITE } from "@/config";
+import { LOCALES } from "@/i18n/config";
+
+export { LOCALES };
 
 interface Social {
   name: string;

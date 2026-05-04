@@ -1,5 +1,7 @@
 ---
 import { getCollection } from "astro:content";
+import { LOCALES } from "@/i18n/config";
+import { resolveLocale } from "@/i18n/utils";
 import Main from "@/layouts/Main.astro";
 import Layout from "@/layouts/Layout.astro";
 import Tag from "@/components/Tag.astro";
@@ -9,15 +11,10 @@ import getUniqueTags from "@/utils/getUniqueTags";
 import { SITE } from "@/config";
 
 export function getStaticPaths() {
-  return [
-    { params: { locale: "zh" } },
-    { params: { locale: "en" } },
-    { params: { locale: "ja" } },
-    { params: { locale: "ru" } },
-  ];
+  return LOCALES.map(locale => ({ params: { locale } }));
 }
 
-const locale = Astro.currentLocale ?? "zh";
+const locale = resolveLocale(Astro.currentLocale);
 const i18nTitle = locale === "zh" ? "标签" : locale === "ja" ? "タグ" : locale === "ru" ? "Теги" : "Tags";
 const i18nDesc = locale === "zh" ? "文章所使用的所有标签。" : locale === "ja" ? "記事で使用されている全てのタグです。" : locale === "ru" ? "Все теги, используемые в записях." : "All the tags used in posts.";
 const allPosts = await getCollection("blog");

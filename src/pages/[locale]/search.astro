@@ -1,5 +1,7 @@
 ---
 import "@pagefind/default-ui/css/ui.css";
+import { LOCALES } from "@/i18n/config";
+import { resolveLocale } from "@/i18n/utils";
 import Main from "@/layouts/Main.astro";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
@@ -7,15 +9,10 @@ import Footer from "@/components/Footer.astro";
 import { SITE } from "@/config";
 
 export function getStaticPaths() {
-  return [
-    { params: { locale: "zh" } },
-    { params: { locale: "en" } },
-    { params: { locale: "ja" } },
-    { params: { locale: "ru" } },
-  ];
+  return LOCALES.map(locale => ({ params: { locale } }));
 }
 
-const locale = Astro.currentLocale ?? "zh";
+const locale = resolveLocale(Astro.currentLocale);
 const i18nTitle = locale === "zh" ? "搜索" : locale === "ja" ? "検索" : locale === "ru" ? "Поиск" : "Search";
 const i18nDesc = locale === "zh" ? "搜索任意文章 ..." : locale === "ja" ? "記事を検索 ..." : locale === "ru" ? "Поиск статей ..." : "Search any article ...";
 

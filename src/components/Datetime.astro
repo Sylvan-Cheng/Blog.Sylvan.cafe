@@ -4,12 +4,13 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import Icon from "@/components/Icon.astro";
 import { SITE } from "@/config";
+import { UI } from "@/i18n/ui";
+import { resolveLocale, t } from "@/i18n/utils";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-const locale = Astro.currentLocale ?? "zh";
-const updatedLabel = locale === "zh" ? "更新：" : locale === "ja" ? "更新：" : locale === "ru" ? "Обновлено:" : "Updated:";
+const locale = resolveLocale(Astro.currentLocale);
 
 type Props = {
   class?: string;
@@ -47,7 +48,7 @@ const date = datetime.format("D MMM, YYYY"); // e.g., '22 Mar, 2025'
   {
     isModified && (
       <span class:list={["text-sm", { "sm:text-base": size === "lg" }]}>
-        {updatedLabel}
+        {t(UI.post.updated, locale)}
       </span>
     )
   }

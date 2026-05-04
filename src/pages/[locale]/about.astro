@@ -1,20 +1,18 @@
 ---
 import { getEntry, render } from "astro:content";
+import { LOCALES } from "@/i18n/config";
+import { resolveLocale, t } from "@/i18n/utils";
+import { UI } from "@/i18n/ui";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import { SITE } from "@/config";
 
 export function getStaticPaths() {
-  return [
-    { params: { locale: "zh" } },
-    { params: { locale: "en" } },
-    { params: { locale: "ja" } },
-    { params: { locale: "ru" } },
-  ];
+  return LOCALES.map(locale => ({ params: { locale } }));
 }
 
-const locale = Astro.currentLocale ?? "zh";
+const locale = resolveLocale(Astro.currentLocale);
 const page = await getEntry("pages", `about/${locale}`);
 const { Content } = page ? await render(page) : { Content: null };
 ---
@@ -31,8 +29,8 @@ const { Content } = page ? await render(page) : { Content: null };
     ) : (
       <main id="main-content" class="app-layout">
         <section class="app-prose mb-28 max-w-app prose-img:border-0">
-          <h1 class="text-2xl tracking-wider sm:text-3xl">About</h1>
-          <p>Page not found.</p>
+          <h1 class="text-2xl tracking-wider sm:text-3xl">{t(UI.nav.about, locale)}</h1>
+          <p>{t(UI.about.notFound, locale)}</p>
         </section>
       </main>
     )
