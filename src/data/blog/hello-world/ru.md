@@ -4,7 +4,6 @@ translationKey: hello-world
 author: Тестовый автор
 pubDatetime: 2026-05-01T00:00:00Z
 title: Привет, мир!
-slug: hello-world-ru
 featured: true
 draft: false
 tags:

@@ -3,10 +3,10 @@ import { slugifyStr } from "./slugify";
 
 /**
  * Get full path of a blog post
- * @param id - id of the blog post (aka slug)
+ * @param id - id of the blog post (from glob loader, e.g. "hello-world/zh" or "zh/hello-world")
  * @param filePath - the blog post full file location
  * @param includeBase - whether to include `/posts` in return value
- * @returns blog post path
+ * @returns blog post path (e.g. "/posts/hello-world")
  */
 export function getPath(
   id: string,
@@ -18,22 +18,35 @@ export function getPath(
   const pathSegments = filePath
     ?.replace(BLOG_PATH, "")
     .split("/")
-    .filter(path => path !== "") // remove empty string in the segments ["", "other-path"] <- empty string will be removed
-    .filter(path => !path.startsWith("_")) // exclude directories start with underscore "_"
-    .filter(path => !KNOWN_LOCALES.includes(path)) // exclude locale directories
-    .slice(0, -1) // remove the last segment_ file name_ since it's unnecessary
-    .map(segment => slugifyStr(segment)); // slugify each segment path
+    .filter(path => path !== "")
+    .filter(path => !path.startsWith("_"))
+    .filter(path => !KNOWN_LOCALES.includes(path))
+    .slice(0, -1) // remove the filename, keep only directory segments
+    .map(segment => slugifyStr(segment));
 
   const basePath = includeBase ? "/posts" : "";
 
-  // Making sure `id` does not contain the directory
+  // Strip known locale from the end of the id (e.g. "hello-world/zh" → "hello-world")
   const blogId = id.split("/");
-  const slug = blogId.length > 0 ? blogId.slice(-1) : blogId;
+  const lastPart = blogId[blogId.length - 1];
+  const cleanParts = KNOWN_LOCALES.includes(lastPart)
+    ? blogId.slice(0, -1)
+    : blogId;
+  const slug = cleanParts.slice(-1);
 
-  // If not inside the sub-dir, simply return the file path
-  if (!pathSegments || pathSegments.length < 1) {
-    return [basePath, slug].join("/");
+  // Dedupe: if the last path segment is the slug itself (post lives in its own directory),
+  // remove it from pathSegments to avoid "/hello-world/hello-world"
+  if (
+    pathSegments &&
+    pathSegments.length >= 1 &&
+    pathSegments[pathSegments.length - 1] === slug[0]
+  ) {
+    pathSegments.pop();
   }
 
-  return [basePath, ...pathSegments, slug].join("/");
+  if (!pathSegments || pathSegments.length < 1) {
+    return [basePath, ...slug].join("/");
+  }
+
+  return [basePath, ...pathSegments, ...slug].join("/");
 }
