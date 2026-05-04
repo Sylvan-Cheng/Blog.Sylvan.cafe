@@ -123,7 +123,7 @@ const structuredData = {
       rel="alternate"
       type="application/rss+xml"
       title={SITE.title}
-      href={new URL("rss.xml", Astro.site)}
+      href={new URL(`${Astro.currentLocale}/rss.xml`, Astro.site)}
     />
 
     <meta name="theme-color" content="" />

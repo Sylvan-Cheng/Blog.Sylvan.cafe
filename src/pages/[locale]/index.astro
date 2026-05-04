@@ -58,20 +58,15 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
       <h1 class="my-4 inline-block text-4xl font-bold sm:my-8 sm:text-5xl">
         {i18n.greeting}
       </h1>
-      <a
-        target="_blank"
-        href="/rss.xml"
-        class="inline-block"
-        aria-label="rss feed"
+      <LinkButton
+        href={`/${locale}/rss.xml`}
+        class="focus-outline flex p-3 sm:p-1"
         title="RSS Feed"
+        aria-label="rss feed"
       >
-        <Icon name="tabler:rss"
-          width={20}
-          height={20}
-          class="scale-125 stroke-accent stroke-3 rtl:-rotate-90"
-        />
+        <Icon name="tabler:rss" />
         <span class="sr-only">RSS Feed</span>
-      </a>
+      </LinkButton>
 
       <p>{i18n.desc}</p>
       <p class="mt-2">
