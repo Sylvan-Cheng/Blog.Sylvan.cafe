@@ -3,15 +3,15 @@ import type { Page } from "astro";
 import type { CollectionEntry } from "astro:content";
 import Icon from "@/components/Icon.astro";
 import LinkButton from "./LinkButton.astro";
+import { UI } from "@/i18n/ui";
+import { resolveLocale, t } from "@/i18n/utils";
 
 type Props = {
   page: Page<CollectionEntry<"blog">>;
 };
 
 const { page } = Astro.props;
-const locale = Astro.currentLocale ?? "zh";
-const i18nPrev = locale === "zh" ? "上一页" : locale === "ja" ? "前へ" : locale === "ru" ? "Назад" : "Prev";
-const i18nNext = locale === "zh" ? "下一页" : locale === "ja" ? "次へ" : locale === "ru" ? "Вперёд" : "Next";
+const locale = resolveLocale(Astro.currentLocale);
 ---
 
 {
@@ -28,7 +28,7 @@ const i18nNext = locale === "zh" ? "下一页" : locale === "ja" ? "次へ" : lo
         aria-label="Goto Previous Page"
       >
         <Icon name="tabler:arrow-left" class="inline-block rtl:rotate-180" />
-        {i18nPrev}
+        {t(UI.pagination.prev, locale)}
       </LinkButton>
       {page.currentPage} / {page.lastPage}
       <LinkButton
@@ -37,7 +37,7 @@ const i18nNext = locale === "zh" ? "下一页" : locale === "ja" ? "次へ" : lo
         class:list={["ms-4 select-none", { "opacity-50": !page.url.next }]}
         aria-label="Goto Next Page"
       >
-        {i18nNext}
+        {t(UI.pagination.next, locale)}
         <Icon name="tabler:arrow-right" class="inline-block rtl:rotate-180" />
       </LinkButton>
     </nav>

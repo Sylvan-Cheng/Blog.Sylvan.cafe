@@ -1,13 +1,11 @@
-import { LOCALES } from "./config";
-import type { Locale } from "./config";
+import { LOCALES, LOCALE_SET } from "./config";
+import type { Locale, Dict } from "./config";
 
-export function t(dict: Record<string, string>, locale: Locale): string {
-  return dict[locale] ?? dict[LOCALES[0]] ?? "";
+export function t(dict: Dict, locale: Locale): string {
+  return dict[locale];
 }
 
 export function resolveLocale(locale: string | undefined): Locale {
-  if (locale && (LOCALES as readonly string[]).includes(locale)) {
-    return locale as Locale;
-  }
+  if (locale && LOCALE_SET.has(locale)) return locale as Locale;
   return LOCALES[0];
 }

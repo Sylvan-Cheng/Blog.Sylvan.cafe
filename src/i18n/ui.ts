@@ -269,4 +269,32 @@ export const UI = {
     ja: "ホームに戻る",
     ru: "На главную",
   } satisfies Dict,
+  pagination: {
+    prev: {
+      zh: "上一页",
+      en: "Prev",
+      ja: "前へ",
+      ru: "Назад",
+    } satisfies Dict,
+    next: {
+      zh: "下一页",
+      en: "Next",
+      ja: "次へ",
+      ru: "Вперёд",
+    } satisfies Dict,
+  },
+  share: {
+    zh: "分享到：",
+    en: "Share this post on:",
+    ja: "共有：",
+    ru: "Поделиться:",
+  } satisfies Dict,
+  breadcrumb: {
+    home: {
+      zh: "首页",
+      en: "Home",
+      ja: "ホーム",
+      ru: "Главная",
+    } satisfies Dict,
+  },
 };

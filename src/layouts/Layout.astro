@@ -54,7 +54,8 @@ function hreflangUrl(targetLocale: string): string {
   } else {
     segments.unshift(targetLocale);
   }
-  return "/" + segments.join("/");
+  const path = "/" + segments.join("/");
+  return path.endsWith("/") ? path : path + "/";
 }
 
 const socialImageURL = new URL(ogImage, Astro.url);
@@ -62,10 +63,14 @@ const socialImageURL = new URL(ogImage, Astro.url);
 const structuredData = pubDatetime ? {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
+  "@id": `${canonicalURL}#article`,
   headline: `${title}`,
+  description: `${description}`,
   image: `${socialImageURL}`,
+  inLanguage: locale,
   datePublished: pubDatetime.toISOString(),
   ...(modDatetime && { dateModified: modDatetime.toISOString() }),
+  mainEntityOfPage: { "@id": `${canonicalURL}` },
   author: [
     {
       "@type": "Person",
@@ -141,7 +146,7 @@ const structuredData = pubDatetime ? {
     }
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:card" content={ogImage && ogImage !== "/og.png" ? "summary_large_image" : "summary"} />
     <meta property="twitter:url" content={canonicalURL} />
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />

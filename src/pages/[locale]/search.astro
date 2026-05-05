@@ -1,7 +1,8 @@
 ---
 import "@pagefind/default-ui/css/ui.css";
 import { LOCALES } from "@/i18n/config";
-import { resolveLocale } from "@/i18n/utils";
+import { resolveLocale, t } from "@/i18n/utils";
+import { UI } from "@/i18n/ui";
 import Main from "@/layouts/Main.astro";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
@@ -13,15 +14,13 @@ export function getStaticPaths() {
 }
 
 const locale = resolveLocale(Astro.currentLocale);
-const i18nTitle = locale === "zh" ? "搜索" : locale === "ja" ? "検索" : locale === "ru" ? "Поиск" : "Search";
-const i18nDesc = locale === "zh" ? "搜索任意文章 ..." : locale === "ja" ? "記事を検索 ..." : locale === "ru" ? "Поиск статей ..." : "Search any article ...";
 
 const backUrl = SITE.showBackButton ? `${Astro.url.pathname}` : "/";
 ---
 
-<Layout title={`${i18nTitle} | ${SITE.title}`}>
+<Layout title={`${t(UI.search.title, locale)} | ${SITE.title}`}>
   <Header />
-  <Main pageTitle={i18nTitle} pageDesc={i18nDesc}>
+  <Main pageTitle={t(UI.search.title, locale)} pageDesc={t(UI.search.desc, locale)}>
     <div id="pagefind-search" transition:persist data-backurl={backUrl}></div>
   </Main>
   <Footer />

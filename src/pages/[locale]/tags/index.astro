@@ -1,7 +1,8 @@
 ---
 import { getCollection } from "astro:content";
 import { LOCALES } from "@/i18n/config";
-import { resolveLocale } from "@/i18n/utils";
+import { resolveLocale, t } from "@/i18n/utils";
+import { UI } from "@/i18n/ui";
 import Main from "@/layouts/Main.astro";
 import Layout from "@/layouts/Layout.astro";
 import Tag from "@/components/Tag.astro";
@@ -15,16 +16,14 @@ export function getStaticPaths() {
 }
 
 const locale = resolveLocale(Astro.currentLocale);
-const i18nTitle = locale === "zh" ? "标签" : locale === "ja" ? "タグ" : locale === "ru" ? "Теги" : "Tags";
-const i18nDesc = locale === "zh" ? "文章所使用的所有标签。" : locale === "ja" ? "記事で使用されている全てのタグです。" : locale === "ru" ? "Все теги, используемые в записях." : "All the tags used in posts.";
 const allPosts = await getCollection("blog");
 const posts = allPosts.filter(p => p.data.locale === locale);
 let tags = getUniqueTags(posts);
 ---
 
-<Layout title={`${i18nTitle} | ${SITE.title}`}>
+<Layout title={`${t(UI.tags.title, locale)} | ${SITE.title}`}>
   <Header />
-  <Main pageTitle={i18nTitle} pageDesc={i18nDesc}>
+  <Main pageTitle={t(UI.tags.title, locale)} pageDesc={t(UI.tags.desc, locale)}>
     <ul class="flex flex-wrap gap-6">
       {tags.map(({ tag, tagName }) => <Tag {tag} {tagName} />)}
     </ul>

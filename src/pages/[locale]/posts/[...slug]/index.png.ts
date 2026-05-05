@@ -11,9 +11,8 @@ export async function getStaticPaths() {
   }
 
   const locales = LOCALES;
-  const posts = await getCollection("blog").then(p =>
-    p.filter(({ data }) => !data.draft && !data.ogImage)
-  );
+  const allPosts = await getCollection("blog");
+  const posts = allPosts.filter(({ data }) => !data.draft && !data.ogImage);
 
   return locales.flatMap(locale =>
     posts
