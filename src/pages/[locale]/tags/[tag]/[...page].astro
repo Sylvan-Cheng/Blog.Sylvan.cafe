@@ -3,6 +3,8 @@ import { getCollection } from "astro:content";
 import { LOCALES } from "@/i18n/config";
 import { resolveLocale, t } from "@/i18n/utils";
 import { UI } from "@/i18n/ui";
+import { translateTag } from "@/i18n/tags";
+import type { Locale } from "@/i18n/config";
 import type { GetStaticPathsOptions } from "astro";
 import Main from "@/layouts/Main.astro";
 import Layout from "@/layouts/Layout.astro";
@@ -24,7 +26,7 @@ export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
     for (const { tag, tagName } of tags) {
       const tagPosts = getPostsByTag(localePosts, tag);
       if (tagPosts.length === 0) continue;
-      const pages = await paginate(tagPosts, {
+      const pages = paginate(tagPosts, {
         params: { locale: loc, tag },
         props: { tagName },
         pageSize: SITE.postPerPage,
@@ -39,16 +41,17 @@ const params = Astro.params;
 const locale = resolveLocale(Astro.currentLocale);
 const { tag } = params;
 const { page, tagName } = Astro.props;
+const displayTag = translateTag(tag, "en", locale) ?? tagName;
 ---
 
-<Layout title={`${t(UI.tags.label, locale)}: ${tagName} | ${SITE.title}`}>
+<Layout title={`${t(UI.tags.label, locale)}: ${displayTag} | ${SITE.title}`}>
   <Header />
   <Main
-    pageTitle={[`${t(UI.tags.label, locale)}:`, `${tagName}`]}
+    pageTitle={[`${t(UI.tags.label, locale)}:`, `${displayTag}`]}
     titleTransition={tag}
-    pageDesc={UI.tags.descFiltered[locale](tagName)}
+    pageDesc={UI.tags.descFiltered[locale](displayTag)}
   >
-    <h1 slot="title" transition:name={`p-${tag}`}>{`${t(UI.tags.label, locale)}:${tag}`}</h1>
+    <h1 slot="title" transition:name={`p-${tag}`}>{`${t(UI.tags.label, locale)}:${displayTag}`}</h1>
     <ul>
       {page.data.map(data => <Card {...data} locale={locale} />)}
     </ul>

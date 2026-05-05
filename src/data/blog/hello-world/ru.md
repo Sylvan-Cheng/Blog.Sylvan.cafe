@@ -6,7 +6,7 @@ title: Привет, мир!
 featured: true
 draft: false
 tags:
-  - тест
+  - test
 description: Это тестовая статья на русском языке для проверки многоязычного блога.
 ---
 

@@ -18,6 +18,7 @@ import { LOCALES } from "./src/i18n/config";
 // https://astro.build/config
 export default defineConfig({
   site: SITE.website,
+  trailingSlash: "always",
   i18n: {
     defaultLocale: "zh",
     locales: [...LOCALES],

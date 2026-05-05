@@ -9,10 +9,8 @@ import { resolveLocale, t } from "@/i18n/utils";
 const locale = resolveLocale(Astro.currentLocale);
 const { pathname } = Astro.url;
 
-const localizePath = (path: string) => `/${locale}${path}`;
-
-const openLabel = t(UI.openMenu, locale);
-const closeLabel = t(UI.closeMenu, locale);
+const localizePath = (path: string) =>
+  `/${locale}${path === "/" ? "" : path}/`;
 
 const currentPath =
   pathname.endsWith("/") && pathname !== "/" ? pathname.slice(0, -1) : pathname;

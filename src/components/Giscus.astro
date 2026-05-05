@@ -1,9 +1,10 @@
 ---
 import { SITE } from "@/config";
+import { resolveLocale } from "@/i18n/utils";
 
 const giscus = SITE.giscus;
-const locale = Astro.currentLocale ?? "zh";
-const giscusLang = { zh: "zh-CN", en: "en", ja: "ja", ru: "ru" }[locale] ?? "en";
+const locale = resolveLocale(Astro.currentLocale);
+const giscusLang = { zh: "zh-CN", en: "en", ja: "ja", ru: "ru" }[locale];
 ---
 
 {
@@ -11,6 +12,7 @@ const giscusLang = { zh: "zh-CN", en: "en", ja: "ja", ru: "ru" }[locale] ?? "en"
     <div class="mt-8">
       <script
         src="https://giscus.app/client.js"
+        is:inline
         data-repo={giscus.repo}
         data-repo-id={giscus.repoId}
         data-category={giscus.category}

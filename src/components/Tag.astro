@@ -1,5 +1,8 @@
 ---
 import Icon from "@/components/Icon.astro";
+import { resolveLocale } from "@/i18n/utils";
+import type { Locale } from "@/i18n/config";
+import { translateTag } from "@/i18n/tags";
 
 type Props = {
   tag: string;
@@ -8,7 +11,8 @@ type Props = {
 };
 
 const { tag, tagName, size = "lg" } = Astro.props;
-const locale = Astro.currentLocale ?? "zh";
+const locale = resolveLocale(Astro.currentLocale);
+const display = translateTag(tag, "en", locale) ?? tagName;
 ---
 
 <li>
@@ -31,6 +35,6 @@ const locale = Astro.currentLocale ?? "zh";
         { "size-4": size === "sm" },
       ]}
     />
-    {tagName}
+    {display}
   </a>
 </li>

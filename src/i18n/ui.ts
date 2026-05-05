@@ -44,22 +44,6 @@ export const UI = {
     } satisfies Dict,
   },
 
-  /** Footer */
-  footer: {
-    copyright: {
-      zh: "版权所有",
-      en: "Copyright",
-      ja: "著作権",
-      ru: "Авторские права",
-    } satisfies Dict,
-    allRightsReserved: {
-      zh: "保留所有权利。",
-      en: "All rights reserved.",
-      ja: "無断転載を禁じます。",
-      ru: "Все права защищены.",
-    } satisfies Dict,
-  },
-
   /** Post detail */
   post: {
     prev: {
@@ -251,12 +235,6 @@ export const UI = {
     ja: "言語を選択",
     ru: "Выбрать язык",
   } satisfies Dict,
-  rssFeed: {
-    zh: "RSS 订阅",
-    en: "RSS Feed",
-    ja: "RSSフィード",
-    ru: "RSS-лента",
-  } satisfies Dict,
   backToTop: {
     zh: "回到顶部",
     en: "Back to top",
@@ -268,6 +246,12 @@ export const UI = {
     en: "Go back home",
     ja: "ホームに戻る",
     ru: "На главную",
+  } satisfies Dict,
+  edit: {
+    zh: "编辑页面",
+    en: "Edit page",
+    ja: "ページを編集",
+    ru: "Редактировать",
   } satisfies Dict,
   pagination: {
     prev: {

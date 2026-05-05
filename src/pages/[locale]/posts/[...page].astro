@@ -21,7 +21,7 @@ export const getStaticPaths = (async ({ paginate }) => {
   const results = [];
   for (const loc of locales) {
     const localePosts = allPosts.filter(p => p.data.locale === loc);
-    const pages = await paginate(getSortedPosts(localePosts), {
+    const pages = paginate(getSortedPosts(localePosts), {
       params: { locale: loc },
       pageSize: SITE.postPerPage,
     });

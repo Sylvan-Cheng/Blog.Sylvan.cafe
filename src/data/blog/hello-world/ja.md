@@ -6,7 +6,7 @@ title: こんにちは、世界！
 featured: true
 draft: false
 tags:
-  - テスト
+  - test
 description: 多言語ブログ機能を検証するための日本語テスト記事です。
 ---
 

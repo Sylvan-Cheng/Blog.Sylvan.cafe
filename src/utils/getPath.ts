@@ -45,9 +45,9 @@ export function getPath(
     pathSegments.pop();
   }
 
-  if (!pathSegments || pathSegments.length < 1) {
-    return [basePath, ...slug].join("/");
-  }
+  const raw = !pathSegments || pathSegments.length < 1
+    ? [basePath, ...slug].join("/")
+    : [basePath, ...pathSegments, ...slug].join("/");
 
-  return [basePath, ...pathSegments, ...slug].join("/");
+  return includeBase ? raw + "/" : raw;
 }

@@ -1,4 +1,4 @@
-import { z } from "astro:schema";
+import { z } from "astro/zod";
 import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { SITE } from "@/config";

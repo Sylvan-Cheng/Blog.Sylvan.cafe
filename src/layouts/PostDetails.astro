@@ -54,7 +54,7 @@ if (typeof initOgImage === "string") {
 
 // Use dynamic OG image if enabled and no remote|local ogImage
 if (!ogImageUrl && SITE.dynamicOgImage) {
-  ogImageUrl = `${localizePostPath(post.id, post.filePath)}/index.png`;
+  ogImageUrl = `${localizePostPath(post.id, post.filePath)}index.png`;
 }
 
 // Resolve OG image URL (or fallback to SITE.ogImage / default `og.png`)
@@ -93,6 +93,7 @@ const nextPost =
   {
     Object.keys(translationMap).length > 0 && (
       <script
+        is:inline
         set:html={`window.__translations=${JSON.stringify(translationMap)};window.__currentLocale="${locale}";`}
       />
     )

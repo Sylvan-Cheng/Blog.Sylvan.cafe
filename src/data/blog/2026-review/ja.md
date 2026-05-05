@@ -4,8 +4,8 @@ title: 2026 年振り返り
 pubDatetime: 2026-01-15T00:00:00Z
 description: 2026 年の技術と生活の成長と変化を振り返り、新年の目標と計画を展望します。
 tags:
-  - テスト
-  - 生活
+  - test
+  - life
 keywords:
   - 年振り返り
   - "2026"
