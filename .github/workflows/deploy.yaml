@@ -1,0 +1,49 @@
+name: Deploy Astro Blog
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      - name: Cache Astro content
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules/.astro
+          key: ${{ runner.os }}-astro-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-astro-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-astro-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Deploy to VPS
+        uses: easingthemes/ssh-deploy@v6.0.3
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          ARGS: "-avz --delete"
+          SOURCE: "dist/"
+          REMOTE_HOST: ${{ secrets.SERVER_IP }}
+          REMOTE_USER: "github"
+          TARGET: "/blog/sylvan.cafe/"
