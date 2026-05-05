@@ -1,14 +1,12 @@
 ---
 locale: zh
-translationKey: hello-world
 author: 测试作者
 pubDatetime: 2026-05-01T00:00:00Z
 title: 你好，世界！
-slug: hello-world-zh
 featured: true
 draft: false
 tags:
-  - 测试
+  - test
 description: 一篇包含完整 Markdown 语法测试的中文文章，用于验证博客渲染和多语言功能。
 ---
 

@@ -1,12 +1,11 @@
 ---
-import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
+import Icon from "@/components/Icon.astro";
 import LinkButton from "./LinkButton.astro";
 import { SITE } from "@/config";
+import { UI } from "@/i18n/ui";
+import { resolveLocale, t } from "@/i18n/utils";
 
-const locale = Astro.currentLocale ?? "zh";
-const i18n = {
-  goBack: locale === "zh" ? "返回" : locale === "ja" ? "戻る" : locale === "ru" ? "Назад" : "Go back",
-};
+const locale = resolveLocale(Astro.currentLocale);
 ---
 
 {
@@ -17,8 +16,8 @@ const i18n = {
         href="/"
         class="focus-outline -ms-2 mt-8 mb-2 hover:text-foreground/75"
       >
-        <IconChevronLeft class="inline-block size-6 rtl:rotate-180" />
-        <span>{i18n.goBack}</span>
+        <Icon name="tabler:chevron-left" class="inline-block size-6 rtl:rotate-180" />
+        <span>{t(UI.post.goBack, locale)}</span>
       </LinkButton>
     </div>
   )

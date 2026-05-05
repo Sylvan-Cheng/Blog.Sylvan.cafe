@@ -71,9 +71,14 @@ if (window.theme) {
 // Ensure theme is reflected (in case body wasn't ready when inline script ran)
 reflectPreference();
 
+let themeBtnBound = false;
+
 function setThemeFeature(): void {
   // set on load so screen readers can get the latest value on the button
   reflectPreference();
+
+  if (themeBtnBound) return;
+  themeBtnBound = true;
 
   // now this script can find and listen for clicks on the control
   document.querySelector("#theme-btn")?.addEventListener("click", () => {
@@ -104,10 +109,11 @@ document.addEventListener("astro:before-swap", event => {
   }
 });
 
-// sync with system changes
+// sync with system changes (only when user has no explicit preference saved)
 window
   .matchMedia("(prefers-color-scheme: dark)")
   .addEventListener("change", ({ matches: isDark }) => {
+    if (localStorage.getItem(THEME)) return; // respect explicit user choice
     themeValue = isDark ? DARK : LIGHT;
     window.theme?.setTheme(themeValue);
     setPreference();

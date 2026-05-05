@@ -1,32 +1,50 @@
 ---
 import { type CollectionEntry, getCollection } from "astro:content";
+import { LOCALES } from "@/i18n/config";
 import PostDetails from "@/layouts/PostDetails.astro";
 import getSortedPosts from "@/utils/getSortedPosts";
 import { getPath } from "@/utils/getPath";
 
 type Props = {
   post: CollectionEntry<"blog">;
+  translationMap: Record<string, string>;
+  posts: CollectionEntry<"blog">[];
 };
 
 export async function getStaticPaths() {
-  const locales = ["zh", "en", "ja", "ru"];
-  const posts = await getCollection("blog", ({ data }) => !data.draft);
-  return locales.flatMap(locale =>
-    posts
+  const allPosts = await getCollection("blog", ({ data }) => !data.draft);
+
+  // Group posts by translation key (derived from id: "hello-world/zh" → "hello-world")
+  const postsByKey: Record<string, CollectionEntry<"blog">[]> = {};
+  for (const p of allPosts) {
+    const key = p.id.split("/").slice(0, -1).join("/");
+    if (key) (postsByKey[key] ??= []).push(p);
+  }
+
+  // Pre-compute sorted posts per locale
+  const sortedByLocale = Object.fromEntries(
+    LOCALES.map(loc => [loc, getSortedPosts(allPosts.filter(p => p.data.locale === loc))])
+  );
+
+  return LOCALES.flatMap(locale =>
+    allPosts
       .filter(post => post.data.locale === locale)
-      .map(post => ({
-        params: { locale, slug: getPath(post.id, post.filePath, false) },
-        props: { post },
-      }))
+      .map(post => {
+        const key = post.id.split("/").slice(0, -1).join("/");
+        const translationMap: Record<string, string> = {};
+        for (const p of postsByKey[key] ?? []) {
+          if (p.data.locale) {
+            translationMap[p.data.locale] = `/${p.data.locale}${getPath(p.id, p.filePath)}`;
+          }
+        }
+        return {
+          params: { locale, slug: getPath(post.id, post.filePath, false) },
+          props: { post, translationMap, posts: sortedByLocale[locale] },
+        };
+      })
   );
 }
 
-const { post } = Astro.props;
-const locale = Astro.currentLocale ?? "zh";
-
-const allPosts = await getCollection("blog");
-const posts = allPosts.filter(p => p.data.locale === locale);
-const sortedPosts = getSortedPosts(posts);
+const { post, translationMap, posts } = Astro.props;
 ---
-
-<PostDetails post={post} posts={sortedPosts} />
+<PostDetails post={post} posts={posts} translationMap={translationMap} />

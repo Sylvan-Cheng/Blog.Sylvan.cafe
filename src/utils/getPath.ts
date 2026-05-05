@@ -1,39 +1,53 @@
 import { BLOG_PATH } from "@/content.config";
 import { slugifyStr } from "./slugify";
+import { LOCALES } from "@/i18n/config";
 
 /**
  * Get full path of a blog post
- * @param id - id of the blog post (aka slug)
+ * @param id - id of the blog post (from glob loader, e.g. "hello-world/zh" or "zh/hello-world")
  * @param filePath - the blog post full file location
  * @param includeBase - whether to include `/posts` in return value
- * @returns blog post path
+ * @returns blog post path (e.g. "/posts/hello-world")
  */
 export function getPath(
   id: string,
   filePath: string | undefined,
   includeBase = true
 ) {
-  const KNOWN_LOCALES = ["zh", "en", "ja", "ru"];
+  const KNOWN_LOCALES: readonly string[] = LOCALES;
 
   const pathSegments = filePath
     ?.replace(BLOG_PATH, "")
     .split("/")
-    .filter(path => path !== "") // remove empty string in the segments ["", "other-path"] <- empty string will be removed
-    .filter(path => !path.startsWith("_")) // exclude directories start with underscore "_"
-    .filter(path => !KNOWN_LOCALES.includes(path)) // exclude locale directories
-    .slice(0, -1) // remove the last segment_ file name_ since it's unnecessary
-    .map(segment => slugifyStr(segment)); // slugify each segment path
+    .filter(path => path !== "")
+    .filter(path => !path.startsWith("_"))
+    .filter(path => !KNOWN_LOCALES.includes(path))
+    .slice(0, -1) // remove the filename, keep only directory segments
+    .map(segment => slugifyStr(segment));
 
   const basePath = includeBase ? "/posts" : "";
 
-  // Making sure `id` does not contain the directory
+  // Strip known locale from the end of the id (e.g. "hello-world/zh" → "hello-world")
   const blogId = id.split("/");
-  const slug = blogId.length > 0 ? blogId.slice(-1) : blogId;
+  const lastPart = blogId[blogId.length - 1];
+  const cleanParts = KNOWN_LOCALES.includes(lastPart)
+    ? blogId.slice(0, -1)
+    : blogId;
+  const slug = cleanParts.slice(-1);
 
-  // If not inside the sub-dir, simply return the file path
-  if (!pathSegments || pathSegments.length < 1) {
-    return [basePath, slug].join("/");
+  // Dedupe: if the last path segment matches the slug (post lives in its own directory),
+  // remove it from pathSegments to avoid "/hello-world/hello-world"
+  if (
+    pathSegments &&
+    pathSegments.length >= 1 &&
+    pathSegments[pathSegments.length - 1] === slugifyStr(slug[0])
+  ) {
+    pathSegments.pop();
   }
 
-  return [basePath, ...pathSegments, slug].join("/");
+  const raw = !pathSegments || pathSegments.length < 1
+    ? [basePath, ...slug].join("/")
+    : [basePath, ...pathSegments, ...slug].join("/");
+
+  return includeBase ? raw + "/" : raw;
 }

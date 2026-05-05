@@ -1,15 +1,17 @@
 ---
 import type { Page } from "astro";
 import type { CollectionEntry } from "astro:content";
-import IconArrowLeft from "@/assets/icons/IconArrowLeft.svg";
-import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
+import Icon from "@/components/Icon.astro";
 import LinkButton from "./LinkButton.astro";
+import { UI } from "@/i18n/ui";
+import { resolveLocale, t } from "@/i18n/utils";
 
 type Props = {
   page: Page<CollectionEntry<"blog">>;
 };
 
 const { page } = Astro.props;
+const locale = resolveLocale(Astro.currentLocale);
 ---
 
 {
@@ -25,8 +27,8 @@ const { page } = Astro.props;
         class:list={["me-4 select-none", { "opacity-50": !page.url.prev }]}
         aria-label="Goto Previous Page"
       >
-        <IconArrowLeft class="inline-block rtl:rotate-180" />
-        Prev
+        <Icon name="tabler:arrow-left" class="inline-block rtl:rotate-180" />
+        {t(UI.pagination.prev, locale)}
       </LinkButton>
       {page.currentPage} / {page.lastPage}
       <LinkButton
@@ -35,8 +37,8 @@ const { page } = Astro.props;
         class:list={["ms-4 select-none", { "opacity-50": !page.url.next }]}
         aria-label="Goto Next Page"
       >
-        Next
-        <IconArrowRight class="inline-block rtl:rotate-180" />
+        {t(UI.pagination.next, locale)}
+        <Icon name="tabler:arrow-right" class="inline-block rtl:rotate-180" />
       </LinkButton>
     </nav>
   )

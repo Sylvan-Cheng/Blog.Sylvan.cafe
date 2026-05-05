@@ -105,7 +105,7 @@ export default async () => {
                           type: "span",
                           props: {
                             style: { overflow: "hidden", fontWeight: "bold" },
-                            children: new URL(SITE.website).hostname,
+                            children: (() => { try { return new URL(SITE.website).hostname } catch { return SITE.website } })(),
                           },
                         },
                       },
@@ -122,7 +122,7 @@ export default async () => {
       width: 1200,
       height: 630,
       embedFont: true,
-      fonts: await loadGoogleFonts(SITE.title + SITE.desc + SITE.website),
+      fonts: await loadGoogleFonts(SITE.title + SITE.desc + SITE.website) as any,
     }
   );
 };

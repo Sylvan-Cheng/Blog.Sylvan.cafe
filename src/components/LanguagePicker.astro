@@ -1,90 +1,130 @@
 ---
-const locales = [
-  { code: "zh", label: "中文" },
-  { code: "en", label: "English" },
-  { code: "ja", label: "日本語" },
-  { code: "ru", label: "Русский" },
-];
+import { Icon } from "astro-icon/components";
+import { LOCALES, LOCALE_META } from "@/i18n/config";
+import { UI } from "@/i18n/ui";
+import { resolveLocale, t } from "@/i18n/utils";
 
-const currentLocale = Astro.currentLocale ?? "zh";
+const currentLocale = resolveLocale(Astro.currentLocale);
 const pathname = Astro.url.pathname;
+
+const locales = LOCALES.map(code => ({
+  code,
+  label: LOCALE_META[code].label,
+}));
 
 function switchLocale(path: string, to: string): string {
   if (path === "/") return `/${to}/`;
-
-  const segments = path.replace(/^\//, "").split("/");
-  const knownLocales = ["zh", "en", "ja", "ru"];
-
-  // Replace locale prefix
-  if (knownLocales.includes(segments[0])) {
-    segments[0] = to;
-  } else {
-    segments.unshift(to);
-  }
-
-  // Tag detail page: go to tags index instead (tag names differ per language)
-  if (segments[1] === "tags" && segments[2]) {
-    return `/${to}/tags/`;
-  }
-
-  const newPath = "/" + segments.join("/");
-  return newPath.endsWith("/") ? newPath : newPath + "/";
+  const replaced = path.replace(/^\/([a-z]{2})(\/|$)/, `/${to}$2`);
+  return replaced.endsWith("/") ? replaced : replaced + "/";
 }
+
+const items = locales.map(({ code, label }) => ({
+  code,
+  label,
+  url: switchLocale(pathname, code),
+}));
 ---
 
-<select
-  id="language-picker"
-  class="focus-outline cursor-pointer rounded border border-border bg-background px-2 py-1 text-sm font-medium text-foreground hover:border-accent"
-  aria-label="Select language"
->
-  {
-    locales.map(({ code, label }) => (
-      <option
-        value={switchLocale(pathname, code)}
-        data-locale={code}
-        selected={code === currentLocale}
-      >
-        {label}
-      </option>
-    ))
-  }
-</select>
+<div class="relative inline-flex">
+  <button
+    id="lang-trigger"
+    class="focus-outline flex p-3 sm:p-1 hover:text-accent text-foreground"
+    aria-label={t(UI.selectLanguage, currentLocale)}
+    aria-expanded="false"
+    aria-haspopup="listbox"
+  >
+    <Icon name="tabler:language" size={24} />
+  </button>
+
+  <ul
+    id="lang-dropdown"
+    class="absolute top-full right-0 z-50 mt-1 min-w-[120px] list-none rounded-md border border-border bg-background py-1 shadow-lg"
+    role="listbox"
+    hidden
+  >
+    {
+      items.map(({ code, label, url }) => (
+        <li role="option" aria-selected={code === currentLocale}>
+          <a
+            href={url}
+            data-locale={code}
+            class:list={[
+              "block px-3 py-1.5 text-sm no-underline whitespace-nowrap transition-colors",
+              "hover:bg-muted",
+              code === currentLocale
+                ? "text-accent font-semibold"
+                : "text-foreground",
+            ]}
+          >
+            {label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</div>
 
 <script>
-  function initLanguagePicker() {
-    const picker = document.getElementById("language-picker") as HTMLSelectElement | null;
-    if (!picker) return;
+  function initLangPicker() {
+    const trigger = document.getElementById("lang-trigger") as HTMLButtonElement | null;
+    const dropdown = document.getElementById("lang-dropdown") as HTMLUListElement | null;
+    if (!trigger || !dropdown) return;
+    if (trigger.dataset.bound) return;
+    trigger.dataset.bound = "1";
 
-    interface TranslationWindow extends Window {
-      __translations?: Record<string, string>;
-      __currentLocale?: string;
-    }
-    const win = window as TranslationWindow;
+    const trig = trigger;
+    const dd = dropdown;
 
-    if (win.__translations) {
-      const translations = win.__translations;
-      const currentLocale = win.__currentLocale || "";
+    const isPostPage = /^\/[a-z]{2}\/posts\/.+/.test(window.location.pathname);
+    if (window.__translations && isPostPage) {
+      const translations = window.__translations;
+      const currentLocale = window.__currentLocale || "";
 
-      picker.querySelectorAll("option").forEach(opt => {
-        const el = opt as HTMLOptionElement;
-        const locale = el.dataset.locale || "";
+      dd.querySelectorAll("a").forEach(link => {
+        const locale = link.dataset.locale || "";
         if (locale === currentLocale) return;
         if (translations[locale]) {
-          el.value = translations[locale];
+          link.href = translations[locale];
         } else {
-          el.value = `/${locale}/404`;
+          link.href = `/${locale}/404`;
         }
       });
     }
 
-    picker.addEventListener("change", () => {
-      const url = picker.value;
-      if (url && url !== window.location.pathname) {
-        window.location.href = url;
+    function open() {
+      dd.hidden = false;
+      trig.setAttribute("aria-expanded", "true");
+    }
+
+    function close() {
+      dd.hidden = true;
+      trig.setAttribute("aria-expanded", "false");
+    }
+
+    trig.addEventListener("click", e => {
+      e.stopPropagation();
+      dd.hidden ? open() : close();
+    });
+
+    dd.addEventListener("click", e => {
+      const link = (e.target as HTMLElement).closest<HTMLAnchorElement>("a");
+      if (link?.href && link.href !== window.location.href) {
+        window.location.href = link.href;
       }
+      close();
+    });
+
+    document.addEventListener("click", e => {
+      if (!trig.contains(e.target as Node) && !dd.contains(e.target as Node)) {
+        close();
+      }
+    });
+
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") close();
     });
   }
 
-  initLanguagePicker();
-  document.addEventListener("astro:after-swap", initLanguagePicker);
+  document.addEventListener("astro:after-swap", initLangPicker);
+  initLangPicker();
 </script>

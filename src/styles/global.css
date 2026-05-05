@@ -1,24 +1,8 @@
 @import "tailwindcss";
 @import "./typography.css";
+@import "./theme.css";
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
-
-:root,
-html[data-theme="light"] {
-  --background: #fdfdfd;
-  --foreground: #282728;
-  --accent: #006cac;
-  --muted: #e6e6e6;
-  --border: #ece9e9;
-}
-
-html[data-theme="dark"] {
-  --background: #212737;
-  --foreground: #eaedf3;
-  --accent: #ff6b01;
-  --muted: #343f60;
-  --border: #ab4b08;
-}
 
 @theme inline {
   --font-body: "Noto Sans", sans-serif;
@@ -33,6 +17,7 @@ html[data-theme="dark"] {
 html[lang="zh"] {
   --font-body: "Noto Sans SC", sans-serif;
 }
+
 html[lang="ja"] {
   --font-body: "Noto Sans JP", sans-serif;
 }
@@ -43,21 +28,29 @@ html[lang="ja"] {
     scrollbar-width: auto;
     scrollbar-color: var(--color-muted) transparent;
   }
+
   html {
     @apply overflow-y-scroll scroll-smooth;
   }
+
   body {
     @apply flex min-h-svh flex-col bg-background font-body text-foreground selection:bg-accent/75 selection:text-background;
   }
+
   a,
   button {
     @apply outline-offset-1 outline-accent focus-visible:no-underline focus-visible:outline-2 focus-visible:outline-dashed;
   }
+
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
-  code, pre, kbd, samp {
+
+  code,
+  pre,
+  kbd,
+  samp {
     font-family: var(--font-code);
   }
 }
@@ -75,10 +68,16 @@ html[lang="ja"] {
 }
 
 /* KaTeX dark mode */
-.katex { color: inherit; }
-.katex .katex-html { color: inherit; }
+.katex {
+  color: inherit;
+}
+
+.katex .katex-html {
+  color: inherit;
+}
+
 html[data-theme="dark"] .katex {
-  color: #eaedf3;
+  color: var(--foreground);
 }
 
 /* Source: https://piccalil.li/blog/a-more-modern-css-reset/ */

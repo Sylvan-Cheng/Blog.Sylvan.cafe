@@ -2,6 +2,8 @@
 import { ClientRouter } from "astro:transitions";
 import { PUBLIC_GOOGLE_SITE_VERIFICATION } from "astro:env/client";
 import { SITE } from "@/config";
+import { LOCALES, LOCALE_META } from "@/i18n/config";
+import { resolveLocale } from "@/i18n/utils";
 import "@/styles/global.css";
 import "katex/dist/katex.min.css";
 import "@fontsource/noto-sans/latin-400.css";
@@ -25,6 +27,7 @@ type Props = {
   pubDatetime?: Date;
   modDatetime?: Date | null;
   scrollSmooth?: boolean;
+  hreflangs?: Record<string, string>;
 };
 
 const {
@@ -37,17 +40,37 @@ const {
   pubDatetime,
   modDatetime,
   scrollSmooth = false,
+  hreflangs,
 } = Astro.props;
+
+const locale = resolveLocale(Astro.currentLocale);
+const currentPath = Astro.url.pathname;
+
+function hreflangUrl(targetLocale: string): string {
+  if (hreflangs?.[targetLocale]) return hreflangs[targetLocale];
+  const segments = currentPath.replace(/^\//, "").split("/");
+  if ((LOCALES as readonly string[]).includes(segments[0])) {
+    segments[0] = targetLocale;
+  } else {
+    segments.unshift(targetLocale);
+  }
+  const path = "/" + segments.join("/");
+  return path.endsWith("/") ? path : path + "/";
+}
 
 const socialImageURL = new URL(ogImage, Astro.url);
 
-const structuredData = {
+const structuredData = pubDatetime ? {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
+  "@id": `${canonicalURL}#article`,
   headline: `${title}`,
+  description: `${description}`,
   image: `${socialImageURL}`,
-  datePublished: `${pubDatetime?.toISOString()}`,
+  inLanguage: locale,
+  datePublished: pubDatetime.toISOString(),
   ...(modDatetime && { dateModified: modDatetime.toISOString() }),
+  mainEntityOfPage: { "@id": `${canonicalURL}` },
   author: [
     {
       "@type": "Person",
@@ -55,13 +78,14 @@ const structuredData = {
       ...(profile && { url: profile }),
     },
   ],
-};
+} : null;
 ---
 
 <!doctype html>
 <html
   dir={SITE.dir}
-  lang={Astro.currentLocale ?? "zh"}
+  data-scheme="gruvbox"
+  lang={locale}
   class={`${scrollSmooth && "scroll-smooth"}`}
 >
   <head>
@@ -71,6 +95,22 @@ const structuredData = {
     <link rel="canonical" href={canonicalURL} />
     <meta name="generator" content={Astro.generator} />
 
+    <!-- hreflang tags for multilingual SEO -->
+    {
+      LOCALES.map(target => (
+        <link
+          rel="alternate"
+          hreflang={LOCALE_META[target].lang}
+          href={new URL(hreflangUrl(target), Astro.site)}
+        />
+      ))
+    }
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href={new URL(hreflangUrl(LOCALES[0]), Astro.site)}
+    />
+
     <!-- General Meta Tags -->
     <title>{title}</title>
     <meta name="title" content={title} />
@@ -79,6 +119,9 @@ const structuredData = {
     <link rel="sitemap" href="/sitemap-index.xml" />
 
     <!-- Open Graph / Facebook -->
+    <meta property="og:type" content={pubDatetime ? "article" : "website"} />
+    <meta property="og:locale" content={LOCALE_META[locale].lang} />
+    <meta property="og:site_name" content={SITE.title} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalURL} />
@@ -103,26 +146,29 @@ const structuredData = {
     }
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:card" content={ogImage && ogImage !== "/og.png" ? "summary_large_image" : "summary"} />
     <meta property="twitter:url" content={canonicalURL} />
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={socialImageURL} />
 
-    <!-- Google JSON-LD Structured data -->
-    <script
-      type="application/ld+json"
-      is:inline
-      set:html={JSON.stringify(structuredData)}
-    />
+    <!-- Google JSON-LD Structured data (only for blog posts) -->
+    {
+      structuredData && (
+        <script
+          type="application/ld+json"
+          is:inline
+          set:html={JSON.stringify(structuredData)}
+        />
+      )
+    }
 
-    <!-- Enable RSS feed auto-discovery  -->
-    <!-- https://docs.astro.build/en/recipes/rss/#enabling-rss-feed-auto-discovery -->
+    <!-- Enable RSS feed auto-discovery -->
     <link
       rel="alternate"
       type="application/rss+xml"
       title={SITE.title}
-      href={new URL("rss.xml", Astro.site)}
+      href={new URL(`${locale}/rss.xml`, Astro.site)}
     />
 
     <meta name="theme-color" content="" />
@@ -140,6 +186,9 @@ const structuredData = {
     }
 
     <ClientRouter />
+
+    <!-- Umami Analytics -->
+    <script defer src="https://umami.sylvan.cafe/script.js" data-website-id="636e674b-026b-4730-b2dc-cd79336f463c"></script>
 
     <!-- Minimal inline script to prevent FOUC - sets theme immediately -->
     <script is:inline>

@@ -1,5 +1,10 @@
 ---
 import { getCollection } from "astro:content";
+import { LOCALES } from "@/i18n/config";
+import { resolveLocale, t } from "@/i18n/utils";
+import { UI } from "@/i18n/ui";
+import { translateTag } from "@/i18n/tags";
+import type { Locale } from "@/i18n/config";
 import type { GetStaticPathsOptions } from "astro";
 import Main from "@/layouts/Main.astro";
 import Layout from "@/layouts/Layout.astro";
@@ -13,7 +18,7 @@ import { SITE } from "@/config";
 
 export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
   const allPosts = await getCollection("blog");
-  const locales = ["zh", "en", "ja", "ru"];
+  const locales = LOCALES;
   const results = [];
   for (const loc of locales) {
     const localePosts = allPosts.filter(p => p.data.locale === loc);
@@ -21,7 +26,7 @@ export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
     for (const { tag, tagName } of tags) {
       const tagPosts = getPostsByTag(localePosts, tag);
       if (tagPosts.length === 0) continue;
-      const pages = await paginate(tagPosts, {
+      const pages = paginate(tagPosts, {
         params: { locale: loc, tag },
         props: { tagName },
         pageSize: SITE.postPerPage,
@@ -33,25 +38,20 @@ export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
 }
 
 const params = Astro.params;
-const locale = Astro.currentLocale ?? "zh";
-const i18nTag = locale === "zh" ? "标签" : locale === "ja" ? "タグ" : locale === "ru" ? "Тег" : "Tag";
-const i18nDesc = (tag: string) =>
-  locale === "zh" ? `所有带有 "${tag}" 标签的文章。`
-  : locale === "ja" ? `「${tag}」タグの付いた全ての記事です。`
-  : locale === "ru" ? `Все записи с тегом "${tag}".`
-  : `All the articles with the tag "${tag}".`;
+const locale = resolveLocale(Astro.currentLocale);
 const { tag } = params;
 const { page, tagName } = Astro.props;
+const displayTag = translateTag(tag, "en", locale) ?? tagName;
 ---
 
-<Layout title={`${i18nTag}: ${tagName} | ${SITE.title}`}>
+<Layout title={`${t(UI.tags.label, locale)}: ${displayTag} | ${SITE.title}`}>
   <Header />
   <Main
-    pageTitle={[`${i18nTag}:`, `${tagName}`]}
+    pageTitle={[`${t(UI.tags.label, locale)}:`, `${displayTag}`]}
     titleTransition={tag}
-    pageDesc={i18nDesc(tagName)}
+    pageDesc={UI.tags.descFiltered[locale](displayTag)}
   >
-    <h1 slot="title" transition:name={tag}>{`${i18nTag}:${tag}`}</h1>
+    <h1 slot="title" transition:name={`p-${tag}`}>{`${t(UI.tags.label, locale)}:${displayTag}`}</h1>
     <ul>
       {page.data.map(data => <Card {...data} locale={locale} />)}
     </ul>

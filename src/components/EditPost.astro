@@ -1,7 +1,9 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import IconEdit from "@/assets/icons/IconEdit.svg";
+import Icon from "@/components/Icon.astro";
 import { SITE } from "@/config";
+import { UI } from "@/i18n/ui";
+import { resolveLocale, t } from "@/i18n/utils";
 
 type Props = {
   hideEditPost?: CollectionEntry<"blog">["data"]["hideEditPost"];
@@ -10,6 +12,7 @@ type Props = {
 };
 
 const { hideEditPost, post, class: className = "" } = Astro.props;
+const locale = resolveLocale(Astro.currentLocale);
 
 const href = `${SITE.editPost.url}${post.filePath}`;
 const showEditPost =
@@ -27,8 +30,8 @@ const showEditPost =
         className,
       ]}
     >
-      <IconEdit class="inline-block" />
-      <span>{SITE.editPost.text}</span>
+      <Icon name="tabler:pencil" class="inline-block" />
+      <span>{t(UI.edit, locale)}</span>
     </a>
   )
 }

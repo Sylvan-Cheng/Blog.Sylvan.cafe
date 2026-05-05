@@ -1,14 +1,12 @@
 ---
 locale: ja
-translationKey: hello-world
 author: テスト著者
 pubDatetime: 2026-05-01T00:00:00Z
 title: こんにちは、世界！
-slug: hello-world-ja
 featured: true
 draft: false
 tags:
-  - テスト
+  - test
 description: 多言語ブログ機能を検証するための日本語テスト記事です。
 ---
 

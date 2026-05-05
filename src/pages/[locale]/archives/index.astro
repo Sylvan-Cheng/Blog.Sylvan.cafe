@@ -1,5 +1,8 @@
 ---
 import { getCollection } from "astro:content";
+import { LOCALES } from "@/i18n/config";
+import { resolveLocale, t } from "@/i18n/utils";
+import { UI } from "@/i18n/ui";
 import Main from "@/layouts/Main.astro";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
@@ -9,12 +12,7 @@ import getPostsByGroupCondition from "@/utils/getPostsByGroupCondition";
 import { SITE } from "@/config";
 
 export function getStaticPaths() {
-  return [
-    { params: { locale: "zh" } },
-    { params: { locale: "en" } },
-    { params: { locale: "ja" } },
-    { params: { locale: "ru" } },
-  ];
+  return LOCALES.map(locale => ({ params: { locale } }));
 }
 
 // Redirect to 404 page if `showArchives` config is false
@@ -22,9 +20,7 @@ if (!SITE.showArchives) {
   return Astro.redirect("/404");
 }
 
-const locale = Astro.currentLocale ?? "zh";
-const i18nTitle = locale === "zh" ? "归档" : locale === "ja" ? "アーカイブ" : locale === "ru" ? "Архив" : "Archives";
-const i18nDesc = locale === "zh" ? "所有归档的文章。" : locale === "ja" ? "アーカイブされた全ての記事です。" : locale === "ru" ? "Все архивные записи." : "All the articles I've archived.";
+const locale = resolveLocale(Astro.currentLocale);
 
 const allPosts = await getCollection("blog", ({ data }) => !data.draft);
 const posts = allPosts.filter(p => p.data.locale === locale);
@@ -37,9 +33,9 @@ const monthNames: Record<string, Record<number, string>> = {
 };
 ---
 
-<Layout title={`${i18nTitle} | ${SITE.title}`}>
+<Layout title={`${t(UI.archives.title, locale)} | ${SITE.title}`}>
   <Header />
-  <Main pageTitle={i18nTitle} pageDesc={i18nDesc}>
+  <Main pageTitle={t(UI.archives.title, locale)} pageDesc={t(UI.archives.desc, locale)}>
     {
       Object.entries(
         getPostsByGroupCondition(posts, post =>

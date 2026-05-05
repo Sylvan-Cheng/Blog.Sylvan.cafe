@@ -27,7 +27,7 @@ const href = locale
     ]}
   >
     <Heading
-      style={{ viewTransitionName: slugifyStr(title.replaceAll(".", "-")) }}
+      transition:name={`p-${slugifyStr(title)}`}
     >
       {title}
     </Heading>

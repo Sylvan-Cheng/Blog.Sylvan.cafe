@@ -1,5 +1,5 @@
 ---
-import { render, type CollectionEntry, getCollection } from "astro:content";
+import { render, type CollectionEntry } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
@@ -9,28 +9,25 @@ import EditPost from "@/components/EditPost.astro";
 import ShareLinks from "@/components/ShareLinks.astro";
 import BackButton from "@/components/BackButton.astro";
 import BackToTopButton from "@/components/BackToTopButton.astro";
+import Giscus from "@/components/Giscus.astro";
 import { getPath } from "@/utils/getPath";
 import { slugifyStr } from "@/utils/slugify";
-import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
-import IconChevronRight from "@/assets/icons/IconChevronRight.svg";
+import Icon from "@/components/Icon.astro";
 import { SITE } from "@/config";
+import { UI } from "@/i18n/ui";
+import { resolveLocale, t } from "@/i18n/utils";
 
 type Props = {
   post: CollectionEntry<"blog">;
   posts: CollectionEntry<"blog">[];
+  translationMap: Record<string, string>;
 };
 
-const { post, posts } = Astro.props;
-const locale = Astro.currentLocale ?? "zh";
+const { post, posts, translationMap } = Astro.props;
+const locale = resolveLocale(Astro.currentLocale);
 
 const localizePostPath = (id: string, filePath?: string) =>
   `/${locale}${getPath(id, filePath)}`;
-
-const i18nPost = {
-  prev: locale === "zh" ? "上一篇" : locale === "ja" ? "前の記事" : locale === "ru" ? "Предыдущая" : "Previous Post",
-  next: locale === "zh" ? "下一篇" : locale === "ja" ? "次の記事" : locale === "ru" ? "Следующая" : "Next Post",
-  goBack: locale === "zh" ? "返回" : locale === "ja" ? "戻る" : locale === "ru" ? "Назад" : "Go back",
-};
 
 const {
   title,
@@ -47,19 +44,6 @@ const {
 
 const { Content } = await render(post);
 
-/* ========== Translations ========== */
-
-const translationMap: Record<string, string> = {};
-
-if (post.data.translationKey) {
-  const allPosts = await getCollection("blog");
-  for (const p of allPosts) {
-    if (p.data.translationKey === post.data.translationKey && p.data.locale) {
-      translationMap[p.data.locale] = `/${p.data.locale}${getPath(p.id, p.filePath)}`;
-    }
-  }
-}
-
 let ogImageUrl: string | undefined;
 
 // Determine OG image source
@@ -71,7 +55,7 @@ if (typeof initOgImage === "string") {
 
 // Use dynamic OG image if enabled and no remote|local ogImage
 if (!ogImageUrl && SITE.dynamicOgImage) {
-  ogImageUrl = `${localizePostPath(post.id, post.filePath)}/index.png`;
+  ogImageUrl = `${localizePostPath(post.id, post.filePath)}index.png`;
 }
 
 // Resolve OG image URL (or fallback to SITE.ogImage / default `og.png`)
@@ -88,6 +72,7 @@ const layoutProps = {
   canonicalURL,
   ogImage,
   scrollSmooth: true,
+  hreflangs: translationMap,
 };
 
 /* ========== Prev/Next Posts ========== */
@@ -102,13 +87,14 @@ const currentPostIndex = allPosts.findIndex(a => a.id === post.id);
 
 const prevPost = currentPostIndex !== 0 ? allPosts[currentPostIndex - 1] : null;
 const nextPost =
-  currentPostIndex !== allPosts.length ? allPosts[currentPostIndex + 1] : null;
+  currentPostIndex < allPosts.length - 1 ? allPosts[currentPostIndex + 1] : null;
 ---
 
 <Layout {...layoutProps}>
   {
     Object.keys(translationMap).length > 0 && (
       <script
+        is:inline
         set:html={`window.__translations=${JSON.stringify(translationMap)};window.__currentLocale="${locale}";`}
       />
     )
@@ -121,7 +107,7 @@ const nextPost =
     data-pagefind-body
   >
     <h1
-      transition:name={slugifyStr(title.replaceAll(".", "-"))}
+      transition:name={`p-${slugifyStr(title)}`}
       class="inline-block text-2xl font-bold text-accent sm:text-3xl"
     >
       {title}
@@ -139,7 +125,7 @@ const nextPost =
     </div>
     <article
       id="article"
-      class="app-prose mt-8 w-full max-w-app prose-pre:bg-(--shiki-light-bg) dark:prose-pre:bg-(--shiki-dark-bg)"
+      class="app-prose mt-8 w-full max-w-app"
     >
       <Content />
     </article>
@@ -166,9 +152,9 @@ const nextPost =
             href={localizePostPath(prevPost.id, prevPost.filePath)}
             class="flex w-full gap-1 hover:opacity-75"
           >
-            <IconChevronLeft class="inline-block flex-none rtl:rotate-180" />
+            <Icon name="tabler:chevron-left" class="inline-block flex-none rtl:rotate-180" />
             <div>
-              <span>{i18nPost.prev}</span>
+              <span>{t(UI.post.prev, locale)}</span>
               <div class="text-sm text-accent/85">{prevPost.title}</div>
             </div>
           </a>
@@ -181,14 +167,16 @@ const nextPost =
             class="flex w-full justify-end gap-1 text-end hover:opacity-75 sm:col-start-2"
           >
             <div>
-              <span>{i18nPost.next}</span>
+              <span>{t(UI.post.next, locale)}</span>
               <div class="text-sm text-accent/85">{nextPost.title}</div>
             </div>
-            <IconChevronRight class="inline-block flex-none rtl:rotate-180" />
+            <Icon name="tabler:chevron-right" class="inline-block flex-none rtl:rotate-180" />
           </a>
         )
       }
     </div>
+
+    <Giscus />
   </main>
   <Footer />
 </Layout>
@@ -215,9 +203,10 @@ const nextPost =
   }
   createProgressBar();
 
-  /** Update the progress bar
-   *  when user scrolls */
+  /** Update the progress bar when user scrolls */
   function updateScrollProgress() {
+    if (window.__scrollBound) return;
+    window.__scrollBound = true;
     document.addEventListener("scroll", () => {
       const winScroll =
         document.body.scrollTop || document.documentElement.scrollTop;
@@ -309,7 +298,9 @@ const nextPost =
   attachCopyButtons();
 
   /* Go to page start after page swap */
-  document.addEventListener("astro:after-swap", () =>
-    window.scrollTo({ left: 0, top: 0, behavior: "instant" })
-  );
+  if (!window.__scrollBound) {
+    document.addEventListener("astro:after-swap", () =>
+      window.scrollTo({ left: 0, top: 0, behavior: "instant" })
+    );
+  }
 </script>

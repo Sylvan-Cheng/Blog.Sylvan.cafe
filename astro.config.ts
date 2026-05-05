@@ -1,6 +1,7 @@
 import { defineConfig, envField } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
+import icon from "astro-icon";
 import remarkToc from "remark-toc";
 import remarkCollapse from "remark-collapse";
 import remarkMath from "remark-math";
@@ -12,13 +13,14 @@ import {
 } from "@shikijs/transformers";
 import { transformerFileName } from "./src/utils/transformers/fileName";
 import { SITE } from "./src/config";
+import { LOCALES } from "./src/i18n/config";
 
 // https://astro.build/config
 export default defineConfig({
   site: SITE.website,
   i18n: {
     defaultLocale: "zh",
-    locales: ["zh", "en", "ja", "ru"],
+    locales: [...LOCALES],
     routing: {
       prefixDefaultLocale: true,
       redirectToDefaultLocale: true,
@@ -26,15 +28,22 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
-      filter: page => SITE.showArchives || !page.endsWith("/archives"),
+      filter: page => SITE.showArchives || !page.replace(/\/$/, "").endsWith("/archives"),
     }),
+    icon(),
   ],
   markdown: {
     remarkPlugins: [remarkToc, remarkMath, [remarkCollapse, { test: "Table of contents" }]],
     rehypePlugins: [rehypeKatex],
     shikiConfig: {
-      // For more themes, visit https://shiki.style/themes
-      themes: { light: "min-light", dark: "night-owl" },
+      /*
+      Shiki 在构建时静态编译，不支持运行时跟随 data-scheme 切换。
+      换色板后需重新构建。备选主题对:
+        Default:  { light: "github-light",  dark: "github-dark" }
+        Nord:     { light: "github-light",  dark: "nord" }
+        Gruvbox:  { light: "gruvbox-light-hard", dark: "gruvbox-dark-hard" }  // ← 当前
+      */
+      themes: { light: "gruvbox-light-hard", dark: "gruvbox-dark-hard" },
       defaultColor: false,
       wrap: false,
       transformers: [

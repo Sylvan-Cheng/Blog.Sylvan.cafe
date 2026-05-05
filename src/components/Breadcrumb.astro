@@ -1,6 +1,8 @@
 ---
-const locale = Astro.currentLocale ?? "zh";
-const i18nHome = locale === "zh" ? "首页" : locale === "ja" ? "ホーム" : locale === "ru" ? "Главная" : "Home";
+import { UI } from "@/i18n/ui";
+import { resolveLocale, t } from "@/i18n/utils";
+
+const locale = resolveLocale(Astro.currentLocale);
 
 // Remove current url path and remove trailing slash if exists
 const currentUrlPath = Astro.url.pathname.replace(/\/+$/, "");
@@ -11,7 +13,7 @@ const breadcrumbList = currentUrlPath.split("/").slice(2);
 
 // if breadcrumb is Home > Posts > 1 <etc>
 if (breadcrumbList[0] === "posts") {
-  const pageLabel = locale === "zh" ? "文章" : locale === "ja" ? "記事" : locale === "ru" ? "Записи" : "Posts";
+  const pageLabel = t(UI.posts.title, locale);
   breadcrumbList.splice(0, 2, `${pageLabel} (page ${breadcrumbList[1] || 1})`);
 }
 
@@ -30,7 +32,7 @@ if (breadcrumbList[0] === "tags" && !isNaN(Number(breadcrumbList[2]))) {
     class="font-light [&>li]:inline [&>li:not(:last-child)>a]:hover:opacity-100"
   >
     <li>
-      <a href={`/${locale}/`} class="opacity-80">{i18nHome}</a>
+      <a href={`/${locale}/`} class="opacity-80">{t(UI.breadcrumb.home, locale)}</a>
       <span aria-hidden="true" class="opacity-80">&raquo;</span>
     </li>
     {

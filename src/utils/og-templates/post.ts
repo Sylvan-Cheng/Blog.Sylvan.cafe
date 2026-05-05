@@ -1,5 +1,5 @@
-import satori from "satori";
-// import { html } from "satori-html";
+﻿import satori from "satori";
+import type { CollectionEntry } from "astro:content";
 import { SITE } from "@/config";
 import loadGoogleFonts from "../loadGoogleFont";
 
@@ -93,7 +93,7 @@ import loadGoogleFonts from "../loadGoogleFont";
 //       </div>
 //     </div>`;
 
-export default async post => {
+export default async (post: CollectionEntry<"blog">) => {
   return satori(
     {
       type: "div",
@@ -223,7 +223,7 @@ export default async post => {
       embedFont: true,
       fonts: await loadGoogleFonts(
         post.data.title + post.data.author + SITE.title + "by"
-      ),
+      ) as any,
     }
   );
 };
