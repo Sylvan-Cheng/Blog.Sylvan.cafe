@@ -8,4 +8,5 @@ interface Window {
   };
   __translations?: Record<string, string>;
   __currentLocale?: string;
+  __scrollBound?: boolean;
 }

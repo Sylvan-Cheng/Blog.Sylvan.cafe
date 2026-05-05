@@ -10,7 +10,14 @@ const giscusLang = { zh: "zh-CN", en: "en", ja: "ja", ru: "ru" }[locale];
 {
   giscus.enabled && (
     <div class="mt-8">
+      <script is:inline set:html={`
+        (function(){
+          var t = document.documentElement.dataset.theme || "light";
+          document.getElementById("giscus-script")?.setAttribute("data-theme", t === "dark" ? "${giscus.darkTheme}" : "${giscus.lightTheme}");
+        })();
+      `}/>
       <script
+        id="giscus-script"
         src="https://giscus.app/client.js"
         is:inline
         data-repo={giscus.repo}
@@ -22,7 +29,6 @@ const giscusLang = { zh: "zh-CN", en: "en", ja: "ja", ru: "ru" }[locale];
         data-reactions-enabled={giscus.reactionsEnabled}
         data-emit-metadata={giscus.emitMetadata.toString()}
         data-input-position={giscus.inputPosition}
-        data-theme={giscus.lightTheme}
         data-lang={giscusLang}
         data-loading="lazy"
         crossorigin="anonymous"

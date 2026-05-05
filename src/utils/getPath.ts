@@ -35,12 +35,12 @@ export function getPath(
     : blogId;
   const slug = cleanParts.slice(-1);
 
-  // Dedupe: if the last path segment is the slug itself (post lives in its own directory),
+  // Dedupe: if the last path segment matches the slug (post lives in its own directory),
   // remove it from pathSegments to avoid "/hello-world/hello-world"
   if (
     pathSegments &&
     pathSegments.length >= 1 &&
-    pathSegments[pathSegments.length - 1] === slug[0]
+    pathSegments[pathSegments.length - 1] === slugifyStr(slug[0])
   ) {
     pathSegments.pop();
   }

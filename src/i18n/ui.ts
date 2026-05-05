@@ -1,6 +1,5 @@
-import type { Locale } from "./config";
+import type { Locale, Dict } from "./config";
 
-type Dict = Record<Locale, string>;
 type TemplateDict = Record<Locale, (arg: string) => string>;
 
 export const UI = {

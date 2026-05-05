@@ -21,7 +21,7 @@ const blog = defineCollection({
 
       // === Optional ===
       author: z.string().default(SITE.author),
-      modDatetime: z.coerce.date().optional().nullable(),
+      modDatetime: z.coerce.date().optional(),
       image: image().or(z.string()).optional(),
       ogImage: image().or(z.string()).optional(),
       canonicalURL: z.string().url().optional(),

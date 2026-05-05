@@ -1,7 +1,7 @@
 import type { Locale } from "./config";
 
 // Flat concept table: each entry holds all translations of one tag
-export const tagDictionary: Record<string, string>[] = [
+export const tagDictionary: Record<Locale, string>[] = [
   { en: "test", zh: "测试", ja: "テスト", ru: "тест" },
   { en: "life", zh: "生活", ja: "生活", ru: "жизнь" },
 ];

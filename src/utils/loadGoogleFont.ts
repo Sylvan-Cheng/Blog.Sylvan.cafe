@@ -1,6 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
+// NOTE: process.cwd() is correct for Astro SSG builds as it resolves to project root.
+// In monorepo/CI scenarios where cwd differs, set the working directory explicitly.
 const NODE_MODULES = resolve(process.cwd(), "node_modules/@fontsource");
 
 async function loadLocalFont(

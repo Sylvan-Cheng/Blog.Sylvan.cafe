@@ -69,6 +69,8 @@ const items = locales.map(({ code, label }) => ({
     const trigger = document.getElementById("lang-trigger") as HTMLButtonElement | null;
     const dropdown = document.getElementById("lang-dropdown") as HTMLUListElement | null;
     if (!trigger || !dropdown) return;
+    if (trigger.dataset.bound) return;
+    trigger.dataset.bound = "1";
 
     const trig = trigger;
     const dd = dropdown;

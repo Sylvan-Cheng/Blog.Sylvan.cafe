@@ -6,6 +6,6 @@ export function t(dict: Dict, locale: Locale): string {
 }
 
 export function resolveLocale(locale: string | undefined): Locale {
-  if (locale && LOCALE_SET.has(locale)) return locale as Locale;
+  if (locale && (LOCALE_SET as Set<string>).has(locale)) return locale as Locale;
   return LOCALES[0];
 }
