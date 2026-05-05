@@ -19,7 +19,7 @@ export async function GET({ params }: { params: { locale: string } }) {
   const sortedPosts = getSortedPosts(posts);
 
   return rss({
-    title: `${SITE.title} (${meta.label})`,
+    title: `${SITE.title} - ${meta.label}`,
     description: SITE.desc,
     site: SITE.website,
     customData: `<language>${meta.lang}</language>`,
