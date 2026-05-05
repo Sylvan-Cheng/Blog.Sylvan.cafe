@@ -263,4 +263,10 @@ export const UI = {
     ja: "トップへ戻る",
     ru: "Наверх",
   } satisfies Dict,
+  goHome: {
+    zh: "返回首页",
+    en: "Go back home",
+    ja: "ホームに戻る",
+    ru: "На главную",
+  } satisfies Dict,
 };

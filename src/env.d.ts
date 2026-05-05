@@ -6,4 +6,6 @@ interface Window {
     getTheme: () => string;
     setTheme: (val: string) => void;
   };
+  __translations?: Record<string, string>;
+  __currentLocale?: string;
 }

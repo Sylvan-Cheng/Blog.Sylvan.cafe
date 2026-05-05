@@ -14,7 +14,7 @@ const locale = Astro.currentLocale ?? "zh";
 <li>
   <a
     href={`/${locale}/tags/${tag}/`}
-    transition:name={tag}
+    transition:name={`p-${tag}`}
     class:list={[
       "flex items-center gap-0.5",
       "border-b-2 border-dashed border-foreground",

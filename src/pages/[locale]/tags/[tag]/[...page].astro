@@ -52,7 +52,7 @@ const { page, tagName } = Astro.props;
     titleTransition={tag}
     pageDesc={i18nDesc(tagName)}
   >
-    <h1 slot="title" transition:name={tag}>{`${i18nTag}:${tag}`}</h1>
+    <h1 slot="title" transition:name={`p-${tag}`}>{`${i18nTag}:${tag}`}</h1>
     <ul>
       {page.data.map(data => <Card {...data} locale={locale} />)}
     </ul>

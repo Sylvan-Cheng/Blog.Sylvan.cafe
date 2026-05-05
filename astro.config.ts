@@ -13,13 +13,14 @@ import {
 } from "@shikijs/transformers";
 import { transformerFileName } from "./src/utils/transformers/fileName";
 import { SITE } from "./src/config";
+import { LOCALES } from "./src/i18n/config";
 
 // https://astro.build/config
 export default defineConfig({
   site: SITE.website,
   i18n: {
     defaultLocale: "zh",
-    locales: ["zh", "en", "ja", "ru"],
+    locales: [...LOCALES],
     routing: {
       prefixDefaultLocale: true,
       redirectToDefaultLocale: true,
@@ -27,7 +28,7 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
-      filter: page => SITE.showArchives || !page.endsWith("/archives"),
+      filter: page => SITE.showArchives || !page.replace(/\/$/, "").endsWith("/archives"),
     }),
     icon(),
   ],
