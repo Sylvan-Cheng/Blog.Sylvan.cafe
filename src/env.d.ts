@@ -1,4 +1,6 @@
 interface Window {
+  __giscusInit?: boolean;
+  __giscusSync?: () => void;
   theme?: {
     themeValue: string;
     setPreference: () => void;

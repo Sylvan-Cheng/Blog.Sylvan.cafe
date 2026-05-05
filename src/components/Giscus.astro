@@ -5,17 +5,15 @@ import { resolveLocale } from "@/i18n/utils";
 const giscus = SITE.giscus;
 const locale = resolveLocale(Astro.currentLocale);
 const giscusLang = { zh: "zh-CN", en: "en", ja: "ja", ru: "ru" }[locale];
+
+// Strip locale prefix for cross-language comment sharing
+const path = Astro.url.pathname.replace(/^\/[a-z]{2}\//, "/");
+const giscusTerm = path.replace(/\/$/, "") || "/";
 ---
 
 {
   giscus.enabled && (
     <div class="mt-8">
-      <script is:inline set:html={`
-        (function(){
-          var t = document.documentElement.dataset.theme || "light";
-          document.getElementById("giscus-script")?.setAttribute("data-theme", t === "dark" ? "${giscus.darkTheme}" : "${giscus.lightTheme}");
-        })();
-      `}/>
       <script
         id="giscus-script"
         src="https://giscus.app/client.js"
@@ -25,10 +23,12 @@ const giscusLang = { zh: "zh-CN", en: "en", ja: "ja", ru: "ru" }[locale];
         data-category={giscus.category}
         data-category-id={giscus.categoryId}
         data-mapping={giscus.mapping}
+        data-term={giscusTerm}
         data-strict={giscus.strict.toString()}
         data-reactions-enabled={giscus.reactionsEnabled}
         data-emit-metadata={giscus.emitMetadata.toString()}
         data-input-position={giscus.inputPosition}
+        data-theme={giscus.darkTheme}
         data-lang={giscusLang}
         data-loading="lazy"
         crossorigin="anonymous"
@@ -40,20 +40,58 @@ const giscusLang = { zh: "zh-CN", en: "en", ja: "ja", ru: "ru" }[locale];
 
 {
   giscus.enabled && (
-    <script is:inline>
-      function updateGiscusTheme() {
-        const theme = document.documentElement.dataset.theme || "light";
-        const iframe = document.querySelector<HTMLIFrameElement>("iframe.giscus-frame");
-        if (iframe) {
-          iframe.contentWindow?.postMessage(
-            { giscus: { setConfig: { theme: theme === "dark" ? "dark" : "light" } } },
-            "https://giscus.app"
-          );
-        }
+    <script is:inline define:vars={{ darkTheme: giscus.darkTheme, lightTheme: giscus.lightTheme }}>
+      // 单例模式：避免 View Transitions 导致监听器重复累积
+      if (window.__giscusInit) {
+        window.__giscusSync?.();
+        return;
       }
-      const observer = new MutationObserver(updateGiscusTheme);
-      observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
-      document.addEventListener("astro:after-swap", updateGiscusTheme);
+      window.__giscusInit = true;
+
+      {
+        let observer;
+
+        const sync = () => {
+          const isDark = document.documentElement.dataset.theme === "dark";
+          const theme = isDark ? darkTheme : lightTheme;
+
+          const el = document.getElementById("giscus-script");
+          if (el) el.setAttribute("data-theme", theme);
+
+          const frame = document.querySelector("iframe.giscus-frame");
+          if (frame?.contentWindow) {
+            frame.contentWindow.postMessage(
+              { giscus: { setConfig: { theme } } },
+              "https://giscus.app"
+            );
+          }
+        };
+        window.__giscusSync = sync;
+
+        const setupObserver = () => {
+          if (observer) observer.disconnect();
+          observer = new MutationObserver(sync);
+          observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ["data-theme"]
+          });
+        };
+
+        const messageHandler = (event) => {
+          if (event.origin !== 'https://giscus.app') return;
+          if (!(typeof event.data === 'object' && event.data.giscus)) return;
+          sync();
+        };
+        window.addEventListener('message', messageHandler);
+
+        sync();
+        setupObserver();
+
+        document.addEventListener("astro:after-swap", () => {
+          sync();
+          setupObserver();
+        });
+      }
     </script>
   )
 }
