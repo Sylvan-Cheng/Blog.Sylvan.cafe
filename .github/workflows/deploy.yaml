@@ -36,6 +36,8 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build
+        env:
+          PUBLIC_GOOGLE_SITE_VERIFICATION: dkAat9gMwLx3qEjtwNz0fhHY5MPfSkmR0poDvVRel0Q
         run: pnpm run build
 
       - name: Deploy to VPS
