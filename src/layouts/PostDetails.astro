@@ -11,6 +11,7 @@ import BackButton from "@/components/BackButton.astro";
 import BackToTopButton from "@/components/BackToTopButton.astro";
 import Giscus from "@/components/Giscus.astro";
 import FloatingTOC from "@/components/FloatingTOC.astro";
+import ImageZoom from "@/components/ImageZoom.astro";
 import { getPath } from "@/utils/getPath";
 import { slugifyStr } from "@/utils/slugify";
 import Icon from "@/components/Icon.astro";
@@ -181,6 +182,7 @@ const nextPost =
     <Giscus />
   </main>
   <Footer />
+  <ImageZoom />
 </Layout>
 
 <script is:inline data-astro-rerun>

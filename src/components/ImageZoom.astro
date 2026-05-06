@@ -1,0 +1,60 @@
+---
+
+---
+
+<script>
+  interface ZoomInstance {
+    detach: () => void;
+  }
+
+  let zoomInstance: ZoomInstance | null = null;
+
+  function initImageZoom() {
+    if (zoomInstance) return;
+    const images = document.querySelectorAll(".app-prose img:not(a img)");
+    if (images.length === 0) return;
+
+    (async () => {
+      const { default: mediumZoom } = await import("medium-zoom");
+
+      zoomInstance = mediumZoom(images, {
+        margin: 24,
+      });
+    })();
+  }
+
+  function destroyImageZoom() {
+    if (zoomInstance) {
+      zoomInstance.detach();
+      zoomInstance = null;
+    }
+  }
+
+  document.addEventListener("astro:page-load", initImageZoom);
+  document.addEventListener("astro:before-swap", destroyImageZoom);
+</script>
+
+<style is:global>
+  .medium-zoom-overlay {
+    background-color: color-mix(
+      in srgb,
+      var(--color-background) 40%,
+      transparent
+    ) !important;
+    z-index: 998;
+
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+
+    transition: opacity 300ms ease !important;
+  }
+
+  .medium-zoom-image--opened {
+    z-index: 999;
+  }
+
+  .app-prose img {
+    height: auto;
+    max-width: 100%;
+  }
+</style>
