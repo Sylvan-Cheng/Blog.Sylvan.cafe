@@ -1,0 +1,295 @@
+---
+import Icon from "@/components/Icon.astro";
+import { UI } from "@/i18n/ui";
+import { resolveLocale, t } from "@/i18n/utils";
+
+const locale = resolveLocale(Astro.currentLocale);
+---
+
+<nav
+  id="floating-toc"
+  aria-label={t(UI.toc, locale)}
+  class="fixed top-24 hidden w-48 xl:block"
+  style="left: min(calc(50% + 26rem), calc(100vw - 14rem));"
+>
+  <div class="border-s-2 border-accent/30 ps-3">
+    <div
+      class="mb-2 flex items-center gap-1.5 text-xs font-semibold text-foreground/70"
+    >
+      <Icon name="tabler:list-tree" class="inline-block size-3.5" />
+      <span>{t(UI.toc, locale)}</span>
+    </div>
+    <div class="relative">
+      <div
+        id="toc-fade-top"
+        class="pointer-events-none absolute top-0 left-0 right-0 z-10 hidden h-6 bg-gradient-to-b from-background to-transparent"
+      >
+      </div>
+      <div
+        id="toc-fade-bottom"
+        class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 hidden h-6 bg-gradient-to-t from-background to-transparent"
+      >
+      </div>
+      <ul
+        id="toc-list"
+        class="space-y-1 text-sm leading-relaxed max-h-[calc(100vh-14rem)] overflow-y-auto"
+      >
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<style is:inline>
+  #toc-list {
+    scrollbar-width: none;
+  }
+  #toc-list::-webkit-scrollbar {
+    display: none;
+  }
+</style>
+
+<script is:inline data-astro-rerun>
+  function buildTOC() {
+    const article = document.getElementById("article");
+    const tocContainer = document.getElementById("floating-toc");
+    const tocList = document.getElementById("toc-list");
+    if (!article || !tocContainer || !tocList) return;
+
+    const headings = Array.from(article.querySelectorAll("h2, h3"));
+    if (headings.length < 2) {
+      tocContainer.style.display = "none";
+      return;
+    }
+
+    // Clean up previous observer and scroll handler
+    if (window.__tocObserver) {
+      window.__tocObserver.disconnect();
+    }
+    if (window.__tocScrollHandler) {
+      document.removeEventListener("scroll", window.__tocScrollHandler);
+      window.__tocScrollHandler = null;
+    }
+    if (window.__tocHideTimeout) {
+      clearTimeout(window.__tocHideTimeout);
+      window.__tocHideTimeout = null;
+    }
+
+    // Clean up any stale global tooltips from previous page
+    document
+      .querySelectorAll(".toc-dynamic-tooltip")
+      .forEach((el) => el.remove());
+
+    // Clear existing list
+    tocList.innerHTML = "";
+
+    // Ensure all headings have IDs (Astro auto-generates them)
+    headings.forEach((heading, i) => {
+      if (!heading.id) {
+        heading.id =
+          heading.textContent
+            ?.trim()
+            .replace(/[^\p{L}\p{N}]+/gu, "-")
+            .replace(/^-|-$/g, "") || `heading-${i}`;
+      }
+    });
+
+    // Build TOC items (tooltips added later only when text is truncated)
+    const fragment = document.createDocumentFragment();
+    headings.forEach((heading) => {
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      a.href = `#${heading.id}`;
+      // Strip the trailing "#" added by addHeadingLinks in PostDetails
+      const label = heading.textContent?.replace(/\s*#\s*$/, "").trim() || "";
+      a.className = `block border-s-2 py-1 pe-2 transition-all duration-200 hover:text-accent hover:translate-x-0.5 ${
+        heading.tagName === "H3" ? "ps-6" : "ps-3"
+      } text-foreground/60 border-transparent hover:border-accent/40`;
+
+      const textSpan = document.createElement("span");
+      textSpan.className = `block truncate${heading.tagName === "H3" ? " text-xs" : ""}`;
+      textSpan.textContent = label;
+
+      a.appendChild(textSpan);
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        const target = document.getElementById(heading.id);
+        if (target) {
+          const offset = 80;
+          const top =
+            target.getBoundingClientRect().top + window.scrollY - offset;
+          window.scrollTo({ top, behavior: "smooth" });
+        }
+      });
+
+      li.appendChild(a);
+      fragment.appendChild(li);
+    });
+    tocList.appendChild(fragment);
+
+    // Attach body-mounted tooltips only for truncated (overflowing) headings
+    const tocItems = tocList.querySelectorAll("li a");
+    const tooltipMap = new WeakMap();
+
+    tocItems.forEach((a) => {
+      const textSpan = a.querySelector("span.block.truncate");
+      if (!textSpan) return;
+      if (textSpan.scrollWidth > textSpan.clientWidth) {
+        const href = a.getAttribute("href") || "";
+        const headingId = href.slice(1);
+        const tooltipId = `toc-tooltip-${headingId}`;
+
+        const tooltip = document.createElement("span");
+        tooltip.id = tooltipId;
+        tooltip.role = "tooltip";
+        tooltip.textContent = textSpan.textContent || "";
+        tooltip.className =
+          "toc-dynamic-tooltip pointer-events-none fixed z-[9999] w-max max-w-[200px] whitespace-normal rounded bg-foreground px-2 py-1 text-xs text-background opacity-0 shadow-md transition-opacity duration-200";
+        tooltip.style.display = "none";
+        document.body.appendChild(tooltip);
+        tooltipMap.set(a, tooltip);
+
+        a.setAttribute("aria-describedby", tooltipId);
+      }
+    });
+
+    // Delegated mouse events on parent container
+    let currentLink = null;
+    let timeoutId = null;
+    let rafId = null;
+
+    function hideTooltip() {
+      if (!currentLink) return;
+      const t = tooltipMap.get(currentLink);
+      if (t) {
+        clearTimeout(timeoutId);
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+        t.style.opacity = "0";
+        window.__tocHideTimeout = setTimeout(() => {
+          if (t.style.opacity === "0") t.style.display = "none";
+          window.__tocHideTimeout = null;
+        }, 200);
+      }
+      currentLink = null;
+    }
+
+    tocList.addEventListener("mouseover", (e) => {
+      const a = e.target.closest("li a");
+      if (!a || a === currentLink) return;
+      hideTooltip();
+      const tooltip = tooltipMap.get(a);
+      if (!tooltip) {
+        currentLink = null;
+        return;
+      }
+      currentLink = a;
+      tooltip.style.display = "block";
+      timeoutId = window.setTimeout(() => {
+        tooltip.style.opacity = "1";
+      }, 400);
+    });
+
+    tocList.addEventListener("mousemove", (e) => {
+      if (!currentLink) return;
+      if (rafId) return;
+      const link = currentLink;
+      rafId = requestAnimationFrame(() => {
+        const t = tooltipMap.get(link);
+        if (t) {
+          t.style.left = `${e.clientX + 12}px`;
+          t.style.top = `${e.clientY + 15}px`;
+        }
+        rafId = null;
+      });
+    });
+
+    tocList.addEventListener("mouseout", (e) => {
+      const a = e.target.closest("li a");
+      if (!a || a !== currentLink) return;
+      // Ignore if mouse moved to a child of the same link
+      if (e.relatedTarget && a.contains(e.relatedTarget)) return;
+      hideTooltip();
+    });
+
+    // Fade edge mask — indicates scrollable overflow when scrollbar is hidden
+    const topFade = document.getElementById("toc-fade-top");
+    const bottomFade = document.getElementById("toc-fade-bottom");
+    if (topFade && bottomFade) {
+      function updateFadeEdges() {
+        if (tocList.scrollHeight <= tocList.clientHeight) {
+          topFade.classList.add("hidden");
+          bottomFade.classList.add("hidden");
+          return;
+        }
+        topFade.classList.toggle("hidden", tocList.scrollTop <= 0);
+        const atBottom =
+          tocList.scrollTop + tocList.clientHeight >= tocList.scrollHeight - 2;
+        bottomFade.classList.toggle("hidden", atBottom);
+      }
+      tocList.addEventListener("scroll", updateFadeEdges, { passive: true });
+      updateFadeEdges();
+    }
+
+    // Scroll spy with IntersectionObserver
+    const tocLinks = Array.from(tocList.querySelectorAll("a"));
+
+    let activeId = headings[0]?.id || null;
+
+    function updateActiveLink() {
+      for (const link of tocLinks) {
+        const href = link.getAttribute("href");
+        if (!href) continue;
+        const id = href.slice(1);
+        const isActive = id === activeId;
+        link.classList.toggle("text-accent", isActive);
+        link.classList.toggle("font-semibold", isActive);
+        link.classList.toggle("border-accent/60", isActive);
+        link.classList.toggle("text-foreground/60", !isActive);
+        link.classList.toggle("border-transparent", !isActive);
+      }
+    }
+
+    window.__tocObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            activeId = entry.target.id;
+          }
+        }
+        updateActiveLink();
+      },
+      {
+        rootMargin: "-80px 0px -65% 0px",
+        threshold: 0,
+      },
+    );
+
+    for (const heading of headings) {
+      window.__tocObserver.observe(heading);
+    }
+
+    // Initial highlight
+    updateActiveLink();
+
+    // Scroll handler for bottom-of-page detection
+    window.__tocScrollHandler = function () {
+      const atBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 10;
+      if (atBottom) {
+        const lastHeading = headings[headings.length - 1];
+        if (lastHeading && activeId !== lastHeading.id) {
+          activeId = lastHeading.id;
+          updateActiveLink();
+        }
+      }
+    };
+    document.addEventListener("scroll", window.__tocScrollHandler, {
+      passive: true,
+    });
+  }
+
+  document.addEventListener("astro:page-load", buildTOC);
+</script>
