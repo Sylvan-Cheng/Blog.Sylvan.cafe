@@ -3,7 +3,6 @@ import { Icon } from "astro-icon/components";
 import { LOCALES, LOCALE_META } from "@/i18n/config";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
-import Tooltip from "./Tooltip.astro";
 
 const currentLocale = resolveLocale(Astro.currentLocale);
 const pathname = Astro.url.pathname;
@@ -27,7 +26,6 @@ const items = locales.map(({ code, label }) => ({
 ---
 
 <div class="relative inline-flex">
-  <Tooltip text={t(UI.selectLanguage, currentLocale)}>
     <button
       id="lang-trigger"
       class="focus-outline flex p-3 sm:p-1 hover:text-accent text-foreground"
@@ -37,7 +35,6 @@ const items = locales.map(({ code, label }) => ({
     >
       <Icon name="tabler:language" size={24} />
     </button>
-  </Tooltip>
 
   <ul
     id="lang-dropdown"
@@ -67,67 +64,4 @@ const items = locales.map(({ code, label }) => ({
   </ul>
 </div>
 
-<script>
-  function initLangPicker() {
-    const trigger = document.getElementById("lang-trigger") as HTMLButtonElement | null;
-    const dropdown = document.getElementById("lang-dropdown") as HTMLUListElement | null;
-    if (!trigger || !dropdown) return;
-    if (trigger.dataset.bound) return;
-    trigger.dataset.bound = "1";
-
-    const trig = trigger;
-    const dd = dropdown;
-
-    const isPostPage = /^\/[a-z]{2}\/posts\/.+/.test(window.location.pathname);
-    if (window.__translations && isPostPage) {
-      const translations = window.__translations;
-      const currentLocale = window.__currentLocale || "";
-
-      dd.querySelectorAll("a").forEach(link => {
-        const locale = link.dataset.locale || "";
-        if (locale === currentLocale) return;
-        if (translations[locale]) {
-          link.href = translations[locale];
-        } else {
-          link.href = `/${locale}/404`;
-        }
-      });
-    }
-
-    function open() {
-      dd.hidden = false;
-      trig.setAttribute("aria-expanded", "true");
-    }
-
-    function close() {
-      dd.hidden = true;
-      trig.setAttribute("aria-expanded", "false");
-    }
-
-    trig.addEventListener("click", e => {
-      e.stopPropagation();
-      dd.hidden ? open() : close();
-    });
-
-    dd.addEventListener("click", e => {
-      const link = (e.target as HTMLElement).closest<HTMLAnchorElement>("a");
-      if (link?.href && link.href !== window.location.href) {
-        window.location.href = link.href;
-      }
-      close();
-    });
-
-    document.addEventListener("click", e => {
-      if (!trig.contains(e.target as Node) && !dd.contains(e.target as Node)) {
-        close();
-      }
-    });
-
-    document.addEventListener("keydown", e => {
-      if (e.key === "Escape") close();
-    });
-  }
-
-  document.addEventListener("astro:after-swap", initLangPicker);
-  initLangPicker();
-</script>
+<script src="../scripts/lang.ts"></script>

@@ -121,28 +121,4 @@ const isActive = (path: string) => {
   </div>
 </header>
 
-<script>
-  function toggleNav() {
-    const menuBtn = document.querySelector("#menu-btn");
-    const navMenu = document.querySelector("#nav-menu");
-    const menuIcon = document.querySelector("#menu-icon");
-    const closeIcon = document.querySelector("#close-icon");
-
-    if (!menuBtn || !navMenu || !menuIcon || !closeIcon) return;
-
-    const openLabel = menuBtn.getAttribute("data-open-label") || "Open Menu";
-    const closeLabel = menuBtn.getAttribute("data-close-label") || "Close Menu";
-
-    menuBtn.addEventListener("click", () => {
-      const openMenu = menuBtn.getAttribute("aria-expanded") === "true";
-      menuBtn.setAttribute("aria-expanded", openMenu ? "false" : "true");
-      menuBtn.setAttribute("aria-label", openMenu ? openLabel : closeLabel);
-      navMenu.classList.toggle("hidden");
-      menuIcon.classList.toggle("hidden");
-      closeIcon.classList.toggle("hidden");
-    });
-  }
-
-  toggleNav();
-  document.addEventListener("astro:after-swap", toggleNav);
-</script>
+<script src="../scripts/nav.ts"></script>
