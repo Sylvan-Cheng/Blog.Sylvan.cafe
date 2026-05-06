@@ -240,6 +240,12 @@ export const UI = {
     ja: "トップへ戻る",
     ru: "Наверх",
   } satisfies Dict,
+  toc: {
+    zh: "目录",
+    en: "Contents",
+    ja: "目次",
+    ru: "Содержание",
+  } satisfies Dict,
   goHome: {
     zh: "返回首页",
     en: "Go back home",
@@ -278,6 +284,56 @@ export const UI = {
       en: "Home",
       ja: "ホーム",
       ru: "Главная",
+    } satisfies Dict,
+  },
+  social: {
+    github: {
+      zh: (site: string) => `${site} 的 GitHub`,
+      en: (site: string) => `${site} on GitHub`,
+      ja: (site: string) => `${site} の GitHub`,
+      ru: (site: string) => `${site} на GitHub`,
+    } satisfies TemplateDict,
+    email: {
+      zh: (site: string) => `发送邮件至 ${site}`,
+      en: (site: string) => `Send an email to ${site}`,
+      ja: (site: string) => `${site} にメールを送信`,
+      ru: (site: string) => `Отправить email на ${site}`,
+    } satisfies TemplateDict,
+    shareWhatsApp: {
+      zh: "通过 WhatsApp 分享",
+      en: "Share this post via WhatsApp",
+      ja: "WhatsApp で共有",
+      ru: "Поделиться через WhatsApp",
+    } satisfies Dict,
+    shareFacebook: {
+      zh: "分享到 Facebook",
+      en: "Share this post on Facebook",
+      ja: "Facebook で共有",
+      ru: "Поделиться в Facebook",
+    } satisfies Dict,
+    shareX: {
+      zh: "分享到 X",
+      en: "Share this post on X",
+      ja: "X で共有",
+      ru: "Поделиться в X",
+    } satisfies Dict,
+    shareTelegram: {
+      zh: "通过 Telegram 分享",
+      en: "Share this post via Telegram",
+      ja: "Telegram で共有",
+      ru: "Поделиться через Telegram",
+    } satisfies Dict,
+    sharePinterest: {
+      zh: "分享到 Pinterest",
+      en: "Share this post on Pinterest",
+      ja: "Pinterest で共有",
+      ru: "Поделиться в Pinterest",
+    } satisfies Dict,
+    shareEmail: {
+      zh: "通过邮件分享",
+      en: "Share this post via email",
+      ja: "メールで共有",
+      ru: "Поделиться по email",
     } satisfies Dict,
   },
 };

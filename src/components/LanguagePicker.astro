@@ -3,6 +3,7 @@ import { Icon } from "astro-icon/components";
 import { LOCALES, LOCALE_META } from "@/i18n/config";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
+import Tooltip from "./Tooltip.astro";
 
 const currentLocale = resolveLocale(Astro.currentLocale);
 const pathname = Astro.url.pathname;
@@ -26,15 +27,17 @@ const items = locales.map(({ code, label }) => ({
 ---
 
 <div class="relative inline-flex">
-  <button
-    id="lang-trigger"
-    class="focus-outline flex p-3 sm:p-1 hover:text-accent text-foreground"
-    aria-label={t(UI.selectLanguage, currentLocale)}
-    aria-expanded="false"
-    aria-haspopup="listbox"
-  >
-    <Icon name="tabler:language" size={24} />
-  </button>
+  <Tooltip text={t(UI.selectLanguage, currentLocale)}>
+    <button
+      id="lang-trigger"
+      class="focus-outline flex p-3 sm:p-1 hover:text-accent text-foreground"
+      aria-label={t(UI.selectLanguage, currentLocale)}
+      aria-expanded="false"
+      aria-haspopup="listbox"
+    >
+      <Icon name="tabler:language" size={24} />
+    </button>
+  </Tooltip>
 
   <ul
     id="lang-dropdown"

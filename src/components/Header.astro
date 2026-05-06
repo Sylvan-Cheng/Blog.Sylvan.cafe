@@ -2,6 +2,7 @@
 import Icon from "@/components/Icon.astro";
 import LinkButton from "./LinkButton.astro";
 import LanguagePicker from "./LanguagePicker.astro";
+import Tooltip from "./Tooltip.astro";
 import { SITE } from "@/config";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
@@ -44,42 +45,46 @@ const isActive = (path: string) => {
     </a>
 
     <div class="flex items-center gap-x-1 sm:gap-x-2 sm:order-3">
-      <LinkButton
-        href={localizePath("/search")}
-        class="focus-outline flex p-3 sm:p-1"
-          title={t(UI.nav.search, locale)}
-        aria-label="search"
-      >
-        <Icon name="tabler:search" />
-        <span class="sr-only">{t(UI.nav.search, locale)}</span>
-      </LinkButton>
+      <Tooltip text={t(UI.nav.search, locale)}>
+        <LinkButton
+          href={localizePath("/search")}
+          class="focus-outline flex p-3 sm:p-1"
+          aria-label="search"
+        >
+          <Icon name="tabler:search" />
+          <span class="sr-only">{t(UI.nav.search, locale)}</span>
+        </LinkButton>
+      </Tooltip>
       <LanguagePicker />
       {
         SITE.lightAndDarkMode && (
-          <button
-            id="theme-btn"
-            class="focus-outline relative size-12 p-4 sm:size-8"
-            title={t(UI.themeToggle, locale)}
-            aria-label="auto"
-            aria-live="polite"
-          >
-            <Icon name="tabler:moon" class="absolute top-[50%] left-[50%] -translate-[50%] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-            <Icon name="tabler:sun-high" class="absolute top-[50%] left-[50%] -translate-[50%] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-          </button>
+          <Tooltip text={t(UI.themeToggle, locale)}>
+            <button
+              id="theme-btn"
+              class="focus-outline relative size-12 p-4 sm:size-8"
+              aria-label="auto"
+              aria-live="polite"
+            >
+              <Icon name="tabler:moon" class="absolute top-[50%] left-[50%] -translate-[50%] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+              <Icon name="tabler:sun-high" class="absolute top-[50%] left-[50%] -translate-[50%] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+            </button>
+          </Tooltip>
         )
       }
-      <button
-        id="menu-btn"
-        class="focus-outline p-2 sm:hidden"
-        aria-label={t(UI.openMenu, locale)}
-        data-open-label={t(UI.openMenu, locale)}
-        data-close-label={t(UI.closeMenu, locale)}
-        aria-expanded="false"
-        aria-controls="nav-menu"
-      >
-        <Icon name="tabler:x" id="close-icon" class="hidden" />
-        <Icon name="tabler:menu-deep" id="menu-icon" />
-      </button>
+      <Tooltip text={t(UI.openMenu, locale)}>
+        <button
+          id="menu-btn"
+          class="focus-outline p-2 sm:hidden"
+          aria-label={t(UI.openMenu, locale)}
+          data-open-label={t(UI.openMenu, locale)}
+          data-close-label={t(UI.closeMenu, locale)}
+          aria-expanded="false"
+          aria-controls="nav-menu"
+        >
+          <Icon name="tabler:x" id="close-icon" class="hidden" />
+          <Icon name="tabler:menu-deep" id="menu-icon" />
+        </button>
+      </Tooltip>
     </div>
 
     <nav

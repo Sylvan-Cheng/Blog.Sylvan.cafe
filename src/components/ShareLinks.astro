@@ -2,11 +2,21 @@
 import { SHARE_LINKS } from "@/constants";
 import LinkButton from "./LinkButton.astro";
 import Icon from "./Icon.astro";
+import Tooltip from "./Tooltip.astro";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
 
 const URL = Astro.url;
 const locale = resolveLocale(Astro.currentLocale);
+
+const shareLabelMap: Record<string, string> = {
+  WhatsApp: UI.social.shareWhatsApp[locale],
+  Facebook: UI.social.shareFacebook[locale],
+  X: UI.social.shareX[locale],
+  Telegram: UI.social.shareTelegram[locale],
+  Pinterest: UI.social.sharePinterest[locale],
+  Mail: UI.social.shareEmail[locale],
+};
 ---
 
 {
@@ -15,16 +25,17 @@ const locale = resolveLocale(Astro.currentLocale);
       <span class="italic">{t(UI.share, locale)}</span>
       <div class="text-center">
         {SHARE_LINKS.map(social => (
-          <LinkButton
-            href={`${social.href + URL}`}
-            class="scale-90 p-2 hover:rotate-6 sm:p-1"
-            title={social.linkTitle}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Icon name={social.icon} class="inline-block size-6 scale-125 stroke-current opacity-90 group-hover:fill-transparent sm:scale-110" />
-            <span class="sr-only">{social.linkTitle}</span>
-          </LinkButton>
+          <Tooltip text={shareLabelMap[social.name] || social.linkTitle}>
+            <LinkButton
+              href={`${social.href + URL}`}
+              class="scale-90 p-2 hover:rotate-6 sm:p-1"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Icon name={social.icon} class="inline-block size-6 scale-125 stroke-current opacity-90 group-hover:fill-transparent sm:scale-110" />
+              <span class="sr-only">{shareLabelMap[social.name] || social.linkTitle}</span>
+            </LinkButton>
+          </Tooltip>
         ))}
       </div>
     </div>
