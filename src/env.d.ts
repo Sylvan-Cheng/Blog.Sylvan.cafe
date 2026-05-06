@@ -11,7 +11,9 @@ interface Window {
   __translations?: Record<string, string>;
   __currentLocale?: string;
   __scrollBound?: boolean;
-  __tocObserver?: IntersectionObserver;
-  __tocScrollHandler?: (() => void) | null;
-  __tocHideTimeout?: number | null;
+  __toc?: {
+    observer?: IntersectionObserver;
+    scrollHandler?: (() => void) | null;
+    hideTimeout?: number | null;
+  };
 }

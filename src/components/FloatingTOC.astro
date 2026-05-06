@@ -10,7 +10,7 @@ const locale = resolveLocale(Astro.currentLocale);
   id="floating-toc"
   aria-label={t(UI.toc, locale)}
   class="fixed top-24 hidden w-48 xl:block"
-  style="left: min(calc(50% + 26rem), calc(100vw - 14rem));"
+  style="left: min(calc(50% + var(--toc-offset-content, 26rem)), calc(100vw - var(--toc-offset-edge, 14rem)));"
 >
   <div class="border-s-2 border-accent/30 ps-3">
     <div
@@ -32,7 +32,8 @@ const locale = resolveLocale(Astro.currentLocale);
       </div>
       <ul
         id="toc-list"
-        class="space-y-1 text-sm leading-relaxed max-h-[calc(100vh-14rem)] overflow-y-auto"
+        class="space-y-1 text-sm leading-relaxed overflow-y-auto"
+        style="max-height: calc(100vh - var(--toc-offset-edge, 14rem))"
       >
       </ul>
     </div>
@@ -40,8 +41,15 @@ const locale = resolveLocale(Astro.currentLocale);
 </nav>
 
 <style is:inline>
+  #floating-toc {
+    --toc-offset-content: 26rem;
+    --toc-offset-edge: 14rem;
+  }
+
   #toc-list {
     scrollbar-width: none;
+    scroll-padding-top: 1.5rem;
+    scroll-padding-bottom: 1.5rem;
   }
   #toc-list::-webkit-scrollbar {
     display: none;
@@ -61,28 +69,37 @@ const locale = resolveLocale(Astro.currentLocale);
       return;
     }
 
-    // Clean up previous observer and scroll handler
-    if (window.__tocObserver) {
-      window.__tocObserver.disconnect();
+    const HEADING_SCROLL_OFFSET = 80;
+    const TOOLTIP_EDGE = 8;
+
+    // 清理上一页的 observer 和 scroll 监听
+    window.__toc ??= {};
+    if (window.__toc.observer) {
+      window.__toc.observer.disconnect();
     }
-    if (window.__tocScrollHandler) {
-      document.removeEventListener("scroll", window.__tocScrollHandler);
-      window.__tocScrollHandler = null;
+    if (window.__toc.scrollHandler) {
+      document.removeEventListener("scroll", window.__toc.scrollHandler);
+      window.__toc.scrollHandler = null;
     }
-    if (window.__tocHideTimeout) {
-      clearTimeout(window.__tocHideTimeout);
-      window.__tocHideTimeout = null;
+    if (window.__toc.hideTimeout) {
+      clearTimeout(window.__toc.hideTimeout);
+      window.__toc.hideTimeout = null;
     }
 
-    // Clean up any stale global tooltips from previous page
-    document
-      .querySelectorAll(".toc-dynamic-tooltip")
-      .forEach((el) => el.remove());
+    // 清理上一页残留的 tooltip（使用专属容器）
+    let tooltipRoot = document.getElementById("toc-tooltip-root");
+    if (tooltipRoot) {
+      tooltipRoot.innerHTML = "";
+    } else {
+      tooltipRoot = document.createElement("div");
+      tooltipRoot.id = "toc-tooltip-root";
+      document.body.appendChild(tooltipRoot);
+    }
 
-    // Clear existing list
+    // 清空现有列表
     tocList.innerHTML = "";
 
-    // Ensure all headings have IDs (Astro auto-generates them)
+    // 确保所有标题都有 ID（Astro 会自动生成）
     headings.forEach((heading, i) => {
       if (!heading.id) {
         heading.id =
@@ -93,13 +110,13 @@ const locale = resolveLocale(Astro.currentLocale);
       }
     });
 
-    // Build TOC items (tooltips added later only when text is truncated)
+    // 构建目录项（tooltip 后续仅为截断文本附加）
     const fragment = document.createDocumentFragment();
     headings.forEach((heading) => {
       const li = document.createElement("li");
       const a = document.createElement("a");
       a.href = `#${heading.id}`;
-      // Strip the trailing "#" added by addHeadingLinks in PostDetails
+      // 去除 PostDetails 中 addHeadingLinks 追加的尾部 "#"
       const label = heading.textContent?.replace(/\s*#\s*$/, "").trim() || "";
       a.className = `block border-s-2 py-1 pe-2 transition-all duration-200 hover:text-accent hover:translate-x-0.5 ${
         heading.tagName === "H3" ? "ps-6" : "ps-3"
@@ -110,23 +127,31 @@ const locale = resolveLocale(Astro.currentLocale);
       textSpan.textContent = label;
 
       a.appendChild(textSpan);
-      a.addEventListener("click", (e) => {
-        e.preventDefault();
-        const target = document.getElementById(heading.id);
-        if (target) {
-          const offset = 80;
-          const top =
-            target.getBoundingClientRect().top + window.scrollY - offset;
-          window.scrollTo({ top, behavior: "smooth" });
-        }
-      });
 
       li.appendChild(a);
       fragment.appendChild(li);
     });
     tocList.appendChild(fragment);
 
-    // Attach body-mounted tooltips only for truncated (overflowing) headings
+    // 点击委托：点击目录项滚动到对应标题
+    tocList.addEventListener("click", (e) => {
+      const a = e.target.closest("a");
+      if (!a) return;
+      e.preventDefault();
+      const id = a.getAttribute("href")?.slice(1);
+      if (!id) return;
+      const target = document.getElementById(id);
+      if (target) {
+        const top =
+          target.getBoundingClientRect().top +
+          window.scrollY -
+          HEADING_SCROLL_OFFSET;
+        window.scrollTo({ top, behavior: "smooth" });
+        history.replaceState(null, "", `#${id}`);
+      }
+    });
+
+    // 仅为文本被截断的标题附加 tooltip
     const tocItems = tocList.querySelectorAll("li a");
     const tooltipMap = new WeakMap();
 
@@ -136,23 +161,26 @@ const locale = resolveLocale(Astro.currentLocale);
       if (textSpan.scrollWidth > textSpan.clientWidth) {
         const href = a.getAttribute("href") || "";
         const headingId = href.slice(1);
-        const tooltipId = `toc-tooltip-${headingId}`;
 
         const tooltip = document.createElement("span");
-        tooltip.id = tooltipId;
+        tooltip.id = `toc-tooltip-${headingId}`;
         tooltip.role = "tooltip";
         tooltip.textContent = textSpan.textContent || "";
         tooltip.className =
           "toc-dynamic-tooltip pointer-events-none fixed z-[9999] w-max max-w-[200px] whitespace-normal rounded bg-foreground px-2 py-1 text-xs text-background opacity-0 shadow-md transition-opacity duration-200";
+        tooltip.style.visibility = "hidden";
+        tooltip.style.display = "block";
+        tooltipRoot.appendChild(tooltip);
+        const dims = tooltip.getBoundingClientRect();
+        tooltip._width = dims.width;
+        tooltip._height = dims.height;
         tooltip.style.display = "none";
-        document.body.appendChild(tooltip);
+        tooltip.style.visibility = "";
         tooltipMap.set(a, tooltip);
-
-        a.setAttribute("aria-describedby", tooltipId);
       }
     });
 
-    // Delegated mouse events on parent container
+    // 父容器上的委托鼠标事件
     let currentLink = null;
     let timeoutId = null;
     let rafId = null;
@@ -167,9 +195,9 @@ const locale = resolveLocale(Astro.currentLocale);
           rafId = null;
         }
         t.style.opacity = "0";
-        window.__tocHideTimeout = setTimeout(() => {
+        window.__toc.hideTimeout = setTimeout(() => {
           if (t.style.opacity === "0") t.style.display = "none";
-          window.__tocHideTimeout = null;
+          window.__toc.hideTimeout = null;
         }, 200);
       }
       currentLink = null;
@@ -195,11 +223,30 @@ const locale = resolveLocale(Astro.currentLocale);
       if (!currentLink) return;
       if (rafId) return;
       const link = currentLink;
+      const { clientX, clientY } = e;
       rafId = requestAnimationFrame(() => {
         const t = tooltipMap.get(link);
         if (t) {
-          t.style.left = `${e.clientX + 12}px`;
-          t.style.top = `${e.clientY + 15}px`;
+          const w = t._width || 200;
+          const h = t._height || 50;
+          let left = clientX + 12;
+          let top = clientY + 15;
+          left = Math.max(
+            TOOLTIP_EDGE,
+            Math.min(
+              left,
+              document.documentElement.clientWidth - w - TOOLTIP_EDGE,
+            ),
+          );
+          top = Math.max(
+            TOOLTIP_EDGE,
+            Math.min(
+              top,
+              document.documentElement.clientHeight - h - TOOLTIP_EDGE,
+            ),
+          );
+          t.style.left = `${left}px`;
+          t.style.top = `${top}px`;
         }
         rafId = null;
       });
@@ -208,12 +255,12 @@ const locale = resolveLocale(Astro.currentLocale);
     tocList.addEventListener("mouseout", (e) => {
       const a = e.target.closest("li a");
       if (!a || a !== currentLink) return;
-      // Ignore if mouse moved to a child of the same link
+      // 鼠标移到同一链接的子元素时忽略
       if (e.relatedTarget && a.contains(e.relatedTarget)) return;
       hideTooltip();
     });
 
-    // Fade edge mask — indicates scrollable overflow when scrollbar is hidden
+    // 淡出遮罩 — 隐藏滚动条时指示可滚动溢出
     const topFade = document.getElementById("toc-fade-top");
     const bottomFade = document.getElementById("toc-fade-bottom");
     if (topFade && bottomFade) {
@@ -232,12 +279,20 @@ const locale = resolveLocale(Astro.currentLocale);
       updateFadeEdges();
     }
 
-    // Scroll spy with IntersectionObserver
-    const tocLinks = Array.from(tocList.querySelectorAll("a"));
+    // 使用 IntersectionObserver 实现滚动监听
+    const tocLinks = Array.from(tocItems);
 
     let activeId = headings[0]?.id || null;
+    // 页面加载时已处于滚动位置，推断正确的激活标题
+    for (let i = headings.length - 1; i >= 0; i--) {
+      if (headings[i].getBoundingClientRect().top <= HEADING_SCROLL_OFFSET) {
+        activeId = headings[i].id;
+        break;
+      }
+    }
 
     function updateActiveLink() {
+      let activeLink = null;
       for (const link of tocLinks) {
         const href = link.getAttribute("href");
         if (!href) continue;
@@ -248,10 +303,14 @@ const locale = resolveLocale(Astro.currentLocale);
         link.classList.toggle("border-accent/60", isActive);
         link.classList.toggle("text-foreground/60", !isActive);
         link.classList.toggle("border-transparent", !isActive);
+        if (isActive) activeLink = link;
+      }
+      if (activeLink) {
+        activeLink.scrollIntoView({ block: "nearest", behavior: "smooth" });
       }
     }
 
-    window.__tocObserver = new IntersectionObserver(
+    window.__toc.observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
@@ -261,20 +320,21 @@ const locale = resolveLocale(Astro.currentLocale);
         updateActiveLink();
       },
       {
-        rootMargin: "-80px 0px -65% 0px",
+        // HEADING_SCROLL_OFFSET: 顶部 header + 文章内边距；-65%: 标题在视口上方约 35% 区域内时激活
+        rootMargin: `-${HEADING_SCROLL_OFFSET}px 0px -65% 0px`,
         threshold: 0,
       },
     );
 
     for (const heading of headings) {
-      window.__tocObserver.observe(heading);
+      window.__toc.observer.observe(heading);
     }
 
-    // Initial highlight
+    // 初始高亮
     updateActiveLink();
 
-    // Scroll handler for bottom-of-page detection
-    window.__tocScrollHandler = function () {
+    // 页面底部检测：用户滚到最底部时激活最后一个标题
+    window.__toc.scrollHandler = function () {
       const atBottom =
         window.innerHeight + window.scrollY >=
         document.documentElement.scrollHeight - 10;
@@ -286,7 +346,7 @@ const locale = resolveLocale(Astro.currentLocale);
         }
       }
     };
-    document.addEventListener("scroll", window.__tocScrollHandler, {
+    document.addEventListener("scroll", window.__toc.scrollHandler, {
       passive: true,
     });
   }
