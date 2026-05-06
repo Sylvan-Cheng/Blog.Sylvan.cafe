@@ -10,6 +10,7 @@ import ShareLinks from "@/components/ShareLinks.astro";
 import BackButton from "@/components/BackButton.astro";
 import BackToTopButton from "@/components/BackToTopButton.astro";
 import Giscus from "@/components/Giscus.astro";
+import FloatingTOC from "@/components/FloatingTOC.astro";
 import { getPath } from "@/utils/getPath";
 import { slugifyStr } from "@/utils/slugify";
 import Icon from "@/components/Icon.astro";
@@ -106,6 +107,7 @@ const nextPost =
     class:list={["app-layout pb-12", { "mt-8": !SITE.showBackButton }]}
     data-pagefind-body
   >
+    <FloatingTOC />
     <h1
       transition:name={`p-${slugifyStr(title)}`}
       class="inline-block text-2xl font-bold text-accent sm:text-3xl"
