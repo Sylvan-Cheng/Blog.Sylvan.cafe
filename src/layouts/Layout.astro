@@ -17,6 +17,20 @@ import "@fontsource/noto-sans-jp/japanese-700.css";
 import "@fontsource/fira-code/latin-400.css";
 import "@fontsource/fira-code/latin-700.css";
 
+// Preload font assets via Vite to get hashed URLs for <link rel="preload">
+import latin400 from "@fontsource/noto-sans/files/noto-sans-latin-400-normal.woff2";
+import latin700 from "@fontsource/noto-sans/files/noto-sans-latin-700-normal.woff2";
+import sc400 from "@fontsource/noto-sans-sc/files/noto-sans-sc-chinese-simplified-400-normal.woff2";
+import jp400 from "@fontsource/noto-sans-jp/files/noto-sans-jp-japanese-400-normal.woff2";
+import cyrillic400 from "@fontsource/noto-sans/files/noto-sans-cyrillic-400-normal.woff2";
+
+// Map locale → additional script font to preload
+const scriptFont: Record<string, string> = {
+  zh: sc400,
+  ja: jp400,
+  ru: cyrillic400,
+};
+
 type Props = {
   title?: string;
   author?: string;
@@ -94,6 +108,19 @@ const structuredData = pubDatetime ? {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href={canonicalURL} />
     <meta name="generator" content={Astro.generator} />
+
+    <!-- Preconnect to Umami analytics early -->
+    <link rel="preconnect" href="https://umami.sylvan.cafe" crossorigin />
+    <link rel="dns-prefetch" href="https://umami.sylvan.cafe" />
+
+    <!-- Preload critical fonts to reduce CLS -->
+    <link rel="preload" href={latin400} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={latin700} as="font" type="font/woff2" crossorigin />
+    {
+      scriptFont[locale] && (
+        <link rel="preload" href={scriptFont[locale]} as="font" type="font/woff2" crossorigin />
+      )
+    }
 
     <!-- hreflang tags for multilingual SEO -->
     {

@@ -13,5 +13,5 @@ interface Window {
   __scrollBound?: boolean;
   __tocObserver?: IntersectionObserver;
   __tocScrollHandler?: (() => void) | null;
-  __tocHideTimeout?: ReturnType<typeof setTimeout> | null;
+  __tocHideTimeout?: number | null;
 }
