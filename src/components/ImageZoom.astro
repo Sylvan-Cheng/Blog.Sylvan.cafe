@@ -10,17 +10,19 @@
   let zoomInstance: ZoomInstance | null = null;
 
   function initImageZoom() {
-    if (zoomInstance) return;
-    const images = document.querySelectorAll(".app-prose img:not(a img)");
-    if (images.length === 0) return;
+    requestAnimationFrame(() => {
+      if (zoomInstance) return;
+      const images = document.querySelectorAll(".app-prose img:not(a img)");
+      if (images.length === 0) return;
 
-    (async () => {
-      const { default: mediumZoom } = await import("medium-zoom");
+      (async () => {
+        const { default: mediumZoom } = await import("medium-zoom");
 
-      zoomInstance = mediumZoom(images, {
-        margin: 24,
-      });
-    })();
+        zoomInstance = mediumZoom(images, {
+          margin: 24,
+        });
+      })();
+    });
   }
 
   function destroyImageZoom() {

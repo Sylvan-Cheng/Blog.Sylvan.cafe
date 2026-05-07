@@ -353,5 +353,5 @@ const locale = resolveLocale(Astro.currentLocale);
     });
   }
 
-  document.addEventListener("astro:page-load", buildTOC);
+  document.addEventListener("astro:page-load", () => requestAnimationFrame(buildTOC));
 </script>
