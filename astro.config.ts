@@ -1,4 +1,5 @@
 import { defineConfig, envField } from "astro/config";
+import partytown from "@astrojs/partytown";
 import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
 import icon from "astro-icon";
@@ -30,6 +31,7 @@ export default defineConfig({
     },
   },
   integrations: [
+    partytown(),
     sitemap({
       filter: page => SITE.showArchives || !page.replace(/\/$/, "").endsWith("/archives"),
     }),

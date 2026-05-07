@@ -29,6 +29,7 @@ const blog = defineCollection({
       keywords: z.array(z.string()).optional(),
       featured: z.boolean().optional().default(false),
       draft: z.boolean().optional().default(false),
+      math: z.boolean().optional().default(false),
       hideEditPost: z.boolean().optional().default(false),
       timezone: z.string().optional(),
     }),

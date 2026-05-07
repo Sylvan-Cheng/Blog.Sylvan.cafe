@@ -5,7 +5,6 @@ import { SITE } from "@/config";
 import { LOCALES, LOCALE_META } from "@/i18n/config";
 import { resolveLocale } from "@/i18n/utils";
 import "@/styles/global.css";
-import "katex/dist/katex.min.css";
 import "@fontsource/noto-sans/latin-400.css";
 import "@fontsource/noto-sans/latin-700.css";
 import "@fontsource/noto-sans/cyrillic-400.css";
@@ -113,6 +112,9 @@ const structuredData = pubDatetime ? {
     <link rel="preconnect" href="https://umami.sylvan.cafe" crossorigin />
     <link rel="dns-prefetch" href="https://umami.sylvan.cafe" />
 
+    <!-- Preconnect to Giscus comments -->
+    <link rel="preconnect" href="https://giscus.app" crossorigin />
+
     <!-- Preload critical fonts to reduce CLS -->
     <link rel="preload" href={latin400} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={latin700} as="font" type="font/woff2" crossorigin />
@@ -214,8 +216,8 @@ const structuredData = pubDatetime ? {
 
     <ClientRouter />
 
-    <!-- Umami Analytics -->
-    <script defer src="https://umami.sylvan.cafe/script.js" data-website-id="636e674b-026b-4730-b2dc-cd79336f463c"></script>
+    <!-- Umami Analytics (Partytown) -->
+    <script type="text/partytown" src="https://umami.sylvan.cafe/script.js" data-website-id="636e674b-026b-4730-b2dc-cd79336f463c"></script>
 
     <!-- Minimal inline script to prevent FOUC - sets theme immediately -->
     <script is:inline>
@@ -246,6 +248,7 @@ const structuredData = pubDatetime ? {
         };
       })();
     </script>
+    <slot name="head" />
   </head>
   <body>
     <slot />

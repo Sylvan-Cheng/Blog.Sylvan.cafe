@@ -4,7 +4,7 @@ export const SITE = {
   profile: "https://blog.sylvan.cafe/",
   desc: "A personal blog about technology, code, and life.",
   title: "Sylvan's Blog",
-  ogImage: "astropaper-og.jpg",
+  ogImage: "assets/astropaper-og.jpg",
   lightAndDarkMode: true,
   postPerIndex: 4,
   postPerPage: 4,

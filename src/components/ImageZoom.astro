@@ -1,0 +1,70 @@
+---
+---
+
+<script is:inline>
+  let zoomInstance = null;
+  let zoomLoading = false;
+  let clickHandler = null;
+
+  async function loadZoom() {
+    if (zoomInstance || zoomLoading) return;
+    zoomLoading = true;
+    const images = document.querySelectorAll(".app-prose img:not(a img)");
+    if (images.length === 0) { zoomLoading = false; return; }
+
+    const { default: mediumZoom } = await import("medium-zoom");
+    zoomInstance = mediumZoom(images, { margin: 24 });
+    zoomLoading = false;
+  }
+
+  function destroyImageZoom() {
+    if (zoomInstance) {
+      zoomInstance.detach();
+      zoomInstance = null;
+    }
+    zoomLoading = false;
+    if (clickHandler) {
+      const article = document.getElementById("article");
+      if (article) article.removeEventListener("click", clickHandler);
+      clickHandler = null;
+    }
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    destroyImageZoom();
+
+    const article = document.getElementById("article");
+    if (!article) return;
+
+    clickHandler = async function (e) {
+      const img = e.target && e.target.closest ? e.target.closest(".app-prose img:not(a img)") : null;
+      if (!img) return;
+      await loadZoom();
+      if (zoomInstance) zoomInstance.open(img);
+    };
+    article.addEventListener("click", clickHandler);
+  });
+
+  document.addEventListener("astro:before-swap", destroyImageZoom);
+</script>
+
+<style is:global>
+  .medium-zoom-overlay {
+    background-color: color-mix(
+      in srgb,
+      var(--color-background) 80%,
+      transparent
+    ) !important;
+    z-index: 998;
+    transition: opacity 300ms ease !important;
+  }
+
+  .medium-zoom-image--opened {
+    z-index: 999;
+  }
+
+  .app-prose img {
+    height: auto;
+    max-width: 100%;
+  }
+</style>
