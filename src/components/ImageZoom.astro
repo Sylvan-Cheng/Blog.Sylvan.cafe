@@ -1,10 +1,10 @@
 ---
 ---
 
-<script>
-  let zoomInstance: any = null;
+<script is:inline>
+  let zoomInstance = null;
   let zoomLoading = false;
-  let clickHandler: ((e: MouseEvent) => void) | null = null;
+  let clickHandler = null;
 
   async function loadZoom() {
     if (zoomInstance || zoomLoading) return;
@@ -25,7 +25,7 @@
     zoomLoading = false;
     if (clickHandler) {
       const article = document.getElementById("article");
-      article?.removeEventListener("click", clickHandler);
+      if (article) article.removeEventListener("click", clickHandler);
       clickHandler = null;
     }
   }
@@ -36,10 +36,8 @@
     const article = document.getElementById("article");
     if (!article) return;
 
-    clickHandler = async (e) => {
-      const target = e.target as Element | null;
-      if (!target) return;
-      const img = target.closest(".app-prose img:not(a img)");
+    clickHandler = async function (e) {
+      const img = e.target && e.target.closest ? e.target.closest(".app-prose img:not(a img)") : null;
       if (!img) return;
       await loadZoom();
       if (zoomInstance) zoomInstance.open(img);

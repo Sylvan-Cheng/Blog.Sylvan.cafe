@@ -18,6 +18,8 @@ import Icon from "@/components/Icon.astro";
 import { SITE } from "@/config";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
+import fs from "fs";
+import path from "path";
 
 type Props = {
   post: CollectionEntry<"blog">;
@@ -90,14 +92,14 @@ const currentPostIndex = allPosts.findIndex(a => a.id === post.id);
 const prevPost = currentPostIndex !== 0 ? allPosts[currentPostIndex - 1] : null;
 const nextPost =
   currentPostIndex < allPosts.length - 1 ? allPosts[currentPostIndex + 1] : null;
+
+const kaTeXInlineCSS = post.data.math
+  ? fs.readFileSync(path.resolve("public/assets/katex.min.css"), "utf-8")
+  : "";
 ---
 
 <Layout {...layoutProps}>
-  {post.data.math && (
-    <>
-      <link slot="head" rel="preload" href="/assets/katex.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
-    </>
-  )}
+  {post.data.math && <style slot="head" set:html={kaTeXInlineCSS} />}
   {
     Object.keys(translationMap).length > 0 && (
       <script
