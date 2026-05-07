@@ -245,13 +245,8 @@ const kaTeXInlineCSS = post.data.math
       const wrapper = document.createElement("div");
       wrapper.style.position = "relative";
 
-      // Check if --file-name-offset custom property exists
-      const computedStyle = getComputedStyle(codeBlock);
-      const hasFileNameOffset =
-        computedStyle.getPropertyValue("--file-name-offset").trim() !== "";
-
-      // Determine the top positioning class
-      const topClass = hasFileNameOffset
+      // 构建时由 transformerFileName 设置，无文件名则不偏移
+      const topClass = codeBlock.dataset.filename !== undefined
         ? "top-(--file-name-offset)"
         : "-top-3";
 

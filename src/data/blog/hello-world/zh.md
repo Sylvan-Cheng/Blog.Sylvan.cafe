@@ -176,7 +176,7 @@ Markdown 的文本样式非常直观。使用双星号或双下划线包裹文�
 
 ### TypeScript 示例
 
-```ts
+```ts file="greet.ts"
 export function greet(name: string): string {
   return `你好，${name}！`;
 }
