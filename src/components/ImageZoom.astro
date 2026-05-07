@@ -1,28 +1,20 @@
 ---
-
 ---
 
 <script>
-  interface ZoomInstance {
-    detach: () => void;
-  }
+  let zoomInstance: any = null;
+  let zoomLoading = false;
+  let clickHandler: ((e: MouseEvent) => void) | null = null;
 
-  let zoomInstance: ZoomInstance | null = null;
+  async function loadZoom() {
+    if (zoomInstance || zoomLoading) return;
+    zoomLoading = true;
+    const images = document.querySelectorAll(".app-prose img:not(a img)");
+    if (images.length === 0) { zoomLoading = false; return; }
 
-  function initImageZoom() {
-    requestAnimationFrame(() => {
-      if (zoomInstance) return;
-      const images = document.querySelectorAll(".app-prose img:not(a img)");
-      if (images.length === 0) return;
-
-      (async () => {
-        const { default: mediumZoom } = await import("medium-zoom");
-
-        zoomInstance = mediumZoom(images, {
-          margin: 24,
-        });
-      })();
-    });
+    const { default: mediumZoom } = await import("medium-zoom");
+    zoomInstance = mediumZoom(images, { margin: 24 });
+    zoomLoading = false;
   }
 
   function destroyImageZoom() {
@@ -30,9 +22,31 @@
       zoomInstance.detach();
       zoomInstance = null;
     }
+    zoomLoading = false;
+    if (clickHandler) {
+      const article = document.getElementById("article");
+      article?.removeEventListener("click", clickHandler);
+      clickHandler = null;
+    }
   }
 
-  document.addEventListener("astro:page-load", initImageZoom);
+  document.addEventListener("astro:page-load", () => {
+    destroyImageZoom();
+
+    const article = document.getElementById("article");
+    if (!article) return;
+
+    clickHandler = async (e) => {
+      const target = e.target as Element | null;
+      if (!target) return;
+      const img = target.closest(".app-prose img:not(a img)");
+      if (!img) return;
+      await loadZoom();
+      if (zoomInstance) zoomInstance.open(img);
+    };
+    article.addEventListener("click", clickHandler);
+  });
+
   document.addEventListener("astro:before-swap", destroyImageZoom);
 </script>
 
@@ -44,7 +58,6 @@
       transparent
     ) !important;
     z-index: 998;
-
     transition: opacity 300ms ease !important;
   }
 
