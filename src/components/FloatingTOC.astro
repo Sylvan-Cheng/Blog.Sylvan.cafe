@@ -9,6 +9,7 @@ const locale = resolveLocale(Astro.currentLocale);
 <nav
   id="floating-toc"
   aria-label={t(UI.toc, locale)}
+  data-footnotes-label={t(UI.footnotes, locale)}
   class="fixed top-24 hidden w-48 xl:block"
   style="left: min(calc(50% + var(--toc-offset-content, 26rem)), calc(100vw - var(--toc-offset-edge, 14rem)));"
 >
@@ -117,7 +118,8 @@ const locale = resolveLocale(Astro.currentLocale);
       const a = document.createElement("a");
       a.href = `#${heading.id}`;
       // 去除 PostDetails 中 addHeadingLinks 追加的尾部 "#"
-      const label = heading.textContent?.replace(/\s*#\s*$/, "").trim() || "";
+      const rawLabel = heading.textContent?.replace(/\s*#\s*$/, "").trim() || "";
+      const label = heading.id === "footnote-label" ? tocContainer.dataset.footnotesLabel || rawLabel : rawLabel;
       a.className = `block border-s-2 py-1 pe-2 transition-all duration-200 hover:text-accent hover:translate-x-0.5 ${
         heading.tagName === "H3" ? "ps-6" : "ps-3"
       } text-foreground/60 border-transparent hover:border-accent/40`;

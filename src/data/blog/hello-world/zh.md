@@ -85,7 +85,7 @@ Markdown 的文本样式非常直观。使用双星号或双下划线包裹文�
 
 链接支持多种写法：行内链接 `[文本](url)`、引用式链接、以及自动链接 `<https://example.com>`。在 Astro 中，内部链接通过 `getPath()` 工具函数自动处理多语言前缀，确保在不同语言版本之间正确跳转。
 
-<img src="https://s11.ax1x.com/2022/12/19/zqcqfA.png" alt="F103C8T6 GPIO示意图" width="300" />
+<img src="https://cdn.jsdelivr.net/gh/Sylvan-Cheng/oss_00@main/img/ENDFIELD-c7a209e663cf740b.avif" alt="明日方舟：终末地" width="800" height="450" loading="lazy" />
 
 ### 引用
 

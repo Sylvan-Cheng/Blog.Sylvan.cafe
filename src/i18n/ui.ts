@@ -246,6 +246,12 @@ export const UI = {
     ja: "目次",
     ru: "Содержание",
   } satisfies Dict,
+  footnotes: {
+    zh: "脚注",
+    en: "Footnotes",
+    ja: "脚注",
+    ru: "Сноски",
+  } satisfies Dict,
   goHome: {
     zh: "返回首页",
     en: "Go back home",
