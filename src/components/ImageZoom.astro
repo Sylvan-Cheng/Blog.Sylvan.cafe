@@ -1,10 +1,12 @@
 ---
 ---
 
-<script is:inline>
-  let zoomInstance = null;
+<script>
+  import type mediumZoom from "medium-zoom";
+
+  let zoomInstance: ReturnType<typeof mediumZoom> | null = null;
   let zoomLoading = false;
-  let clickHandler = null;
+  let clickHandler: ((e: MouseEvent) => Promise<void>) | null = null;
 
   async function loadZoom() {
     if (zoomInstance || zoomLoading) return;
@@ -25,7 +27,7 @@
     zoomLoading = false;
     if (clickHandler) {
       const article = document.getElementById("article");
-      if (article) article.removeEventListener("click", clickHandler);
+      if (article) article.removeEventListener("click", clickHandler as unknown as EventListener);
       clickHandler = null;
     }
   }
@@ -36,13 +38,16 @@
     const article = document.getElementById("article");
     if (!article) return;
 
-    clickHandler = async function (e) {
-      const img = e.target && e.target.closest ? e.target.closest(".app-prose img:not(a img)") : null;
+    // 页面无图片则跳过，不绑定任何监听器
+    if (!document.querySelector(".app-prose img:not(a img)")) return;
+
+    clickHandler = async function (e: MouseEvent) {
+      const img = (e.target as HTMLElement)?.closest?.(".app-prose img:not(a img)") as HTMLElement | null;
       if (!img) return;
       await loadZoom();
-      if (zoomInstance) zoomInstance.open(img);
+      if (zoomInstance) zoomInstance.open({ target: img });
     };
-    article.addEventListener("click", clickHandler);
+    article.addEventListener("click", clickHandler as unknown as EventListener);
   });
 
   document.addEventListener("astro:before-swap", destroyImageZoom);
