@@ -88,6 +88,17 @@ const giscusTerm = path.replace(/\/$/, "") || "/";
         setupObserver();
 
         document.addEventListener("astro:after-swap", () => {
+          // 销毁旧 iframe 并重建脚本元素，强制 Giscus 为新页面重新渲染
+          const oldFrame = document.querySelector("iframe.giscus-frame");
+          if (oldFrame) oldFrame.remove();
+          const script = document.getElementById("giscus-script");
+          if (script) {
+            const newScript = document.createElement("script");
+            for (const attr of script.attributes) {
+              if (attr.name !== "is:inline") newScript.setAttribute(attr.name, attr.value);
+            }
+            script.replaceWith(newScript);
+          }
           sync();
           setupObserver();
         });
