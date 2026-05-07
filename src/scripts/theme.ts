@@ -71,16 +71,11 @@ if (window.theme) {
 // Ensure theme is reflected (in case body wasn't ready when inline script ran)
 reflectPreference();
 
-let themeBtnBound = false;
-
 function setThemeFeature(): void {
   // set on load so screen readers can get the latest value on the button
   reflectPreference();
 
-  if (themeBtnBound) return;
-  themeBtnBound = true;
-
-  // now this script can find and listen for clicks on the control
+  // 视图过渡后 DOM 被替换，重新绑定到新的 #theme-btn 元素
   document.querySelector("#theme-btn")?.addEventListener("click", () => {
     themeValue = themeValue === LIGHT ? DARK : LIGHT;
     window.theme?.setTheme(themeValue);

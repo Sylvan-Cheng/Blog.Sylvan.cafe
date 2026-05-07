@@ -238,8 +238,9 @@ const structuredData = pubDatetime ? {
         // Set theme immediately to prevent flash
         document.firstElementChild?.setAttribute("data-theme", themeValue);
 
-        // Export minimal API for external script
+        // 合并现有 API（视图过渡时保留 theme.ts 扩展的方法）
         window.theme = {
+          ...(window.theme || {}),
           themeValue: themeValue,
           getTheme: () => window.theme.themeValue,
           setTheme: val => {

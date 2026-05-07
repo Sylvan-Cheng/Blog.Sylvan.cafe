@@ -7,6 +7,8 @@ import remarkToc from "remark-toc";
 import remarkCollapse from "remark-collapse";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import { rehypeA11y } from "./src/utils/rehype-a11y";
 import {
   transformerNotationDiff,
   transformerNotationHighlight,
@@ -39,7 +41,27 @@ export default defineConfig({
   ],
   markdown: {
     remarkPlugins: [remarkToc, remarkMath, [remarkCollapse, { test: "Table of contents" }]],
-    rehypePlugins: [rehypeKatex],
+    rehypePlugins: [
+      rehypeKatex,
+      rehypeA11y,
+      [
+        rehypeAutolinkHeadings,
+        {
+          behavior: "append",
+          properties: {
+            className:
+              "heading-link ms-2 no-underline opacity-75 md:opacity-0 md:group-hover:opacity-100 md:focus:opacity-100",
+            ariaLabel: "Jump to heading",
+          },
+          content: {
+            type: "element",
+            tagName: "span",
+            properties: { ariaHidden: "true" },
+            children: [{ type: "text", value: "#" }],
+          },
+        },
+      ],
+    ],
     shikiConfig: {
       /*
       Shiki 在构建时静态编译，不支持运行时跟随 data-scheme 切换。

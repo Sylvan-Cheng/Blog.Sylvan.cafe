@@ -37,6 +37,9 @@ export const transformerFileName = ({
 
     if (!file) return;
 
+    // 标记 copy 按钮需偏移（避免运行时 getComputedStyle 强制重排）
+    node.properties["data-filename"] = "";
+
     // Add additional margin to code block
     this.addClassToHast(
       node,
