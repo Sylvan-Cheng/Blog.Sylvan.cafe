@@ -153,34 +153,43 @@ const locale = resolveLocale(Astro.currentLocale);
       }
     });
 
-    // 仅为文本被截断的标题附加 tooltip
+    // 仅为文本被截断的标题附加 tooltip（读/写两阶段分离，避免交替重排）
     const tocItems = tocList.querySelectorAll("li a");
     const tooltipMap = new WeakMap();
 
-    tocItems.forEach((a) => {
-      const textSpan = a.querySelector("span.block.truncate");
-      if (!textSpan) return;
-      if (textSpan.scrollWidth > textSpan.clientWidth) {
-        const href = a.getAttribute("href") || "";
-        const headingId = href.slice(1);
-
+    function initTooltips() {
+      // 阶段 1：收集所有截断检查（纯读）
+      const truncated = [];
+      tocItems.forEach((a) => {
+        const textSpan = a.querySelector("span.block.truncate");
+        if (!textSpan) return;
+        if (textSpan.scrollWidth > textSpan.clientWidth) {
+          const href = a.getAttribute("href") || "";
+          truncated.push({ a, headingId: href.slice(1), label: textSpan.textContent || "" });
+        }
+      });
+      // 阶段 2：创建 tooltip 并批量测量（先写入再读取，一次布局计算）
+      const tooltips = [];
+      truncated.forEach(({ a, headingId, label }) => {
         const tooltip = document.createElement("span");
         tooltip.id = `toc-tooltip-${headingId}`;
         tooltip.role = "tooltip";
-        tooltip.textContent = textSpan.textContent || "";
+        tooltip.textContent = label;
         tooltip.className =
           "toc-dynamic-tooltip pointer-events-none fixed z-[9999] w-max max-w-[200px] whitespace-normal rounded bg-foreground px-2 py-1 text-xs text-background opacity-0 shadow-md transition-opacity duration-200";
-        tooltip.style.visibility = "hidden";
         tooltip.style.display = "block";
         tooltipRoot.appendChild(tooltip);
-        const dims = tooltip.getBoundingClientRect();
-        tooltip._width = dims.width;
-        tooltip._height = dims.height;
-        tooltip.style.display = "none";
-        tooltip.style.visibility = "";
         tooltipMap.set(a, tooltip);
+        tooltips.push(tooltip);
+      });
+      // 阶段 3：批量测量尺寸（所有写入完成后统一读取，避免重复重排）
+      for (const tooltip of tooltips) {
+        const d = tooltip.getBoundingClientRect();
+        tooltip._width = d.width;
+        tooltip._height = d.height;
+        tooltip.style.display = "none";
       }
-    });
+    }
 
     // 父容器上的委托鼠标事件
     let currentLink = null;
@@ -265,33 +274,28 @@ const locale = resolveLocale(Astro.currentLocale);
     // 淡出遮罩 — 隐藏滚动条时指示可滚动溢出
     const topFade = document.getElementById("toc-fade-top");
     const bottomFade = document.getElementById("toc-fade-bottom");
-    if (topFade && bottomFade) {
-      function updateFadeEdges() {
-        if (tocList.scrollHeight <= tocList.clientHeight) {
-          topFade.classList.add("hidden");
-          bottomFade.classList.add("hidden");
-          return;
-        }
-        topFade.classList.toggle("hidden", tocList.scrollTop <= 0);
-        const atBottom =
-          tocList.scrollTop + tocList.clientHeight >= tocList.scrollHeight - 2;
-        bottomFade.classList.toggle("hidden", atBottom);
+
+    function updateFadeEdges() {
+      if (!topFade || !bottomFade) return;
+      if (tocList.scrollHeight <= tocList.clientHeight) {
+        topFade.classList.add("hidden");
+        bottomFade.classList.add("hidden");
+        return;
       }
+      topFade.classList.toggle("hidden", tocList.scrollTop <= 0);
+      const atBottom =
+        tocList.scrollTop + tocList.clientHeight >= tocList.scrollHeight - 2;
+      bottomFade.classList.toggle("hidden", atBottom);
+    }
+
+    if (topFade && bottomFade) {
       tocList.addEventListener("scroll", updateFadeEdges, { passive: true });
-      updateFadeEdges();
     }
 
     // 使用 IntersectionObserver 实现滚动监听
     const tocLinks = Array.from(tocItems);
 
     let activeId = headings[0]?.id || null;
-    // 页面加载时已处于滚动位置，推断正确的激活标题
-    for (let i = headings.length - 1; i >= 0; i--) {
-      if (headings[i].getBoundingClientRect().top <= HEADING_SCROLL_OFFSET) {
-        activeId = headings[i].id;
-        break;
-      }
-    }
 
     function updateActiveLink() {
       let activeLink = null;
@@ -332,8 +336,21 @@ const locale = resolveLocale(Astro.currentLocale);
       window.__toc.observer.observe(heading);
     }
 
-    // 初始高亮
-    updateActiveLink();
+    // 推迟所有布局读取到下一帧，避免强制同步重排
+    requestAnimationFrame(() => {
+      // 页面可能已导航离开，检查 DOM 是否仍然存活
+      if (!document.getElementById("article")) return;
+      initTooltips();
+      updateFadeEdges();
+      // 推断正确的激活标题
+      for (let i = headings.length - 1; i >= 0; i--) {
+        if (headings[i].getBoundingClientRect().top <= HEADING_SCROLL_OFFSET) {
+          activeId = headings[i].id;
+          break;
+        }
+      }
+      updateActiveLink();
+    });
 
     // 页面底部检测：用户滚到最底部时激活最后一个标题
     window.__toc.scrollHandler = function () {
