@@ -1,0 +1,140 @@
+---
+import { UI } from "@/i18n/ui";
+import { resolveLocale, t } from "@/i18n/utils";
+
+const locale = resolveLocale(Astro.currentLocale);
+const labelExpand = t(UI.codeBlock.expand, locale);
+const labelCollapse = t(UI.codeBlock.collapse, locale);
+---
+
+<style is:global>
+  pre[data-collapse] {
+    --cf-max-h: 12rem;
+    --cf-duration: 400ms;
+    --cf-easing: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  pre[data-collapse].cf-collapsed > code {
+    max-height: var(--cf-max-h);
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      black calc(100% - 3rem),
+      transparent
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      black calc(100% - 3rem),
+      transparent
+    );
+  }
+
+  pre[data-collapse] > code {
+    transition: max-height var(--cf-duration) var(--cf-easing);
+  }
+
+  /* 折叠按钮 — 右下角，与 copy 按钮同风格，置于底边框上 */
+  .cf-btn {
+    position: absolute;
+    z-index: 10;
+    right: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.25rem;
+    background: var(--color-muted);
+    color: var(--color-foreground);
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500;
+    font-family: var(--font-body);
+    cursor: pointer;
+    transition: background-color 150ms ease;
+  }
+
+  .cf-btn:hover,
+  .cf-btn:focus-visible {
+    background: var(--color-border);
+  }
+</style>
+
+<script define:vars={{ labelExpand, labelCollapse }}>
+  function initCodeFolding() {
+    const pres = document.querySelectorAll("pre[data-collapse]");
+    if (pres.length === 0) return;
+
+    const rootFS = parseFloat(getComputedStyle(document.documentElement).fontSize);
+
+    pres.forEach(function (pre) {
+      if (pre.querySelector(".cf-btn")) return;
+
+      const code = pre.querySelector("code");
+      if (!code) return;
+
+      // 跳过高度不足的代码块，避免无效按钮和动画死锁
+      const maxHPx = parseFloat(getComputedStyle(pre).getPropertyValue("--cf-max-h")) * rootFS;
+      if (code.scrollHeight <= maxHPx) return;
+
+      const btn = document.createElement("button");
+      btn.className = "cf-btn";
+      btn.type = "button";
+      btn.textContent = labelExpand;
+      btn.setAttribute("aria-expanded", "false");
+      btn.setAttribute("aria-label", labelExpand);
+      btn.style.bottom = "-0.75rem";
+      pre.appendChild(btn);
+
+      pre.classList.add("cf-collapsed");
+
+      let animating = false;
+
+      btn.addEventListener("click", function () {
+        if (animating) return;
+        animating = true;
+
+        const isCollapsed = pre.classList.contains("cf-collapsed");
+
+        if (isCollapsed) {
+          const fullH = code.scrollHeight;
+          code.style.overflow = "hidden";
+          code.style.maxHeight = fullH + "px";
+          pre.classList.remove("cf-collapsed");
+          btn.textContent = labelCollapse;
+          btn.setAttribute("aria-expanded", "true");
+          btn.setAttribute("aria-label", labelCollapse);
+        } else {
+          const curH = code.scrollHeight;
+          code.style.overflow = "hidden";
+          code.style.maxHeight = curH + "px";
+          requestAnimationFrame(function () {
+            pre.classList.add("cf-collapsed");
+            code.style.maxHeight = "var(--cf-max-h)";
+            btn.textContent = labelExpand;
+            btn.setAttribute("aria-expanded", "false");
+            btn.setAttribute("aria-label", labelExpand);
+          });
+        }
+
+        code.addEventListener(
+          "transitionend",
+          function (e) {
+            if (e.propertyName !== "max-height") return;
+            clearTimeout(safetyTimer);
+            code.style.maxHeight = "";
+            code.style.overflow = "";
+            animating = false;
+          },
+          { once: true },
+        );
+
+        const safetyTimer = setTimeout(function () {
+          if (!animating) return;
+          code.style.maxHeight = "";
+          code.style.overflow = "";
+          animating = false;
+        }, 700);
+      });
+    });
+  }
+
+  document.addEventListener("astro:page-load", initCodeFolding);
+</script>

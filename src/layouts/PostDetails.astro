@@ -12,6 +12,8 @@ import BackToTopButton from "@/components/BackToTopButton.astro";
 import Giscus from "@/components/Giscus.astro";
 import FloatingTOC from "@/components/FloatingTOC.astro";
 import ImageZoom from "@/components/ImageZoom.astro";
+import CodeFolding from "@/components/CodeFolding.astro";
+import CodeCopy from "@/components/CodeCopy.astro";
 import { getPath } from "@/utils/getPath";
 import { slugifyStr } from "@/utils/slugify";
 import Icon from "@/components/Icon.astro";
@@ -104,6 +106,7 @@ const kaTeXInlineCSS = post.data.math
     Object.keys(translationMap).length > 0 && (
       <script
         is:inline
+        data-astro-rerun
         set:html={`window.__translations=${JSON.stringify(translationMap)};window.__currentLocale="${locale}";`}
       />
     )
@@ -190,26 +193,25 @@ const kaTeXInlineCSS = post.data.math
   </main>
   <Footer />
   <ImageZoom />
+  <CodeFolding />
+  <CodeCopy />
 </Layout>
 
 <script is:inline data-astro-rerun>
-  /** Create a progress indicator
-   *  at the top */
+  /** Create a progress indicator at the top */
   function createProgressBar() {
-    // Create the main container div
+    const existing = document.querySelector(".progress-container");
+    if (existing) {
+      existing.querySelector(".progress-bar").style.width = "0%";
+      return;
+    }
     const progressContainer = document.createElement("div");
     progressContainer.className =
       "progress-container fixed top-0 z-10 h-1 w-full bg-background";
-
-    // Create the progress bar div
     const progressBar = document.createElement("div");
     progressBar.className = "progress-bar h-1 w-0 bg-accent";
     progressBar.id = "myBar";
-
-    // Append the progress bar to the progress container
     progressContainer.appendChild(progressBar);
-
-    // Append the progress container to the document body or any other desired parent element
     document.body.appendChild(progressContainer);
   }
   createProgressBar();
@@ -218,73 +220,30 @@ const kaTeXInlineCSS = post.data.math
   function updateScrollProgress() {
     if (window.__scrollBound) return;
     window.__scrollBound = true;
+    let ticking = false;
     document.addEventListener("scroll", () => {
-      const winScroll =
-        document.body.scrollTop || document.documentElement.scrollTop;
-      const height =
-        document.documentElement.scrollHeight -
-        document.documentElement.clientHeight;
-      const scrolled = (winScroll / height) * 100;
-      if (document) {
-        const myBar = document.getElementById("myBar");
-        if (myBar) {
-          myBar.style.width = scrolled + "%";
-        }
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const myBar = document.getElementById("myBar");
+          if (!myBar) { ticking = false; return; }
+          const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+          const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+          if (height <= 0) { myBar.style.width = "0%"; ticking = false; return; }
+          myBar.style.width = (winScroll / height) * 100 + "%";
+          ticking = false;
+        });
+        ticking = true;
       }
-    });
+    }, { passive: true });
   }
   updateScrollProgress();
 
-  /** Attaches copy buttons to code blocks in the document,
-   * allowing users to copy code easily. */
-  function attachCopyButtons() {
-    const copyButtonLabel = "Copy";
-    const codeBlocks = Array.from(document.querySelectorAll("pre"));
-
-    for (const codeBlock of codeBlocks) {
-      const wrapper = document.createElement("div");
-      wrapper.style.position = "relative";
-
-      // 构建时由 transformerFileName 设置，无文件名则不偏移
-      const topClass = codeBlock.dataset.filename !== undefined
-        ? "top-(--file-name-offset)"
-        : "-top-3";
-
-      const copyButton = document.createElement("button");
-      copyButton.className = `copy-code absolute end-3 ${topClass} rounded bg-muted border border-muted px-2 py-1 text-xs leading-4 text-foreground font-medium`;
-      copyButton.innerHTML = copyButtonLabel;
-      codeBlock.setAttribute("tabindex", "0");
-      codeBlock.appendChild(copyButton);
-
-      // wrap codebock with relative parent element
-      codeBlock?.parentNode?.insertBefore(wrapper, codeBlock);
-      wrapper.appendChild(codeBlock);
-
-      copyButton.addEventListener("click", async () => {
-        await copyCode(codeBlock, copyButton);
-      });
-    }
-
-    async function copyCode(block, button) {
-      const code = block.querySelector("code");
-      const text = code?.innerText;
-
-      await navigator.clipboard.writeText(text ?? "");
-
-      // visual feedback that task is completed
-      button.innerText = "Copied";
-
-      setTimeout(() => {
-        button.innerText = copyButtonLabel;
-      }, 700);
-    }
-  }
-  attachCopyButtons();
-
   /* Go to page start after page swap */
-  if (!window.__scrollBound) {
-    document.addEventListener("astro:after-swap", () =>
-      window.scrollTo({ left: 0, top: 0, behavior: "instant" })
-    );
+  if (!window.__scrollTopBound) {
+    window.__scrollTopBound = true;
+    document.addEventListener("astro:after-swap", () => {
+      if (!document.getElementById("main-content")) return;
+      window.scrollTo({ left: 0, top: 0, behavior: "instant" });
+    });
   }
 </script>

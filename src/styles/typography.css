@@ -71,7 +71,7 @@
     }
 
     .astro-code code {
-      @apply flex-[1_0_100%] bg-inherit p-0;
+      @apply flex-[1_0_100%] bg-inherit p-0 min-w-0 overflow-hidden;
     }
 
     blockquote {
@@ -93,21 +93,21 @@
 
   /* ===== Code Blocks & Syntax Highlighting ===== */
   .astro-code {
-    @apply flex border bg-(--shiki-light-bg) text-(--shiki-light) outline-border [&_span]:text-(--shiki-light);
+    @apply flex border bg-(--shiki-light-bg) text-(--shiki-light) outline-border [&_span:not(.line-number)]:text-(--shiki-light);
   }
 
   html[data-theme="dark"] .astro-code {
-    @apply bg-(--shiki-dark-bg) text-(--shiki-dark) [&_span]:text-(--shiki-dark);
+    @apply bg-(--shiki-dark-bg) text-(--shiki-dark) [&_span:not(.line-number)]:text-(--shiki-dark);
   }
 
   /* Styles for Shiki transformers */
   /* https://shiki.style/packages/transformers */
   .astro-code {
     .line.diff.add {
-      @apply relative inline-block w-full bg-green-400/20 before:absolute before:-left-3 before:text-green-500 before:content-['+'];
+      @apply relative inline-block w-full bg-green-400/20 before:absolute before:left-[-3rem] before:text-green-500 before:content-['+'];
     }
     .line.diff.remove {
-      @apply relative inline-block w-full bg-red-500/20 before:absolute before:-left-3 before:text-red-500 before:content-['-'];
+      @apply relative inline-block w-full bg-red-500/20 before:absolute before:left-[-3rem] before:text-red-500 before:content-['-'];
     }
     .line.highlighted {
       @apply inline-block w-full bg-slate-400/20;
@@ -115,5 +115,23 @@
     .highlighted-word {
       @apply rounded-sm border border-border px-0.5 py-px;
     }
+  }
+
+  /* Line numbers */
+  .astro-code .line-number {
+    display: inline-block;
+    min-width: 1.75rem;
+    text-align: right;
+    margin-right: 0.5rem;
+    color: color-mix(in srgb, var(--color-foreground) 40%, transparent);
+    user-select: none;
+  }
+
+  .astro-code .line {
+    display: inline-block;
+    box-sizing: border-box;
+    width: 100%;
+    padding-left: calc(1.75rem + 0.5rem);
+    text-indent: calc(-1.75rem - 0.5rem);
   }
 }
