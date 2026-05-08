@@ -71,7 +71,7 @@
     }
 
     .astro-code code {
-      @apply flex-[1_0_100%] bg-inherit p-0;
+      @apply flex-[1_0_100%] bg-inherit p-0 min-w-0;
     }
 
     blockquote {
@@ -93,21 +93,21 @@
 
   /* ===== Code Blocks & Syntax Highlighting ===== */
   .astro-code {
-    @apply flex border bg-(--shiki-light-bg) text-(--shiki-light) outline-border [&_span]:text-(--shiki-light);
+    @apply flex border bg-(--shiki-light-bg) text-(--shiki-light) outline-border [&_span:not(.line-number)]:text-(--shiki-light);
   }
 
   html[data-theme="dark"] .astro-code {
-    @apply bg-(--shiki-dark-bg) text-(--shiki-dark) [&_span]:text-(--shiki-dark);
+    @apply bg-(--shiki-dark-bg) text-(--shiki-dark) [&_span:not(.line-number)]:text-(--shiki-dark);
   }
 
   /* Styles for Shiki transformers */
   /* https://shiki.style/packages/transformers */
   .astro-code {
     .line.diff.add {
-      @apply relative inline-block w-full bg-green-400/20 before:absolute before:-left-3 before:text-green-500 before:content-['+'];
+      @apply relative inline-block w-full bg-green-400/20 before:absolute before:left-[-3rem] before:text-green-500 before:content-['+'];
     }
     .line.diff.remove {
-      @apply relative inline-block w-full bg-red-500/20 before:absolute before:-left-3 before:text-red-500 before:content-['-'];
+      @apply relative inline-block w-full bg-red-500/20 before:absolute before:left-[-3rem] before:text-red-500 before:content-['-'];
     }
     .line.highlighted {
       @apply inline-block w-full bg-slate-400/20;
@@ -117,34 +117,13 @@
     }
   }
 
-  /* Copy button */
-  .copy-btn {
-    position: absolute;
-    right: 0.75rem;
-    border-radius: 0.25rem;
-    background: var(--color-muted);
-    border: 1px solid var(--color-border);
-    padding: 0.25rem 0.5rem;
-    font-size: 0.75rem;
-    line-height: 1rem;
-    color: var(--color-foreground);
-    font-weight: 500;
-    font-family: var(--font-body);
-    transition: background-color 150ms ease;
-  }
-
-  .copy-btn:hover,
-  .copy-btn:focus-visible {
-    background: var(--color-border);
-  }
-
   /* Line numbers */
   .astro-code .line-number {
     display: inline-block;
     min-width: 1.75rem;
     text-align: right;
     margin-right: 0.5rem;
-    color: var(--color-border);
+    color: color-mix(in srgb, var(--color-foreground) 40%, transparent);
     user-select: none;
   }
 
