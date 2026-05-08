@@ -71,7 +71,7 @@
     }
 
     .astro-code code {
-      @apply flex-[1_0_100%] bg-inherit p-0 min-w-0;
+      @apply flex-[1_0_100%] bg-inherit p-0 min-w-0 overflow-hidden;
     }
 
     blockquote {
@@ -129,6 +129,7 @@
 
   .astro-code .line {
     display: inline-block;
+    box-sizing: border-box;
     width: 100%;
     padding-left: calc(1.75rem + 0.5rem);
     text-indent: calc(-1.75rem - 0.5rem);
