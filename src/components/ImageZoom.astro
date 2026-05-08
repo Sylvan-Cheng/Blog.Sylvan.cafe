@@ -1,21 +1,19 @@
 ---
 ---
 
-<script>
-  import type mediumZoom from "medium-zoom";
-
-  let zoomInstance: ReturnType<typeof mediumZoom> | null = null;
-  let zoomLoading = false;
-  let clickHandler: ((e: MouseEvent) => Promise<void>) | null = null;
+<script is:inline>
+  var zoomInstance = null;
+  var zoomLoading = false;
+  var clickHandler = null;
 
   async function loadZoom() {
     if (zoomInstance || zoomLoading) return;
     zoomLoading = true;
-    const images = document.querySelectorAll(".app-prose img:not(a img)");
+    var images = document.querySelectorAll(".app-prose img:not(a img)");
     if (images.length === 0) { zoomLoading = false; return; }
 
-    const { default: mediumZoom } = await import("medium-zoom");
-    zoomInstance = mediumZoom(images, { margin: 24 });
+    var mediumZoomModule = await import("medium-zoom");
+    zoomInstance = mediumZoomModule.default(images, { margin: 24 });
     zoomLoading = false;
   }
 
@@ -26,30 +24,32 @@
     }
     zoomLoading = false;
     if (clickHandler) {
-      const article = document.getElementById("article");
-      if (article) article.removeEventListener("click", clickHandler as unknown as EventListener);
+      var article = document.getElementById("article");
+      if (article) article.removeEventListener("click", clickHandler);
       clickHandler = null;
     }
   }
 
-  document.addEventListener("astro:page-load", () => {
+  function initImageZoom() {
     destroyImageZoom();
 
-    const article = document.getElementById("article");
+    var article = document.getElementById("article");
     if (!article) return;
 
-    // 页面无图片则跳过，不绑定任何监听器
     if (!document.querySelector(".app-prose img:not(a img)")) return;
 
-    clickHandler = async function (e: MouseEvent) {
-      const img = (e.target as HTMLElement)?.closest?.(".app-prose img:not(a img)") as HTMLElement | null;
+    clickHandler = function (e) {
+      var img = e.target.closest(".app-prose img:not(a img)");
       if (!img) return;
-      await loadZoom();
-      if (zoomInstance) zoomInstance.open({ target: img });
+      loadZoom().then(function () {
+        if (zoomInstance) zoomInstance.open({ target: img });
+      });
     };
-    article.addEventListener("click", clickHandler as unknown as EventListener);
-  });
+    article.addEventListener("click", clickHandler);
+  }
 
+  initImageZoom();
+  document.addEventListener("astro:page-load", initImageZoom);
   document.addEventListener("astro:before-swap", destroyImageZoom);
 </script>
 

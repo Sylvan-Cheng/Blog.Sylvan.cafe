@@ -102,6 +102,14 @@ const kaTeXInlineCSS = post.data.math
 
 <Layout {...layoutProps}>
   {post.data.math && <style slot="head" set:html={kaTeXInlineCSS} />}
+  {post.data.math && (
+    <>
+      <link slot="head" rel="preload" href="/assets/fonts/katex/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin />
+      <link slot="head" rel="preload" href="/assets/fonts/katex/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin />
+      <link slot="head" rel="preload" href="/assets/fonts/katex/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin />
+      <link slot="head" rel="preload" href="/assets/fonts/katex/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    </>
+  )}
   {
     Object.keys(translationMap).length > 0 && (
       <script
