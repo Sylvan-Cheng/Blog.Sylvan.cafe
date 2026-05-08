@@ -116,4 +116,42 @@
       @apply rounded-sm border border-border px-0.5 py-px;
     }
   }
+
+  /* Copy button */
+  .copy-btn {
+    position: absolute;
+    right: 0.75rem;
+    border-radius: 0.25rem;
+    background: var(--color-muted);
+    border: 1px solid var(--color-border);
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    color: var(--color-foreground);
+    font-weight: 500;
+    font-family: var(--font-body);
+    transition: background-color 150ms ease;
+  }
+
+  .copy-btn:hover,
+  .copy-btn:focus-visible {
+    background: var(--color-border);
+  }
+
+  /* Line numbers */
+  .astro-code .line-number {
+    display: inline-block;
+    min-width: 1.75rem;
+    text-align: right;
+    margin-right: 0.5rem;
+    color: var(--color-border);
+    user-select: none;
+  }
+
+  .astro-code .line {
+    display: inline-block;
+    width: 100%;
+    padding-left: calc(1.75rem + 0.5rem);
+    text-indent: calc(-1.75rem - 0.5rem);
+  }
 }

@@ -264,6 +264,32 @@ export const UI = {
     ja: "ページを編集",
     ru: "Редактировать",
   } satisfies Dict,
+  codeBlock: {
+    expand: {
+      zh: "展开",
+      en: "Expand",
+      ja: "展開",
+      ru: "Развернуть",
+    } satisfies Dict,
+    collapse: {
+      zh: "折叠",
+      en: "Collapse",
+      ja: "折りたたむ",
+      ru: "Свернуть",
+    } satisfies Dict,
+    copy: {
+      zh: "复制",
+      en: "Copy",
+      ja: "コピー",
+      ru: "Копировать",
+    } satisfies Dict,
+    copied: {
+      zh: "已复制",
+      en: "Copied",
+      ja: "コピー済み",
+      ru: "Скопировано",
+    } satisfies Dict,
+  },
   pagination: {
     prev: {
       zh: "上一页",

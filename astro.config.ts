@@ -14,7 +14,8 @@ import {
   transformerNotationHighlight,
   transformerNotationWordHighlight,
 } from "@shikijs/transformers";
-import { transformerFileName } from "./src/utils/transformers/fileName";
+import { transformerCodeMeta } from "./src/utils/transformers/codeMeta.js";
+import { transformerLineNumbers } from "./src/utils/transformers/lineNumbers.js";
 import { SITE } from "./src/config";
 import { LOCALES } from "./src/i18n/config";
 
@@ -72,9 +73,10 @@ export default defineConfig({
       */
       themes: { light: "gruvbox-light-hard", dark: "gruvbox-dark-hard" },
       defaultColor: false,
-      wrap: false,
+      wrap: true,
       transformers: [
-        transformerFileName({ style: "v2", hideDot: false }),
+        transformerCodeMeta({ style: "v2", hideDot: false }),
+        transformerLineNumbers(),
         transformerNotationHighlight(),
         transformerNotationWordHighlight(),
         transformerNotationDiff({ matchAlgorithm: "v3" }),

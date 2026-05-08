@@ -1,0 +1,86 @@
+---
+import { UI } from "@/i18n/ui";
+import { resolveLocale, t } from "@/i18n/utils";
+
+const locale = resolveLocale(Astro.currentLocale);
+const labelCopy = t(UI.codeBlock.copy, locale);
+const labelCopied = t(UI.codeBlock.copied, locale);
+---
+
+<style is:global>
+  .copy-btn {
+    position: absolute;
+    right: 0.75rem;
+    border-radius: 0.25rem;
+    background: var(--color-muted);
+    border: 1px solid var(--color-border);
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    color: var(--color-foreground);
+    font-weight: 500;
+    font-family: var(--font-body);
+    transition: background-color 150ms ease;
+  }
+
+  .copy-btn:hover,
+  .copy-btn:focus-visible {
+    background: var(--color-border);
+  }
+</style>
+
+<script define:vars={{ labelCopy, labelCopied }}>
+  function attachCopyButtons() {
+    const codeBlocks = Array.from(document.querySelectorAll("pre"));
+
+    for (const codeBlock of codeBlocks) {
+      if (codeBlock.classList.contains("copy-ready")) continue;
+      codeBlock.classList.add("copy-ready");
+
+      const wrapper = document.createElement("div");
+      wrapper.style.position = "relative";
+
+      // 构建时由 transformerCodeMeta 设置，无文件名则不偏移
+      const topClass = codeBlock.dataset.filename !== undefined
+        ? "top-(--file-name-offset)"
+        : "-top-3";
+
+      const copyButton = document.createElement("button");
+      copyButton.className = `copy-btn ${topClass}`;
+      copyButton.type = "button";
+      copyButton.innerHTML = labelCopy;
+      codeBlock.setAttribute("tabindex", "0");
+      codeBlock.appendChild(copyButton);
+
+      // wrap codeblock with relative parent element
+      codeBlock?.parentNode?.insertBefore(wrapper, codeBlock);
+      wrapper.appendChild(codeBlock);
+
+      copyButton.addEventListener("click", async () => {
+        await copyCode(codeBlock, copyButton);
+      });
+    }
+
+    async function copyCode(block, button) {
+      const code = block.querySelector("code");
+      if (!code) return;
+      const clone = code.cloneNode(true);
+      clone.querySelectorAll(".line-number").forEach(el => el.remove());
+      const text = clone.innerText;
+
+      try {
+        await navigator.clipboard.writeText(text ?? "");
+      } catch {
+        // clipboard API unavailable (e.g. HTTP context)
+      }
+
+      // visual feedback that task is completed
+      button.innerText = labelCopied;
+      setTimeout(() => {
+        button.innerText = labelCopy;
+      }, 700);
+    }
+  }
+
+  document.addEventListener("astro:page-load", attachCopyButtons);
+</script>

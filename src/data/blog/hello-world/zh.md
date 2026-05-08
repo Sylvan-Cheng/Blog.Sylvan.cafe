@@ -172,26 +172,51 @@ Markdown 的文本样式非常直观。使用双星号或双下划线包裹文�
 
 ## 代码块
 
-代码块是技术博客的核心内容。Astro 使用 Shiki 进行语法高亮，支持多种编程语言和主题。
+代码块基于 Shiki 语法高亮，支持：默认行号、自动换行（悬挂缩进）、代码折叠（`collapse`）、文件名标签（`file`）、关闭行号（`nolines`）。
 
-### TypeScript 示例
+### 默认行号
 
-```ts file="greet.ts"
-export function greet(name: string): string {
-  return `你好，${name}！`;
-}
-
-const msg = greet("世界");
-console.log(msg);
-```
-
-TypeScript 作为 JavaScript 的超集，提供了可选的静态类型检查。在 Astro 项目中，内容集合的 schema 定义就使用了 TypeScript 的 Zod 类型推导。类型安全使得大型项目的维护更加可靠。
-
-### Python 示例
+所有代码块默认开启行号，无需任何标记。
 
 ```python
+def fib(n: int) -> list[int]:
+    a, b = 0, 1
+    result = []
+    for _ in range(n):
+        result.append(a)
+        a, b = b, a + b
+    return result
+```
+
+### 文件标签：file
+
+`file="名称"` 在左上角显示文件名标签，带绿色圆点。
+
+```python file="fibonacci.py"
+def fib(n: int) -> list[int]:
+    a, b = 0, 1
+    for _ in range(n):
+        a, b = b, a + b
+    return a
+```
+
+### 关闭行号：nolines
+
+短代码片段加 `nolines` 关闭行号，保持简洁。
+
+```bash nolines
+pnpm install
+pnpm dev
+pnpm build
+```
+
+### 代码折叠：collapse
+
+超过 8 行的代码块加 `collapse` 自动折叠，底部渐隐提示还有内容，展开按钮在右下角。
+
+```python collapse file="utils.py"
 def fibonacci(n: int) -> list[int]:
-    """Generate first n Fibonacci numbers."""
+    """生成前 n 个斐波那契数"""
     a, b = 0, 1
     result = []
     for _ in range(n):
@@ -199,15 +224,90 @@ def fibonacci(n: int) -> list[int]:
         a, b = b, a + b
     return result
 
-# 生成前 10 个斐波那契数
-print(fibonacci(10))  # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+
+def is_prime(num: int) -> bool:
+    """判断整数是否为素数"""
+    if num < 2:
+        return False
+    for i in range(2, int(num ** 0.5) + 1):
+        if num % i == 0:
+            return False
+    return True
+
+
+def chunk_list(data: list, size: int):
+    """将列表按固定大小分块，返回生成器"""
+    for i in range(0, len(data), size):
+        yield data[i:i + size]
+
+
+print(fibonacci(10))
+primes = [x for x in fibonacci(20) if is_prime(x)]
+print(f"Primes: {primes}")
 ```
 
-Python 以其简洁的语法和丰富的生态而闻名。在数据科学、机器学习和自动化脚本领域有广泛应用。类型注解（type hints）是 Python 3.5 引入的特性，配合 mypy 等工具可以实现与 TypeScript 类似的类型检查体验。
+### 折叠 + 无行号：collapse nolines
 
-### CSS 示例
+多个标记可自由组合。
 
-```css
+```python collapse nolines
+import json
+from pathlib import Path
+
+
+def load_config(path: str | Path) -> dict:
+    """加载 JSON 配置文件，若不存在则返回空字典。"""
+    config_path = Path(path)
+    if not config_path.exists():
+        return {}
+    return json.loads(config_path.read_text(encoding="utf-8"))
+
+
+def merge_configs(base: dict, override: dict) -> dict:
+    """深度合并两个配置字典，override 优先。"""
+    result = base.copy()
+    for key, value in override.items():
+        if isinstance(value, dict) and key in result:
+            result[key] = merge_configs(result[key], value)
+        else:
+            result[key] = value
+    return result
+
+
+cfg = load_config("defaults.json")
+user_cfg = load_config("user.json")
+final = merge_configs(cfg, user_cfg)
+print(json.dumps(final, indent=2, ensure_ascii=False))
+```
+
+### 自动换行 + 悬挂缩进
+
+超长代码行会在容器边界自动折行，且折行缩进与首行代码对齐。
+
+```python collapse file="dashboard.py"
+def build_dashboard_report(assignments: dict[str, list[dict]], include_history: bool = False) -> str:
+    """根据各工作节点的任务分配结果，生成供运维使用的聚合仪表盘报告。"""
+    lines = ["# 负载报告", f"生成时间: {datetime.now().isoformat()}", ""]
+    for node_name, tasks in assignments.items():
+        pending = [t for t in tasks if t.get("status") == "pending" and t.get("priority", 0) >= 3]
+        lines.append(f"## {node_name}（{len(pending)} 个高优任务）")
+        lines.extend(f"  - [{t['priority']}] {t.get('title', '未命名')}" for t in sorted(pending, key=lambda x: -x["priority"]))
+    if include_history:
+        lines.append("\n---\n## 历史趋势\n*需启用持久化存储后获取*")
+    return "\n".join(lines)
+
+
+sample = [
+    {"title": "数据迁移", "status": "pending", "priority": 5, "node": "worker-0"},
+    {"title": "日志轮转", "status": "done", "priority": 1, "node": "worker-0"},
+    {"title": "索引重建", "status": "pending", "priority": 4, "node": "worker-1"},
+]
+print(build_dashboard_report({"worker-0": sample[:2], "worker-1": sample[2:]}, include_history=True))
+```
+
+### CSS
+
+```css nolines
 .astro-code {
   @apply rounded-lg border border-border;
   font-family: var(--font-code);
@@ -217,23 +317,6 @@ Python 以其简洁的语法和丰富的生态而闻名。在数据科学、机�
   min-height: 1.5rem;
 }
 ```
-
-本博客使用 Tailwind CSS v4 进行样式管理。Tailwind 的工具类（utility-first）方案让样式的编写更加直观，避免了传统 CSS 中类名命名的困扰。结合 `@apply` 指令，可以将常用的样式组合抽象为自定义工具类。
-
-### Shell 示例
-
-```bash
-# 安装依赖
-pnpm install
-
-# 启动开发服务器
-pnpm dev
-
-# 构建生产版本
-pnpm build
-```
-
-使用 pnpm 作为包管理器，相比 npm 可以显著减少磁盘占用和安装时间。`pnpm dev` 启动开发服务器后支持热更新，修改代码后浏览器自动刷新。
 
 ---
 
