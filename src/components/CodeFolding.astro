@@ -14,7 +14,7 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
     --cf-easing: cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  pre[data-collapse].cf-collapsed > code {
+  pre[data-collapse] > code {
     max-height: var(--cf-max-h);
     overflow: hidden;
     -webkit-mask-image: linear-gradient(
@@ -27,9 +27,6 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
       black calc(100% - 3rem),
       transparent
     );
-  }
-
-  pre[data-collapse] > code {
     transition: max-height var(--cf-duration) var(--cf-easing);
   }
 
@@ -70,10 +67,28 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
       const code = pre.querySelector("code");
       if (!code) return;
 
-      // 跳过高度不足的代码块，避免无效按钮和动画死锁
+      // 测量自然高度以判断是否需要折叠
       const maxHPx = parseFloat(getComputedStyle(pre).getPropertyValue("--cf-max-h")) * rootFS;
-      if (code.scrollHeight <= maxHPx) return;
+      code.style.transition = "none";
+      code.style.maxHeight = "none";
+      code.style.maskImage = "none";
+      code.style.webkitMaskImage = "none";
+      const fullH = code.scrollHeight;
+      code.style.transition = "";
+      code.style.maxHeight = "";
+      code.style.maskImage = "";
+      code.style.webkitMaskImage = "";
 
+      if (fullH <= maxHPx) {
+        // 内容不足，永久展开
+        code.style.maxHeight = "none";
+        code.style.overflow = "";
+        code.style.maskImage = "none";
+        code.style.webkitMaskImage = "none";
+        return;
+      }
+
+      // 内容超标，保持折叠 + 创建按钮
       const btn = document.createElement("button");
       btn.className = "cf-btn";
       btn.type = "button";
@@ -82,7 +97,6 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
       btn.setAttribute("aria-label", labelExpand);
       btn.style.bottom = "-0.75rem";
       pre.appendChild(btn);
-
       pre.classList.add("cf-collapsed");
 
       let animating = false;
@@ -94,20 +108,22 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
         const isCollapsed = pre.classList.contains("cf-collapsed");
 
         if (isCollapsed) {
-          const fullH = code.scrollHeight;
           code.style.overflow = "hidden";
           code.style.maxHeight = fullH + "px";
+          code.style.maskImage = "none";
+          code.style.webkitMaskImage = "none";
           pre.classList.remove("cf-collapsed");
           btn.textContent = labelCollapse;
           btn.setAttribute("aria-expanded", "true");
           btn.setAttribute("aria-label", labelCollapse);
         } else {
-          const curH = code.scrollHeight;
           code.style.overflow = "hidden";
-          code.style.maxHeight = curH + "px";
+          code.style.maxHeight = code.scrollHeight + "px";
           requestAnimationFrame(function () {
-            pre.classList.add("cf-collapsed");
             code.style.maxHeight = "var(--cf-max-h)";
+            code.style.maskImage = "";
+            code.style.webkitMaskImage = "";
+            pre.classList.add("cf-collapsed");
             btn.textContent = labelExpand;
             btn.setAttribute("aria-expanded", "false");
             btn.setAttribute("aria-label", labelExpand);
@@ -119,8 +135,17 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
           function (e) {
             if (e.propertyName !== "max-height") return;
             clearTimeout(safetyTimer);
-            code.style.maxHeight = "";
-            code.style.overflow = "";
+            if (pre.classList.contains("cf-collapsed")) {
+              code.style.maxHeight = "";
+              code.style.overflow = "";
+              code.style.maskImage = "";
+              code.style.webkitMaskImage = "";
+            } else {
+              code.style.maxHeight = "none";
+              code.style.overflow = "";
+              code.style.maskImage = "none";
+              code.style.webkitMaskImage = "none";
+            }
             animating = false;
           },
           { once: true },
@@ -128,8 +153,17 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
 
         const safetyTimer = setTimeout(function () {
           if (!animating) return;
-          code.style.maxHeight = "";
-          code.style.overflow = "";
+          if (pre.classList.contains("cf-collapsed")) {
+            code.style.maxHeight = "";
+            code.style.overflow = "";
+            code.style.maskImage = "";
+            code.style.webkitMaskImage = "";
+          } else {
+            code.style.maxHeight = "none";
+            code.style.overflow = "";
+            code.style.maskImage = "none";
+            code.style.webkitMaskImage = "none";
+          }
           animating = false;
         }, 700);
       });
