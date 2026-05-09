@@ -212,7 +212,7 @@ pnpm build
 
 ### 代码折叠：collapse
 
-超过 8 行的代码块加 `collapse` 自动折叠，底部渐隐提示还有内容，展开按钮在右下角。
+超过 8 行的代码块加 `collapse` 自动折叠，底部渐隐提示还有内容，展开按钮在底部居中。
 
 ```python collapse file="utils.py"
 def fibonacci(n: int) -> list[int]:
