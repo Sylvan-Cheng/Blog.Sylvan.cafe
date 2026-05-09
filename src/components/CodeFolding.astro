@@ -102,7 +102,7 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
       const code = pre.querySelector("code");
       if (!code) return;
 
-      // 测量自然高度以判断是否需要折叠
+      // 测量自然高度：先写隐藏样式，下一帧读取避免强制同步重排
       const maxHPx =
         parseFloat(getComputedStyle(pre).getPropertyValue("--cf-max-h")) *
         rootFS;
@@ -110,98 +110,83 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
       code.style.maxHeight = "none";
       code.style.maskImage = "none";
       code.style.webkitMaskImage = "none";
-      const fullH = code.scrollHeight;
-      code.style.transition = "";
-      code.style.maxHeight = "";
-      code.style.maskImage = "";
-      code.style.webkitMaskImage = "";
 
-      if (fullH <= maxHPx) {
-        // 内容不足，永久展开
-        code.style.maxHeight = "none";
-        code.style.overflow = "";
-        code.style.maskImage = "none";
-        code.style.webkitMaskImage = "none";
-        return;
-      }
+      code.style.visibility = "hidden";
+      requestAnimationFrame(function () {
+        const fullH = code.scrollHeight;
+        code.style.visibility = "";
+        code.style.transition = "";
+        code.style.maxHeight = "";
+        code.style.maskImage = "";
+        code.style.webkitMaskImage = "";
 
-      // 内容超标，保持折叠 + 创建按钮
-      const btn = document.createElement("button");
-      btn.className = "cf-btn";
-      btn.type = "button";
-      const leftSvg = createChevronSVG(chevronDownD);
-      const textSpan = document.createElement("span");
-      textSpan.className = "cf-btn-text";
-      textSpan.textContent = labelExpand;
-      const rightSvg = createChevronSVG(chevronDownD);
-      btn.appendChild(leftSvg);
-      btn.appendChild(textSpan);
-      btn.appendChild(rightSvg);
-      btn._leftPath = leftSvg.firstChild;
-      btn._textSpan = textSpan;
-      btn._rightPath = rightSvg.firstChild;
-      btn.setAttribute("aria-expanded", "false");
-      btn.setAttribute("aria-label", labelExpand);
-      btn.style.bottom = "-0.75rem";
-      pre.appendChild(btn);
-      pre.classList.add("cf-collapsed");
-
-      let animating = false;
-
-      btn.addEventListener("click", function () {
-        if (animating) return;
-        animating = true;
-
-        const isCollapsed = pre.classList.contains("cf-collapsed");
-
-        if (isCollapsed) {
-          code.style.overflow = "hidden";
-          code.style.maxHeight = fullH + "px";
+        if (fullH <= maxHPx) {
+          // 内容不足，永久展开
+          code.style.maxHeight = "none";
+          code.style.overflow = "";
           code.style.maskImage = "none";
           code.style.webkitMaskImage = "none";
-          pre.classList.remove("cf-collapsed");
-          btn._leftPath.setAttribute('d', chevronUpD);
-          btn._rightPath.setAttribute('d', chevronUpD);
-          btn._textSpan.textContent = labelCollapse;
-          btn.setAttribute("aria-expanded", "true");
-          btn.setAttribute("aria-label", labelCollapse);
-        } else {
-          code.style.overflow = "hidden";
-          code.style.maxHeight = code.scrollHeight + "px";
-          requestAnimationFrame(function () {
-            code.style.maxHeight = "var(--cf-max-h)";
-            code.style.maskImage = "";
-            code.style.webkitMaskImage = "";
-            pre.classList.add("cf-collapsed");
-            btn._leftPath.setAttribute('d', chevronDownD);
-            btn._rightPath.setAttribute('d', chevronDownD);
-            btn._textSpan.textContent = labelExpand;
-            btn.setAttribute("aria-expanded", "false");
-            btn.setAttribute("aria-label", labelExpand);
-          });
+          return;
         }
 
-        const safetyTimer = setTimeout(function () {
-          if (!animating) return;
-          if (pre.classList.contains("cf-collapsed")) {
-            code.style.maxHeight = "";
-            code.style.overflow = "";
-            code.style.maskImage = "";
-            code.style.webkitMaskImage = "";
-          } else {
-            code.style.maxHeight = "none";
-            code.style.overflow = "";
+        // 内容超标，保持折叠 + 创建按钮
+        const btn = document.createElement("button");
+        btn.className = "cf-btn";
+        btn.type = "button";
+        const leftSvg = createChevronSVG(chevronDownD);
+        const textSpan = document.createElement("span");
+        textSpan.className = "cf-btn-text";
+        textSpan.textContent = labelExpand;
+        const rightSvg = createChevronSVG(chevronDownD);
+        btn.appendChild(leftSvg);
+        btn.appendChild(textSpan);
+        btn.appendChild(rightSvg);
+        btn._leftPath = leftSvg.firstChild;
+        btn._textSpan = textSpan;
+        btn._rightPath = rightSvg.firstChild;
+        btn.setAttribute("aria-expanded", "false");
+        btn.setAttribute("aria-label", labelExpand);
+        btn.style.bottom = "-0.75rem";
+        pre.appendChild(btn);
+        pre.classList.add("cf-collapsed");
+
+        let animating = false;
+
+        btn.addEventListener("click", function () {
+          if (animating) return;
+          animating = true;
+
+          const isCollapsed = pre.classList.contains("cf-collapsed");
+
+          if (isCollapsed) {
+            code.style.overflow = "hidden";
+            code.style.maxHeight = fullH + "px";
             code.style.maskImage = "none";
             code.style.webkitMaskImage = "none";
+            pre.classList.remove("cf-collapsed");
+            btn._leftPath.setAttribute('d', chevronUpD);
+            btn._rightPath.setAttribute('d', chevronUpD);
+            btn._textSpan.textContent = labelCollapse;
+            btn.setAttribute("aria-expanded", "true");
+            btn.setAttribute("aria-label", labelCollapse);
+          } else {
+            code.style.overflow = "hidden";
+            code.style.maxHeight = code.scrollHeight + "px";
+            requestAnimationFrame(function () {
+              code.style.maxHeight = "var(--cf-max-h)";
+              code.style.maskImage = "";
+              code.style.webkitMaskImage = "";
+              pre.classList.add("cf-collapsed");
+              btn._leftPath.setAttribute('d', chevronDownD);
+              btn._rightPath.setAttribute('d', chevronDownD);
+              btn._textSpan.textContent = labelExpand;
+              btn.setAttribute("aria-expanded", "false");
+              btn.setAttribute("aria-label", labelExpand);
+            });
           }
-          animating = false;
-        }, 700);
 
-        code.addEventListener(
-          "transitionend",
-          function (e) {
-            if (e.propertyName !== "max-height") return;
-            clearTimeout(safetyTimer);
+          const safetyTimer = setTimeout(function () {
+            if (!animating) return;
             if (pre.classList.contains("cf-collapsed")) {
               code.style.maxHeight = "";
               code.style.overflow = "";
@@ -214,9 +199,29 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
               code.style.webkitMaskImage = "none";
             }
             animating = false;
-          },
-          { once: true },
-        );
+          }, 700);
+
+          code.addEventListener(
+            "transitionend",
+            function (e) {
+              if (e.propertyName !== "max-height") return;
+              clearTimeout(safetyTimer);
+              if (pre.classList.contains("cf-collapsed")) {
+                code.style.maxHeight = "";
+                code.style.overflow = "";
+                code.style.maskImage = "";
+                code.style.webkitMaskImage = "";
+              } else {
+                code.style.maxHeight = "none";
+                code.style.overflow = "";
+                code.style.maskImage = "none";
+                code.style.webkitMaskImage = "none";
+              }
+              animating = false;
+            },
+            { once: true },
+          );
+        });
       });
     });
   }
