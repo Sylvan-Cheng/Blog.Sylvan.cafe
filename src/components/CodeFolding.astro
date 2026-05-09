@@ -30,12 +30,16 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
     transition: max-height var(--cf-duration) var(--cf-easing);
   }
 
-  /* 折叠按钮 — 右下角，与 copy 按钮同风格，置于底边框上 */
+  /* 折叠按钮 — 底部居中 */
   .cf-btn {
     position: absolute;
     z-index: 10;
-    right: 0.75rem;
-    padding: 0.25rem 0.5rem;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
+    padding: 4px 8px;
     border: 1px solid var(--color-border);
     border-radius: 0.25rem;
     background: var(--color-muted);
@@ -48,6 +52,19 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
     transition: background-color 150ms ease;
   }
 
+  .cf-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .cf-btn svg {
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+  }
+
   .cf-btn:hover,
   .cf-btn:focus-visible {
     background: var(--color-border);
@@ -56,10 +73,23 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
 
 <script define:vars={{ labelExpand, labelCollapse }}>
   function initCodeFolding() {
+    const chevronUp =
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>';
+    const chevronDown =
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+    function expandHTML(label) {
+      return `${chevronDown}<span class="cf-btn-text">${label}</span>${chevronDown}`;
+    }
+    function collapseHTML(label) {
+      return `${chevronUp}<span class="cf-btn-text">${label}</span>${chevronUp}`;
+    }
+
     const pres = document.querySelectorAll("pre[data-collapse]");
     if (pres.length === 0) return;
 
-    const rootFS = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    const rootFS = parseFloat(
+      getComputedStyle(document.documentElement).fontSize,
+    );
 
     pres.forEach(function (pre) {
       if (pre.querySelector(".cf-btn")) return;
@@ -68,7 +98,9 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
       if (!code) return;
 
       // 测量自然高度以判断是否需要折叠
-      const maxHPx = parseFloat(getComputedStyle(pre).getPropertyValue("--cf-max-h")) * rootFS;
+      const maxHPx =
+        parseFloat(getComputedStyle(pre).getPropertyValue("--cf-max-h")) *
+        rootFS;
       code.style.transition = "none";
       code.style.maxHeight = "none";
       code.style.maskImage = "none";
@@ -92,7 +124,7 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
       const btn = document.createElement("button");
       btn.className = "cf-btn";
       btn.type = "button";
-      btn.textContent = labelExpand;
+      btn.innerHTML = expandHTML(labelExpand);
       btn.setAttribute("aria-expanded", "false");
       btn.setAttribute("aria-label", labelExpand);
       btn.style.bottom = "-0.75rem";
@@ -113,7 +145,7 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
           code.style.maskImage = "none";
           code.style.webkitMaskImage = "none";
           pre.classList.remove("cf-collapsed");
-          btn.textContent = labelCollapse;
+          btn.innerHTML = collapseHTML(labelCollapse);
           btn.setAttribute("aria-expanded", "true");
           btn.setAttribute("aria-label", labelCollapse);
         } else {
@@ -124,7 +156,7 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
             code.style.maskImage = "";
             code.style.webkitMaskImage = "";
             pre.classList.add("cf-collapsed");
-            btn.textContent = labelExpand;
+            btn.innerHTML = expandHTML(labelExpand);
             btn.setAttribute("aria-expanded", "false");
             btn.setAttribute("aria-label", labelExpand);
           });
