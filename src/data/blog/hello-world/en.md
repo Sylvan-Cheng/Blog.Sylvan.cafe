@@ -30,7 +30,7 @@ This article aims to test all Markdown syntax rendering while verifying the floa
 
 The TOC has a fixed width of 192px, fitting roughly 22–24 Latin characters at 14px font size. This heading far exceeds that length, so it should be truncated with `...` in the TOC, showing the full title on hover. Below is sample body text.
 
-### An Similarly Lengthy Third-Level Subheading to Verify Indentation Differences During Truncation
+### A Similarly Lengthy Third-Level Subheading to Verify Indentation Differences During Truncation
 
 Third-level headings have extra left indentation in the TOC, making the available width even narrower, so truncation should occur sooner. This heading is intentionally verbose to trigger overflow detection.
 

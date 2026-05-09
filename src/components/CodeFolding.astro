@@ -8,6 +8,7 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
 ---
 
 <style is:global>
+  /* Shiki 内联设置了 position: relative + overflow-x: auto，此处不重复添加以避免滚动条与按钮错位 */
   pre[data-collapse] {
     --cf-max-h: 12rem;
     --cf-duration: 400ms;
@@ -39,6 +40,10 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
     margin-left: auto;
     margin-right: auto;
     width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
     padding: 4px 8px;
     border: 1px solid var(--color-border);
     border-radius: 0.25rem;
@@ -50,13 +55,6 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
     font-family: var(--font-body);
     cursor: pointer;
     transition: background-color 150ms ease;
-  }
-
-  .cf-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
   }
 
   .cf-btn svg {
@@ -73,15 +71,22 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
 
 <script define:vars={{ labelExpand, labelCollapse }}>
   function initCodeFolding() {
-    const chevronUp =
-      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>';
-    const chevronDown =
-      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
-    function expandHTML(label) {
-      return `${chevronDown}<span class="cf-btn-text">${label}</span>${chevronDown}`;
-    }
-    function collapseHTML(label) {
-      return `${chevronUp}<span class="cf-btn-text">${label}</span>${chevronUp}`;
+    const chevronDownD = 'm6 9 6 6 6-6';
+    const chevronUpD = 'm18 15-6-6-6 6';
+
+    function createChevronSVG(d) {
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('aria-hidden', 'true');
+      svg.setAttribute('viewBox', '0 0 24 24');
+      svg.setAttribute('fill', 'none');
+      svg.setAttribute('stroke', 'currentColor');
+      svg.setAttribute('stroke-width', '2');
+      svg.setAttribute('stroke-linecap', 'round');
+      svg.setAttribute('stroke-linejoin', 'round');
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', d);
+      svg.appendChild(path);
+      return svg;
     }
 
     const pres = document.querySelectorAll("pre[data-collapse]");
@@ -124,7 +129,17 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
       const btn = document.createElement("button");
       btn.className = "cf-btn";
       btn.type = "button";
-      btn.innerHTML = expandHTML(labelExpand);
+      const leftSvg = createChevronSVG(chevronDownD);
+      const textSpan = document.createElement("span");
+      textSpan.className = "cf-btn-text";
+      textSpan.textContent = labelExpand;
+      const rightSvg = createChevronSVG(chevronDownD);
+      btn.appendChild(leftSvg);
+      btn.appendChild(textSpan);
+      btn.appendChild(rightSvg);
+      btn._leftPath = leftSvg.firstChild;
+      btn._textSpan = textSpan;
+      btn._rightPath = rightSvg.firstChild;
       btn.setAttribute("aria-expanded", "false");
       btn.setAttribute("aria-label", labelExpand);
       btn.style.bottom = "-0.75rem";
@@ -145,7 +160,9 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
           code.style.maskImage = "none";
           code.style.webkitMaskImage = "none";
           pre.classList.remove("cf-collapsed");
-          btn.innerHTML = collapseHTML(labelCollapse);
+          btn._leftPath.setAttribute('d', chevronUpD);
+          btn._rightPath.setAttribute('d', chevronUpD);
+          btn._textSpan.textContent = labelCollapse;
           btn.setAttribute("aria-expanded", "true");
           btn.setAttribute("aria-label", labelCollapse);
         } else {
@@ -156,11 +173,29 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
             code.style.maskImage = "";
             code.style.webkitMaskImage = "";
             pre.classList.add("cf-collapsed");
-            btn.innerHTML = expandHTML(labelExpand);
+            btn._leftPath.setAttribute('d', chevronDownD);
+            btn._rightPath.setAttribute('d', chevronDownD);
+            btn._textSpan.textContent = labelExpand;
             btn.setAttribute("aria-expanded", "false");
             btn.setAttribute("aria-label", labelExpand);
           });
         }
+
+        const safetyTimer = setTimeout(function () {
+          if (!animating) return;
+          if (pre.classList.contains("cf-collapsed")) {
+            code.style.maxHeight = "";
+            code.style.overflow = "";
+            code.style.maskImage = "";
+            code.style.webkitMaskImage = "";
+          } else {
+            code.style.maxHeight = "none";
+            code.style.overflow = "";
+            code.style.maskImage = "none";
+            code.style.webkitMaskImage = "none";
+          }
+          animating = false;
+        }, 700);
 
         code.addEventListener(
           "transitionend",
@@ -182,22 +217,6 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
           },
           { once: true },
         );
-
-        const safetyTimer = setTimeout(function () {
-          if (!animating) return;
-          if (pre.classList.contains("cf-collapsed")) {
-            code.style.maxHeight = "";
-            code.style.overflow = "";
-            code.style.maskImage = "";
-            code.style.webkitMaskImage = "";
-          } else {
-            code.style.maxHeight = "none";
-            code.style.overflow = "";
-            code.style.maskImage = "none";
-            code.style.webkitMaskImage = "none";
-          }
-          animating = false;
-        }, 700);
       });
     });
   }

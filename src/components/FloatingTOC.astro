@@ -87,6 +87,10 @@ const locale = resolveLocale(Astro.currentLocale);
       clearTimeout(window.__toc.hideTimeout);
       window.__toc.hideTimeout = null;
     }
+    if (window.__toc.showTimeout) {
+      clearTimeout(window.__toc.showTimeout);
+      window.__toc.showTimeout = null;
+    }
 
     // 清理上一页残留的 tooltip（使用专属容器）
     let tooltipRoot = document.getElementById("toc-tooltip-root");
@@ -194,14 +198,13 @@ const locale = resolveLocale(Astro.currentLocale);
 
     // 父容器上的委托鼠标事件
     let currentLink = null;
-    let timeoutId = null;
     let rafId = null;
 
     function hideTooltip() {
       if (!currentLink) return;
       const t = tooltipMap.get(currentLink);
       if (t) {
-        clearTimeout(timeoutId);
+        clearTimeout(window.__toc.showTimeout);
         if (rafId) {
           cancelAnimationFrame(rafId);
           rafId = null;
@@ -226,7 +229,7 @@ const locale = resolveLocale(Astro.currentLocale);
       }
       currentLink = a;
       tooltip.style.display = "block";
-      timeoutId = window.setTimeout(() => {
+      window.__toc.showTimeout = window.setTimeout(() => {
         tooltip.style.opacity = "1";
       }, 400);
     });
