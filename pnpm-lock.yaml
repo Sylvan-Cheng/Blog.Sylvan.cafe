@@ -65,6 +65,9 @@ importers:
       rehype-katex:
         specifier: ^7.0.1
         version: 7.0.1
+      rehype-raw:
+        specifier: ^7.0.0
+        version: 7.0.0
       remark-collapse:
         specifier: ^0.1.2
         version: 0.1.2
