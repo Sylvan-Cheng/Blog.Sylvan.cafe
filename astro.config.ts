@@ -6,9 +6,11 @@ import icon from "astro-icon";
 import remarkToc from "remark-toc";
 import remarkCollapse from "remark-collapse";
 import remarkMath from "remark-math";
+import rehypeRaw from "rehype-raw";
 import rehypeKatex from "rehype-katex";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { rehypeA11y } from "./src/utils/rehype-a11y";
+import { rehypeImgProxy } from "./src/plugins/rehypeImgProxy";
 import {
   transformerNotationDiff,
   transformerNotationHighlight,
@@ -43,6 +45,8 @@ export default defineConfig({
   markdown: {
     remarkPlugins: [remarkToc, remarkMath, [remarkCollapse, { test: "Table of contents" }]],
     rehypePlugins: [
+      rehypeRaw,
+      rehypeImgProxy,
       rehypeKatex,
       rehypeA11y,
       [
