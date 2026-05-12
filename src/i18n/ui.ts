@@ -73,7 +73,15 @@ export const UI = {
       zh: (count: string) => `${count} 字`,
       en: (count: string) => `${count} words`,
       ja: (count: string) => `${count} 文字`,
-      ru: (count: string) => `${count} слов`,
+      ru: (count: string) => {
+        const n = parseInt(count, 10);
+        const lastDigit = n % 10;
+        const lastTwo = n % 100;
+        if (lastTwo >= 11 && lastTwo <= 14) return `${count} слов`;
+        if (lastDigit === 1) return `${count} слово`;
+        if (lastDigit >= 2 && lastDigit <= 4) return `${count} слова`;
+        return `${count} слов`;
+      },
     } satisfies TemplateDict,
   },
 
