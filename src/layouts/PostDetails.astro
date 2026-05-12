@@ -16,6 +16,7 @@ import CodeFolding from "@/components/CodeFolding.astro";
 import CodeCopy from "@/components/CodeCopy.astro";
 import { getPath } from "@/utils/getPath";
 import { slugifyStr } from "@/utils/slugify";
+import { countWords } from "@/utils/wordCount";
 import Icon from "@/components/Icon.astro";
 import { SITE } from "@/config";
 import { UI } from "@/i18n/ui";
@@ -135,6 +136,10 @@ const kaTeXInlineCSS = post.data.math
     </h1>
     <div class="my-2 flex items-center gap-2">
       <Datetime {pubDatetime} {modDatetime} {timezone} size="lg" />
+      <span aria-hidden="true" class="max-sm:hidden select-none opacity-40">&middot;</span>
+      <span class="text-sm text-foreground opacity-60 max-sm:hidden">
+        {UI.post.wordsCount[locale](String(countWords(post.body ?? "")))}
+      </span>
       <span
         aria-hidden="true"
         class:list={[
