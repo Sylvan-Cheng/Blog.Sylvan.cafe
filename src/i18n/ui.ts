@@ -69,6 +69,12 @@ export const UI = {
       ja: "更新：",
       ru: "Обновлено:",
     } satisfies Dict,
+    wordsCount: {
+      zh: (count: string) => `${count} 字`,
+      en: (count: string) => `${count} words`,
+      ja: (count: string) => `${count} 文字`,
+      ru: (count: string) => `${count} слов`,
+    } satisfies TemplateDict,
   },
 
   /** Home page */
