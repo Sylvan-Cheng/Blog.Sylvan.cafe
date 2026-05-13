@@ -3,4 +3,5 @@ dist
 .env
 .astro
 .opencode/
+.agents
 AGENTS.md

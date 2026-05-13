@@ -1,4 +1,4 @@
-export const LOCALES = ["zh", "en", "ja", "ru"] as const;
+export const LOCALES = ["zh", "en", "ja", "ru", "de"] as const;
 export type Locale = (typeof LOCALES)[number];
 export type Dict = Record<Locale, string>;
 
@@ -9,4 +9,5 @@ export const LOCALE_META: Record<Locale, { lang: string; label: string }> = {
   en: { lang: "en-US", label: "English" },
   ja: { lang: "ja", label: "日本語" },
   ru: { lang: "ru", label: "Русский" },
+  de: { lang: "de", label: "Deutsch" },
 };
