@@ -64,7 +64,7 @@ html[lang="ja"] {
 }
 
 .active-nav {
-  @apply underline decoration-wavy decoration-2 underline-offset-8;
+  @apply underline decoration-dashed decoration-2 underline-offset-8;
 }
 
 /* KaTeX dark mode */

@@ -102,11 +102,6 @@ const isActive = (path: string) => {
             {t(UI.nav.tags, locale)}
           </a>
         </li>
-        <li class="w-full sm:w-auto">
-          <a href={localizePath("/about")} class="block px-4 py-3 text-center font-medium hover:text-accent sm:px-2 sm:py-1" class:list={{ "active-nav": isActive(localizePath("/about")) }}>
-            {t(UI.nav.about, locale)}
-          </a>
-        </li>
         {
           SITE.showArchives && (
             <li class="w-full sm:w-auto">
@@ -116,6 +111,11 @@ const isActive = (path: string) => {
             </li>
           )
         }
+        <li class="w-full sm:w-auto">
+          <a href={localizePath("/about")} class="block px-4 py-3 text-center font-medium hover:text-accent sm:px-2 sm:py-1" class:list={{ "active-nav": isActive(localizePath("/about")) }}>
+            {t(UI.nav.about, locale)}
+          </a>
+        </li>
       </ul>
     </nav>
   </div>
