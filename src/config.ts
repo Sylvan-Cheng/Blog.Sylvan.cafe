@@ -4,7 +4,7 @@ export const SITE = {
   profile: "https://blog.sylvan.cafe/",
   desc: "A personal blog about technology, code, and life.",
   title: "Sylvan's Blog",
-  ogImage: "assets/astropaper-og.jpg",
+  ogImage: "",
   lightAndDarkMode: true,
   postPerIndex: 4,
   postPerPage: 4,
@@ -13,7 +13,7 @@ export const SITE = {
   showBackButton: true, // show back button in post detail
   editPost: {
     enabled: false,
-    url: "https://github.com/satnaing/astro-paper/edit/main/",
+    url: "https://github.com/Sylvan-Cheng/Blog.Sylvan.cafe/edit/main/",
   },
   giscus: {
     enabled: true,
