@@ -1,43 +1,344 @@
 ---
-import { SHARE_LINKS } from "@/constants";
 import LinkButton from "./LinkButton.astro";
 import Icon from "./Icon.astro";
 import Tooltip from "./Tooltip.astro";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
 
-const URL = Astro.url;
 const locale = resolveLocale(Astro.currentLocale);
+const pageUrl = Astro.url.href;
 
-const shareLabelMap: Record<string, string> = {
-  WhatsApp: UI.social.shareWhatsApp[locale],
-  Facebook: UI.social.shareFacebook[locale],
-  X: UI.social.shareX[locale],
-  Telegram: UI.social.shareTelegram[locale],
-  Pinterest: UI.social.sharePinterest[locale],
-  Mail: UI.social.shareEmail[locale],
+const shareConfig: Record<string, { primary: string[]; more: string[] }> = {
+  zh: {
+    primary: ['copy', 'brand-wechat', 'brand-telegram', 'brand-qq'],
+    more: ['brand-x', 'brand-reddit', 'brand-whatsapp', 'brand-line', 'brand-facebook', 'mail'],
+  },
+  en: {
+    primary: ['copy', 'brand-x', 'brand-reddit', 'mail'],
+    more: ['brand-whatsapp', 'brand-telegram', 'brand-facebook', 'brand-wechat', 'brand-line', 'brand-qq'],
+  },
+  ru: {
+    primary: ['copy', 'brand-telegram', 'brand-x', 'mail'],
+    more: ['brand-whatsapp', 'brand-reddit', 'brand-facebook', 'brand-line', 'brand-wechat', 'brand-qq'],
+  },
+  ja: {
+    primary: ['copy', 'brand-x', 'brand-line', 'brand-facebook'],
+    more: ['brand-reddit', 'brand-whatsapp', 'brand-telegram', 'brand-wechat', 'brand-qq', 'mail'],
+  },
+  de: {
+    primary: ['copy', 'brand-whatsapp', 'brand-x', 'mail'],
+    more: ['brand-telegram', 'brand-reddit', 'brand-facebook', 'brand-line', 'brand-wechat', 'brand-qq'],
+  },
 };
+
+const platformKeyMap: Record<string, keyof typeof UI.share.platforms> = {
+  'copy': 'copy',
+  'brand-wechat': 'wechat',
+  'brand-telegram': 'telegram',
+  'brand-qq': 'qq',
+  'brand-x': 'x',
+  'brand-reddit': 'reddit',
+  'brand-whatsapp': 'whatsapp',
+  'brand-line': 'line',
+  'brand-facebook': 'facebook',
+  'mail': 'mail',
+};
+
+const shareUrls: Record<string, string> = {
+  'brand-whatsapp': 'https://wa.me/?text=',
+  'brand-facebook': 'https://www.facebook.com/sharer.php?u=',
+  'brand-x': 'https://x.com/intent/post?url=',
+  'brand-telegram': 'https://t.me/share/url?url=',
+  'brand-reddit': 'https://www.reddit.com/submit?url=',
+  'brand-line': 'https://social-plugins.line.me/lineit/share?url=',
+  'mail': 'mailto:?subject=&body=',
+};
+
+const cfg = shareConfig[locale] || shareConfig.en;
+
+function getHref(icon: string): string {
+  if (icon === 'copy') return '#';
+  const base = shareUrls[icon];
+  if (!base) return '#';
+  return base + encodeURIComponent(pageUrl);
+}
+
+function getLabel(icon: string): string {
+  const key = platformKeyMap[icon];
+  if (!key) return icon;
+  return t(UI.share.platforms[key], locale);
+}
+
+const LINK =
+  'scale-90 p-2 hover:-translate-y-0.5 sm:p-1 ' +
+  'focus-visible:ring-2 focus-visible:ring-accent focus-visible:rounded';
+
+const ICON =
+  'inline-block size-6 scale-125 stroke-current ' +
+  'opacity-90 group-hover:fill-transparent sm:scale-110';
 ---
 
-{
-  SHARE_LINKS.length > 0 && (
-    <div class="flex flex-none flex-col items-center justify-center gap-1 md:items-start">
-      <span class="italic">{t(UI.share, locale)}</span>
-      <div class="text-center">
-        {SHARE_LINKS.map(social => (
-          <Tooltip text={shareLabelMap[social.name] || social.linkTitle}>
-            <LinkButton
-              href={`${social.href + URL}`}
-              class="scale-90 p-2 hover:rotate-6 sm:p-1"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Icon name={social.icon} class="inline-block size-6 scale-125 stroke-current opacity-90 group-hover:fill-transparent sm:scale-110" />
-              <span class="sr-only">{shareLabelMap[social.name] || social.linkTitle}</span>
-            </LinkButton>
-          </Tooltip>
-        ))}
-      </div>
+<div class="flex flex-none flex-col items-center justify-center gap-1 md:items-start">
+  <span class="italic">{t(UI.share.heading, locale)}</span>
+  <div class="flex flex-wrap items-center justify-center gap-1 md:justify-start" data-share-container>
+    <!-- narrow-screen centering spacer -->
+    <div class="max-md:inline-block hidden relative" aria-hidden="true">
+      <span class="inline-flex items-center gap-1 scale-90 p-2 sm:p-1 invisible pointer-events-none">
+        <Icon name="tabler:plus" class={ICON} />
+      </span>
     </div>
-  )
-}
+
+    <!-- primary buttons -->
+    {cfg.primary.map(icon => (
+      <Tooltip text={getLabel(icon)}>
+        {icon === 'copy' ? (
+          <LinkButton href="#" class={LINK} data-share-btn="copy">
+            <span class="share-copy-default"><Icon name="tabler:copy" class={ICON} /></span>
+            <span class="share-copy-success hidden"><Icon name="tabler:check" class={ICON} /></span>
+            <span class="sr-only" aria-live="polite" data-share-live
+                  data-live-success={t(UI.share.copySuccess, locale)}
+                  data-live-error={t(UI.share.copyError, locale)}
+                  data-live-unsupported={t(UI.share.copyUnsupported, locale)}></span>
+          </LinkButton>
+        ) : (
+          <LinkButton
+            href={getHref(icon)}
+            target={getHref(icon) !== '#' ? '_blank' : undefined}
+            rel={getHref(icon) !== '#' ? 'noopener noreferrer' : undefined}
+            class={LINK}
+            data-share-btn={icon}
+          >
+            <Icon name={`tabler:${icon}`} class={ICON} />
+          </LinkButton>
+        )}
+      </Tooltip>
+    ))}
+
+    <!-- more items (hidden until expanded) -->
+    <span
+      data-share-more
+      class="inline-flex items-center gap-1 max-md:order-2 max-md:w-full max-md:justify-center max-md:flex-wrap"
+      style="max-width:0;max-height:0"
+    >
+      {cfg.more.map(icon => (
+        <Tooltip text={getLabel(icon)}>
+          <LinkButton
+            href={getHref(icon)}
+            target={getHref(icon) !== '#' ? '_blank' : undefined}
+            rel={getHref(icon) !== '#' ? 'noopener noreferrer' : undefined}
+            class={`more-item shrink-0 ${LINK} opacity-0 pointer-events-none transition-[opacity,transform] duration-300 ease-out`}
+            data-share-btn={icon}
+          >
+            <Icon name={`tabler:${icon}`} class={ICON} />
+          </LinkButton>
+        </Tooltip>
+      ))}
+    </span>
+
+    <!-- toggle button -->
+    <Tooltip text={t(UI.share.more, locale)}>
+      <button
+        data-share-toggle
+        data-tip-collapsed={t(UI.share.more, locale)}
+        data-tip-expanded={t(UI.share.less, locale)}
+        aria-label={t(UI.share.more, locale)}
+        aria-expanded="false"
+        class="group inline-flex items-center gap-1 scale-90 p-2 sm:p-1 hover:text-accent border-0 bg-transparent cursor-pointer max-md:order-1 opacity-60 hover:opacity-100 transition-opacity duration-200 focus-visible:ring-2 focus-visible:ring-accent focus-visible:rounded"
+      >
+        <span class="share-toggle-collapsed"><Icon name="tabler:plus" class={ICON} /></span>
+        <span class="share-toggle-expanded hidden"><Icon name="tabler:minus" class={ICON} /></span>
+      </button>
+    </Tooltip>
+  </div>
+</div>
+
+<script data-astro-rerun>
+  (function() {
+    /* ── SPA cleanup: abort previous instance ───── */
+    if (window.__shareAC) window.__shareAC.abort();
+    var ac = new AbortController();
+    window.__shareAC = ac;
+
+    /* ── DOM refs ─────────────────────────────── */
+    var container = document.querySelector('[data-share-container]');
+    if (!container) return;
+
+    var wrapper = container.querySelector('[data-share-more]');
+    if (!wrapper) return;
+    var items = wrapper.querySelectorAll('.more-item');
+
+    var toggle = container.querySelector('[data-share-toggle]');
+    if (!toggle) return;
+    var toggleCollapsed = toggle.querySelector('.share-toggle-collapsed');
+    var toggleExpanded = toggle.querySelector('.share-toggle-expanded');
+    var tooltipSpan = toggle.parentElement.querySelector('[data-tooltip-text]');
+
+    var copyDefault = container.querySelector('.share-copy-default');
+    var copySuccess = container.querySelector('.share-copy-success');
+    var copyLive = container.querySelector('[data-share-live]');
+
+    /* ── State ─────────────────────────────────── */
+    var expanded = false;
+    var mobileQuery = window.matchMedia('not all and (min-width: 768px)');
+    var expandStagger = 50;
+    var expandDuration = 300;
+    var timerWrap = 0;
+
+    function isMobile() {
+      return mobileQuery.matches;
+    }
+
+    /* ── Expand / Collapse ─────────────────────── */
+    function expand() {
+      clearTimeout(timerWrap);
+      var mobile = isMobile();
+      if (mobile) {
+        wrapper.style.maxWidth = 'none';
+        wrapper.style.transition = 'max-height 500ms ease-out';
+        wrapper.style.maxHeight = '12rem';
+      } else {
+        wrapper.style.maxHeight = 'none';
+        wrapper.style.transition = 'max-width 500ms ease-out';
+        wrapper.style.maxWidth = '30rem';
+      }
+      items.forEach(function(item, i) {
+        item.style.transitionDelay = (i * expandStagger) + 'ms';
+        item.style.transitionDuration = expandDuration + 'ms';
+        item.style.transform = mobile ? '' : 'translateX(0)';
+        item.setAttribute('tabindex', '0');
+        item.classList.add('opacity-100', 'pointer-events-auto');
+        item.classList.remove('opacity-0', 'pointer-events-none');
+      });
+      toggleCollapsed.classList.add('hidden');
+      toggleExpanded.classList.remove('hidden');
+      toggle.setAttribute('aria-expanded', 'true');
+      if (tooltipSpan) tooltipSpan.textContent = toggle.dataset.tipExpanded;
+      toggle.setAttribute('aria-label', toggle.dataset.tipExpanded);
+    }
+
+    function collapse() {
+      clearTimeout(timerWrap);
+      var mobile = isMobile();
+      toggleExpanded.classList.add('hidden');
+      toggleCollapsed.classList.remove('hidden');
+      toggle.setAttribute('aria-expanded', 'false');
+      if (tooltipSpan) tooltipSpan.textContent = toggle.dataset.tipCollapsed;
+      toggle.setAttribute('aria-label', toggle.dataset.tipCollapsed);
+      items.forEach(function(item) {
+        item.style.transitionDelay = '0ms';
+        item.style.transitionDuration = '150ms';
+        item.style.transform = mobile ? '' : 'translateX(-0.75rem)';
+        item.setAttribute('tabindex', '-1');
+        item.classList.add('opacity-0', 'pointer-events-none');
+        item.classList.remove('opacity-100', 'pointer-events-auto');
+      });
+      timerWrap = setTimeout(function() {
+        wrapper.style.transition = mobile ? 'max-height 300ms ease-out' : 'max-width 300ms ease-out';
+        if (mobile) {
+          wrapper.style.maxHeight = '0';
+        } else {
+          wrapper.style.maxWidth = '0';
+        }
+        timerWrap = 0;
+      }, 100);
+    }
+
+    function reset() {
+      if (!document.body.contains(container)) return;
+      expanded = false;
+      clearTimeout(timerWrap);
+      wrapper.style.transition = 'none';
+      wrapper.style.maxWidth = '0';
+      wrapper.style.maxHeight = '0';
+      items.forEach(function(item) {
+        item.style.transitionDelay = '0ms';
+        item.style.transitionDuration = '0ms';
+        item.style.transform = '';
+        item.setAttribute('tabindex', '-1');
+        item.classList.add('opacity-0', 'pointer-events-none');
+        item.classList.remove('opacity-100', 'pointer-events-auto');
+      });
+      toggleCollapsed.classList.remove('hidden');
+      toggleExpanded.classList.add('hidden');
+      toggle.setAttribute('aria-expanded', 'false');
+      if (tooltipSpan) tooltipSpan.textContent = toggle.dataset.tipCollapsed;
+      toggle.setAttribute('aria-label', toggle.dataset.tipCollapsed);
+      if (copyDefault) copyDefault.classList.remove('hidden');
+      if (copySuccess) copySuccess.classList.add('hidden');
+    }
+
+    /* ── Init & SPA lifecycle ──────────────────── */
+    reset();
+    mobileQuery.addEventListener('change', function() {
+      if (!expanded) return;
+      reset();
+    }, { signal: ac.signal });
+    document.addEventListener('astro:after-swap', reset, { signal: ac.signal });
+
+    /* ── Clipboard / Native Share ──────────────── */
+    var copyTimer;
+
+    function clipboardCopy() {
+      if (!navigator.clipboard) {
+        if (copyDefault) copyDefault.classList.add('hidden');
+        if (copySuccess) copySuccess.classList.add('hidden');
+        if (copyLive) copyLive.textContent = copyLive.dataset.liveUnsupported || '';
+        return;
+      }
+      navigator.clipboard.writeText(location.href).then(function() {
+        if (copyDefault) copyDefault.classList.add('hidden');
+        if (copySuccess) copySuccess.classList.remove('hidden');
+        if (copyLive) copyLive.textContent = copyLive.dataset.liveSuccess || '';
+        clearTimeout(copyTimer);
+        copyTimer = setTimeout(function() {
+          if (copySuccess) copySuccess.classList.add('hidden');
+          if (copyDefault) copyDefault.classList.remove('hidden');
+        }, 1200);
+      }).catch(function() {
+        if (copyDefault) copyDefault.classList.add('hidden');
+        if (copySuccess) copySuccess.classList.add('hidden');
+        if (copyLive) copyLive.textContent = copyLive.dataset.liveError || '';
+      });
+    }
+
+    function doNativeShare() {
+      if (navigator.share) {
+        navigator.share({ url: location.href }).catch(function() {});
+      } else {
+        clipboardCopy();
+      }
+    }
+
+    /* ── Event listeners ───────────────────────── */
+    toggle.addEventListener('click', function() {
+      expanded = !expanded;
+      if (expanded) {
+        expand();
+      } else {
+        collapse();
+      }
+    }, { signal: ac.signal });
+
+    container.addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-share-btn]');
+      if (!btn) return;
+
+      var icon = btn.dataset.shareBtn;
+      if (icon === 'copy') {
+        e.preventDefault();
+        clipboardCopy();
+        return;
+      }
+      if (icon === 'brand-wechat' || icon === 'brand-qq') {
+        e.preventDefault();
+        doNativeShare();
+        return;
+      }
+
+      var href = btn.getAttribute('href');
+      if (!href || href === '#') {
+        e.preventDefault();
+      }
+    }, { signal: ac.signal });
+  })();
+</script>
