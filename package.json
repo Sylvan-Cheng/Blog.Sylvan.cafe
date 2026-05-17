@@ -22,13 +22,13 @@
     "@fontsource/noto-sans-jp": "^5.2.9",
     "@fontsource/noto-sans-sc": "^5.2.9",
     "@iconify-json/circle-flags": "^1.2.10",
-    "@iconify-json/tabler": "^1.2.33",
+    "@iconify-json/tabler": "^1.2.35",
     "@resvg/resvg-js": "^2.6.2",
-    "@tailwindcss/vite": "^4.2.4",
-    "astro": "^6.2.2",
+    "@tailwindcss/vite": "^4.3.0",
+    "astro": "^6.3.3",
     "astro-icon": "^1.1.5",
     "dayjs": "^1.11.20",
-    "katex": "^0.16.45",
+    "katex": "^0.16.47",
     "lodash.kebabcase": "^4.1.1",
     "medium-zoom": "^1.1.0",
     "rehype-autolink-headings": "^7.1.0",
@@ -40,7 +40,7 @@
     "satori": "^0.26.0",
     "sharp": "^0.34.5",
     "slugify": "^1.6.9",
-    "tailwindcss": "^4.2.4",
+    "tailwindcss": "^4.3.0",
     "unist-util-visit": "^5.1.0"
   },
   "devDependencies": {
@@ -50,8 +50,8 @@
     "@tailwindcss/typography": "^0.5.19",
     "@types/hast": "^3.0.4",
     "@types/lodash.kebabcase": "^4.1.9",
-    "@typescript-eslint/parser": "^8.59.2",
-    "eslint": "^10.3.0",
+    "@typescript-eslint/parser": "^8.59.3",
+    "eslint": "^10.4.0",
     "eslint-plugin-astro": "^1.7.0",
     "globals": "^17.6.0",
     "pagefind": "^1.5.2",
@@ -59,6 +59,6 @@
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.59.2"
+    "typescript-eslint": "^8.59.3"
   }
 }
