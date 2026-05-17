@@ -6,6 +6,7 @@ title: Hallo, Welt!
 featured: true
 draft: false
 math: true
+license: cc-by-nc-sa-4.0
 tags:
   - test
 description: Ein umfassender Markdown-Syntax-Test auf Deutsch, der alle Rendering-Funktionen abdeckt und die mehrsprachige Blog-Funktionalität überprüft.

@@ -14,6 +14,7 @@ import FloatingTOC from "@/components/FloatingTOC.astro";
 import ImageZoom from "@/components/ImageZoom.astro";
 import CodeFolding from "@/components/CodeFolding.astro";
 import CodeCopy from "@/components/CodeCopy.astro";
+import LicenseInfo from "@/components/LicenseInfo.astro";
 import { getPath } from "@/utils/getPath";
 import { slugifyStr } from "@/utils/slugify";
 import { countWords } from "@/utils/wordCount";
@@ -47,6 +48,7 @@ const {
   timezone,
   tags,
   hideEditPost,
+  license,
 } = post.data;
 
 const { Content } = await render(post);
@@ -169,6 +171,8 @@ const kaTeXInlineCSS = post.data.math
     <ShareLinks />
 
     <hr class="my-6 border-dashed" />
+
+    <LicenseInfo {license} />
 
     <!-- Previous/Next Post Buttons -->
     <div data-pagefind-ignore class="grid grid-cols-1 gap-6 sm:grid-cols-2">
