@@ -214,6 +214,30 @@ export const UI = {
   },
 
   /** About page */
+  about: {
+    desc: {
+      zh: "这里是 Sylvan。",
+      en: "This is Sylvan.",
+      ja: "ここは Sylvan です。",
+      ru: "Это Sylvan.",
+    } satisfies Dict,
+  },
+
+  /** License page */
+  license: {
+    title: {
+      zh: "License",
+      en: "License",
+      ja: "License",
+      ru: "License",
+    } satisfies Dict,
+    desc: {
+      zh: "了解本站内容的许可规则。",
+      en: "Learn about the licensing terms for this site.",
+      ja: "このサイトのライセンス規約について。",
+      ru: "Узнайте о правилах лицензирования контента.",
+    } satisfies Dict,
+  },
 
   /** Theme toggle */
   themeToggle: {

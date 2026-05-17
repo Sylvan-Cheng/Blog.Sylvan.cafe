@@ -3,8 +3,6 @@ title: License
 locale: en
 ---
 
-Content on this blog follows a **tiered licensing model**. Please review the terms below before reposting, quoting, or using any material from this site.
-
 ### TL;DR
 
 - **Tech articles (with CC badge):** Share freely with attribution, but no commercial use.
