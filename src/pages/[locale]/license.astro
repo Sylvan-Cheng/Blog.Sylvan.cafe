@@ -14,13 +14,13 @@ export function getStaticPaths() {
 }
 
 const locale = resolveLocale(Astro.currentLocale);
-const page = await getEntry("pages", `about/${locale}`);
+const page = await getEntry("pages", `license/${locale}`);
 const { Content } = page ? await render(page) : { Content: null };
 ---
 
-<Layout title={`${page?.data.title ?? "About"} | ${SITE.title}`}>
+<Layout title={`${page?.data.title ?? "License"} | ${SITE.title}`}>
   <Header />
-  <Main pageTitle={page?.data.title ?? "About"} pageDesc={t(UI.about.desc, locale)}>
+  <Main pageTitle={page?.data.title ?? "License"} pageDesc={t(UI.license.desc, locale)}>
     {
       Content ? (
         <article class="app-prose max-w-app prose-img:border-0">

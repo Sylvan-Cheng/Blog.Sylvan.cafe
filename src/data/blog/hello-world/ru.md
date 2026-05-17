@@ -6,6 +6,7 @@ title: Привет, мир!
 featured: true
 draft: false
 math: true
+license: cc-by-nc-sa-4.0
 tags:
   - test
 description: Полная проверка синтаксиса Markdown на русском языке, охватывающая все возможности рендеринга и многоязычную функциональность блога.

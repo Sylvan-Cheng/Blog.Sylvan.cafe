@@ -32,6 +32,7 @@ const blog = defineCollection({
       math: z.boolean().optional().default(false),
       hideEditPost: z.boolean().optional().default(false),
       timezone: z.string().optional(),
+      license: z.enum(["cc-by-nc-sa-4.0", "copyright"]).optional(),
     }),
 });
 

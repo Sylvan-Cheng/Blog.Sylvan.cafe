@@ -6,6 +6,7 @@ title: こんにちは、世界！
 featured: true
 draft: false
 math: true
+license: cc-by-nc-sa-4.0
 tags:
   - test
 description: すべての Markdown 構文を網羅した日本語テスト記事。レンダリング機能の検証と多言語ブログの動作確認を行います。
