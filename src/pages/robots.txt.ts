@@ -5,6 +5,10 @@ User-agent: *
 Allow: /
 
 Sitemap: ${sitemapURL.href}
+
+# LLM
+Allow: /llms.txt
+Allow: /llms-full.txt
 `;
 
 export const GET: APIRoute = ({ site }) => {
