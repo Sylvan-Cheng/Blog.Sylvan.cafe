@@ -3,24 +3,10 @@ title: 关于
 locale: zh
 ---
 
-## 关于我
+Sylvan。机械工程在读，编程是爱好。
 
-你好，我是 Sylvan。
+这里主要写技术笔记、学习记录、项目日志，偶尔也写生活杂谈。给自己的备忘，也希望能帮到偶然路过的人。
 
-这是一个使用 Astro 和 Tailwind CSS 构建的个人博客，支持中英日俄四种语言。
+博客支持多语言，一方面是练练外语，另一方面希望不同语言的读者都能读到。
 
-### 技术栈
-
-- **框架**: Astro 6
-- **样式**: Tailwind CSS 4
-- **字体**: Noto Sans / SC / JP + Fira Code
-- **评论**: Giscus
-- **搜索**: Pagefind
-
-### 联系方式
-
-你可以通过以下方式找到我：
-
-- GitHub
-- X (Twitter)
-- Email
+你可以通过 GitHub 或 Email 与我联系。
