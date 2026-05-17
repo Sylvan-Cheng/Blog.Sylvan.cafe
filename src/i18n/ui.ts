@@ -3,6 +3,15 @@ import type { Locale, Dict } from "./config";
 type TemplateDict = Record<Locale, (arg: string) => string>;
 
 export const UI = {
+  /** 404 / 页面未找到 */
+  notFound: {
+    zh: "页面未找到。",
+    en: "Page not found.",
+    ja: "ページが見つかりません。",
+    ru: "Страница не найдена.",
+    de: "Seite nicht gefunden.",
+  } satisfies Dict,
+
   /** Header / Navigation */
   nav: {
     skipToContent: {
@@ -233,15 +242,6 @@ export const UI = {
   },
 
   /** About page */
-  about: {
-    notFound: {
-      zh: "页面未找到。",
-      en: "Page not found.",
-      ja: "ページが見つかりません。",
-      ru: "Страница не найдена.",
-      de: "Seite nicht gefunden.",
-    } satisfies Dict,
-  },
 
   /** Theme toggle */
   themeToggle: {

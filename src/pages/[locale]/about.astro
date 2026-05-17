@@ -5,6 +5,7 @@ import { resolveLocale, t } from "@/i18n/utils";
 import { UI } from "@/i18n/ui";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
+import Breadcrumb from "@/components/Breadcrumb.astro";
 import Footer from "@/components/Footer.astro";
 import { SITE } from "@/config";
 
@@ -19,6 +20,7 @@ const { Content } = page ? await render(page) : { Content: null };
 
 <Layout title={`${page?.data.title ?? "About"} | ${SITE.title}`}>
   <Header />
+  <Breadcrumb />
   {
     Content ? (
       <main id="main-content" class="app-layout">
@@ -30,7 +32,7 @@ const { Content } = page ? await render(page) : { Content: null };
       <main id="main-content" class="app-layout">
         <section class="app-prose mb-28 max-w-app prose-img:border-0">
           <h1 class="text-2xl tracking-wider sm:text-3xl">{t(UI.nav.about, locale)}</h1>
-          <p>{t(UI.about.notFound, locale)}</p>
+          <p>{t(UI.notFound, locale)}</p>
         </section>
       </main>
     )
