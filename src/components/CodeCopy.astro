@@ -29,7 +29,7 @@ const labelCopied = t(UI.codeBlock.copied, locale);
   }
 </style>
 
-<script define:vars={{ labelCopy, labelCopied }}>
+<script is:inline define:vars={{ labelCopy, labelCopied }}>
   function attachCopyButtons() {
     const codeBlocks = Array.from(document.querySelectorAll("pre"));
 

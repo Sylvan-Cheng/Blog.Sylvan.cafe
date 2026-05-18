@@ -217,7 +217,7 @@ const structuredData = pubDatetime ? {
     <ClientRouter />
 
     <!-- Umami Analytics (Partytown) -->
-    <script type="text/partytown" src="https://umami.sylvan.cafe/script.js" data-website-id="636e674b-026b-4730-b2dc-cd79336f463c"></script>
+    <script is:inline type="text/partytown" src="https://umami.sylvan.cafe/script.js" data-website-id="636e674b-026b-4730-b2dc-cd79336f463c"></script>
 
     <!-- Minimal inline script to prevent FOUC - sets theme immediately -->
     <script is:inline>
@@ -252,9 +252,6 @@ const structuredData = pubDatetime ? {
     <slot name="head" />
   </head>
   <body>
-    <a href="#main-content" class="fixed -top-full left-2 z-50 rounded bg-accent px-3 py-1.5 text-sm font-medium text-background transition-[top] focus:top-2">
-      Skip to content
-    </a>
     <slot />
 
     <!-- Load full theme logic -->

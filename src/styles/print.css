@@ -1,0 +1,163 @@
+/* =========================================================
+   Print Stylesheet
+   Layers:
+     1. Browser print settings (@page, color-adjust)
+     2. B&W-optimized color palette
+     3. Hide non-content elements (semantic)
+     4. Layout normalization
+     5. Content enhancements
+     6. Page break controls
+   ========================================================= */
+
+@media print {
+
+  /* ── 1. Browser print settings ── */
+  @page {
+    margin: 2cm;
+  }
+
+  * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* ── 2. B&W-optimized palette ── */
+  :root,
+  html,
+  html[data-theme="dark"] {
+    --background: #fff !important;
+    --foreground: #000 !important;
+    --accent: #333 !important;
+    --muted: #eee !important;
+    --border: #999 !important;
+    color-scheme: light !important;
+  }
+
+  /* ── 3. Hide non-content elements ── */
+  body>header,
+  body>footer,
+  nav,
+  /* dynamic UI widgets */
+  .progress-container,
+  #btt-btn-container,
+  .medium-zoom-overlay,
+  /* comments */
+  .giscus,
+  .giscus-frame,
+  /* code toolbar buttons */
+  .copy-btn,
+  .cf-btn,
+  /* metadata & share */
+  [data-print-hide] {
+    display: none !important;
+  }
+
+  /* ── 4. Layout normalization ── */
+  html {
+    overflow: visible !important;
+  }
+
+  body {
+    display: block !important;
+    min-height: auto !important;
+  }
+
+  .app-layout,
+  .max-w-app,
+  .app-prose {
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* ── 5. Content enhancements ── */
+  .app-prose {
+    font-size: 12pt;
+    line-height: 1.6;
+  }
+
+  /* Preserve link underlines for B&W legibility */
+  .app-prose a {
+    text-decoration: underline !important;
+  }
+
+  /* Show URL after external / non-trivial links */
+  .app-prose a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #666;
+    word-break: break-all;
+  }
+
+  .app-prose a[href^="#"]::after,
+  .app-prose a.heading-link::after,
+  .app-prose a[role="doc-noteref"]::after,
+  .app-prose a[href^="/"]::after,
+  .app-prose a[href^="mailto:"]::after,
+  .app-prose a[href^="javascript:"]::after {
+    content: none;
+  }
+
+  /* Images */
+  .app-prose img {
+    max-width: 100% !important;
+  }
+
+  /* Code blocks */
+  .astro-code {
+    background: var(--muted) !important;
+    color: var(--foreground) !important;
+    border: 1px solid var(--border) !important;
+    white-space: pre-wrap !important;
+    overflow-wrap: break-word;
+  }
+
+  .astro-code span:not(.line-number) {
+    color: inherit !important;
+  }
+
+  /* Unfold collapsed code blocks */
+  pre[data-collapse]>code {
+    max-height: none !important;
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
+
+  /* Hide line numbers, reset line indent */
+  .line-number {
+    display: none !important;
+  }
+
+  .astro-code .line {
+    padding-left: 0 !important;
+    text-indent: 0 !important;
+  }
+
+  /* ── 6. Page break controls ── */
+  h1,
+  h2,
+  h3,
+  h4 {
+    page-break-after: avoid;
+  }
+
+  p,
+  li,
+  blockquote {
+    orphans: 3;
+    widows: 3;
+  }
+
+  pre,
+  .astro-code,
+  figure,
+  table,
+  blockquote {
+    page-break-inside: avoid;
+  }
+
+  /* ── 7. Cleanup ── */
+  *:focus {
+    outline: none !important;
+  }
+}

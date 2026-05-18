@@ -10,7 +10,7 @@ const locale = resolveLocale(Astro.currentLocale);
 
 {
   SITE.showBackButton && (
-    <div class="app-layout flex items-center justify-start">
+    <div class="app-layout flex items-center justify-start" data-print-hide>
       <LinkButton
         id="back-button"
         href="/"
