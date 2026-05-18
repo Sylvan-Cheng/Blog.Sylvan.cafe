@@ -83,13 +83,13 @@
     }
 
     pre {
-      @apply focus-visible:border-transparent focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-dashed;
+      @apply relative overflow-visible! focus-visible:border-transparent focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-dashed;
     }
   }
 
   /* ===== Code Blocks & Syntax Highlighting ===== */
   .astro-code {
-    @apply relative flex border bg-(--shiki-light-bg) text-(--shiki-light) outline-border [&_span:not(.line-number)]:text-(--shiki-light);
+    @apply flex border bg-(--shiki-light-bg) text-(--shiki-light) outline-border [&_span:not(.line-number)]:text-(--shiki-light);
   }
 
   html[data-theme="dark"] .astro-code {
