@@ -51,7 +51,8 @@ const {
   license,
 } = post.data;
 
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
+const tocHeadings = headings.filter(h => h.depth === 2 || h.depth === 3);
 
 let ogImageUrl: string | undefined;
 
@@ -129,7 +130,7 @@ const kaTeXInlineCSS = post.data.math
     class:list={["app-layout pb-12", { "mt-8": !SITE.showBackButton }]}
     data-pagefind-body
   >
-    <FloatingTOC />
+    <FloatingTOC headings={tocHeadings} />
     <h1
       transition:name={`p-${slugifyStr(title)}`}
       class="inline-block text-2xl font-bold text-accent sm:text-3xl"
