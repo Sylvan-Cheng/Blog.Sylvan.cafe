@@ -136,7 +136,7 @@ const kaTeXInlineCSS = post.data.math
     >
       {title}
     </h1>
-    <div class="my-2 flex items-center gap-2">
+    <div class="my-2 flex items-center gap-2" data-print-hide>
       <Datetime {pubDatetime} {modDatetime} {timezone} size="lg" />
       <span aria-hidden="true" class="max-sm:hidden select-none opacity-40">&middot;</span>
       <span class="text-sm text-foreground opacity-60 max-sm:hidden">
@@ -160,9 +160,9 @@ const kaTeXInlineCSS = post.data.math
 
     <hr class="my-8 border-dashed" />
 
-    <EditPost class="sm:hidden" {hideEditPost} {post} />
+    <EditPost class="sm:hidden" data-print-hide {hideEditPost} {post} />
 
-    <ul class="mt-4 mb-8 flex flex-wrap gap-4 sm:my-8">
+    <ul data-print-hide class="mt-4 mb-8 flex flex-wrap gap-4 sm:my-8">
       {tags.map(tag => <Tag tag={slugifyStr(tag)} tagName={tag} size="sm" />)}
     </ul>
 
@@ -175,7 +175,7 @@ const kaTeXInlineCSS = post.data.math
     <LicenseInfo {license} />
 
     <!-- Previous/Next Post Buttons -->
-    <div data-pagefind-ignore class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+    <div data-pagefind-ignore data-print-hide class="grid grid-cols-1 gap-6 sm:grid-cols-2">
       {
         prevPost && (
           <a
