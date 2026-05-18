@@ -15,5 +15,6 @@ interface Window {
     observer?: IntersectionObserver;
     scrollHandler?: (() => void) | null;
     hideTimeout?: number | null;
+    showTimeout?: number | null;
   };
 }
