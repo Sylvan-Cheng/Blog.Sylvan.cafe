@@ -40,7 +40,7 @@ const tocHeadings = (headings ?? []).filter(h => h.depth === 2 || h.depth === 3)
         </div>
         <div
           id="toc-fade-bottom"
-          class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 hidden h-6 bg-gradient-to-t from-background to-transparent"
+          class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-6 bg-gradient-to-t from-background to-transparent"
         >
         </div>
         <ul
@@ -48,16 +48,17 @@ const tocHeadings = (headings ?? []).filter(h => h.depth === 2 || h.depth === 3)
           class="space-y-1 text-sm leading-relaxed overflow-y-auto"
           style="max-height: calc(100vh - var(--toc-offset-edge, 14rem))"
         >
-          {tocHeadings.map((h) => {
+          {tocHeadings.map((h, idx) => {
             const isH3 = h.depth === 3;
             const label = h.slug === "footnote-label"
               ? t(UI.footnotes, locale)
               : h.text;
+            const isFirst = idx === 0;
             return (
               <li>
                 <a
                   href={`#${h.slug}`}
-                  class={`block border-s-2 py-1 pe-2 transition-all duration-200 hover:text-accent hover:translate-x-0.5 ${isH3 ? "ps-6" : "ps-3"} text-foreground/60 border-transparent hover:border-accent/40`}
+                  class={`block border-s-2 py-1 pe-2 transition-all duration-200 hover:text-accent hover:translate-x-0.5 ${isH3 ? "ps-6" : "ps-3"} ${isFirst ? "text-accent font-semibold border-accent/60" : "text-foreground/60 border-transparent"} hover:border-accent/40`}
                 >
                   <span class={`block truncate${isH3 ? " text-xs" : ""}`}>
                     {label}
@@ -94,7 +95,7 @@ const tocHeadings = (headings ?? []).filter(h => h.depth === 2 || h.depth === 3)
     window.__toc ??= {};
     window.__toc._init = true;
     window.__toc.buildTOC = function () {
-    // 始终清理上一页状态（含从 TOC 页面导航到无 TOC 页面的场景）
+    // 始终清理上一页状态
     window.__toc ??= {};
     if (window.__toc.observer) {
       window.__toc.observer.disconnect();
@@ -355,14 +356,10 @@ const tocHeadings = (headings ?? []).filter(h => h.depth === 2 || h.depth === 3)
       window.__toc.observer.observe(heading);
     }
 
-    // 推迟所有布局读取到下一帧，避免强制同步重排
-    requestAnimationFrame(() => {
-      // 页面可能已导航离开，检查 DOM 是否仍然存活
-      if (!document.getElementById("article") || !document.body.contains(tocList)) return;
-      initTooltips();
+    // 推断正确的激活标题与淡出遮罩（外层 rAF 已确保布局完成）
+    if (document.getElementById("article") && document.body.contains(tocList)) {
       setupMouseEvents();
       updateFadeEdges();
-      // 推断正确的激活标题
       for (let i = headings.length - 1; i >= 0; i--) {
         if (headings[i].getBoundingClientRect().top <= HEADING_SCROLL_OFFSET) {
           activeId = headings[i].id;
@@ -370,6 +367,12 @@ const tocHeadings = (headings ?? []).filter(h => h.depth === 2 || h.depth === 3)
         }
       }
       updateActiveLink();
+    }
+
+    // tooltip 批量测量需要独立帧，避免强制同步重排
+    requestAnimationFrame(() => {
+      if (!document.body.contains(tocList)) return;
+      initTooltips();
     });
 
     // 页面底部检测：用户滚到最底部时激活最后一个标题
