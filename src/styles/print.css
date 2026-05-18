@@ -92,6 +92,7 @@
   .app-prose a[href^="#"]::after,
   .app-prose a.heading-link::after,
   .app-prose a[role="doc-noteref"]::after,
+  .app-prose a[href^="/"]::after,
   .app-prose a[href^="mailto:"]::after,
   .app-prose a[href^="javascript:"]::after {
     content: none;
@@ -108,7 +109,7 @@
     color: var(--foreground) !important;
     border: 1px solid var(--border) !important;
     white-space: pre-wrap !important;
-    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 
   .astro-code span:not(.line-number) {
