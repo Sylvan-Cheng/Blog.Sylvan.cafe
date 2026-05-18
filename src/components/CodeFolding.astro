@@ -69,7 +69,7 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
   }
 </style>
 
-<script define:vars={{ labelExpand, labelCollapse }}>
+<script is:inline define:vars={{ labelExpand, labelCollapse }}>
   function initCodeFolding() {
     const chevronDownD = 'm6 9 6 6 6-6';
     const chevronUpD = 'm18 15-6-6-6 6';
@@ -109,7 +109,7 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
       code.style.transition = "none";
       code.style.maxHeight = "none";
       code.style.maskImage = "none";
-      code.style.webkitMaskImage = "none";
+      code.style.setProperty("-webkit-mask-image", "none");
 
       code.style.visibility = "hidden";
       requestAnimationFrame(function () {
@@ -118,14 +118,14 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
         code.style.transition = "";
         code.style.maxHeight = "";
         code.style.maskImage = "";
-        code.style.webkitMaskImage = "";
+        code.style.setProperty("-webkit-mask-image", "");
 
         if (fullH <= maxHPx) {
           // 内容不足，永久展开
           code.style.maxHeight = "none";
           code.style.overflow = "";
           code.style.maskImage = "none";
-          code.style.webkitMaskImage = "none";
+          code.style.setProperty("-webkit-mask-image", "none");
           return;
         }
 
@@ -162,7 +162,7 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
             code.style.overflow = "hidden";
             code.style.maxHeight = fullH + "px";
             code.style.maskImage = "none";
-            code.style.webkitMaskImage = "none";
+            code.style.setProperty("-webkit-mask-image", "none");
             pre.classList.remove("cf-collapsed");
             btn._leftPath.setAttribute('d', chevronUpD);
             btn._rightPath.setAttribute('d', chevronUpD);
@@ -175,7 +175,7 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
             requestAnimationFrame(function () {
               code.style.maxHeight = "var(--cf-max-h)";
               code.style.maskImage = "";
-              code.style.webkitMaskImage = "";
+              code.style.setProperty("-webkit-mask-image", "");
               pre.classList.add("cf-collapsed");
               btn._leftPath.setAttribute('d', chevronDownD);
               btn._rightPath.setAttribute('d', chevronDownD);
@@ -191,12 +191,12 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
               code.style.maxHeight = "";
               code.style.overflow = "";
               code.style.maskImage = "";
-              code.style.webkitMaskImage = "";
+              code.style.setProperty("-webkit-mask-image", "");
             } else {
               code.style.maxHeight = "none";
               code.style.overflow = "";
               code.style.maskImage = "none";
-              code.style.webkitMaskImage = "none";
+              code.style.setProperty("-webkit-mask-image", "none");
             }
             animating = false;
           }, 700);
@@ -210,12 +210,12 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
                 code.style.maxHeight = "";
                 code.style.overflow = "";
                 code.style.maskImage = "";
-                code.style.webkitMaskImage = "";
+                code.style.setProperty("-webkit-mask-image", "");
               } else {
                 code.style.maxHeight = "none";
                 code.style.overflow = "";
                 code.style.maskImage = "none";
-                code.style.webkitMaskImage = "none";
+                code.style.setProperty("-webkit-mask-image", "none");
               }
               animating = false;
             },

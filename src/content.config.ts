@@ -24,7 +24,7 @@ const blog = defineCollection({
       modDatetime: z.coerce.date().optional(),
       image: image().or(z.string()).optional(),
       ogImage: image().or(z.string()).optional(),
-      canonicalURL: z.string().url().optional(),
+      canonicalURL: z.url().optional(),
       tags: z.array(z.string()).default(["others"]),
       keywords: z.array(z.string()).optional(),
       featured: z.boolean().optional().default(false),

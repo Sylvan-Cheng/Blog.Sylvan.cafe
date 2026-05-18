@@ -235,8 +235,8 @@ const kaTeXInlineCSS = post.data.math
 
   /** Update the progress bar when user scrolls */
   function updateScrollProgress() {
-    if (window.__scrollBound) return;
-    window.__scrollBound = true;
+    if (window["__scrollBound"]) return;
+    window["__scrollBound"] = true;
     let ticking = false;
     document.addEventListener("scroll", () => {
       if (!ticking) {
@@ -256,8 +256,8 @@ const kaTeXInlineCSS = post.data.math
   updateScrollProgress();
 
   /* Go to page start after page swap */
-  if (!window.__scrollTopBound) {
-    window.__scrollTopBound = true;
+  if (!window["__scrollTopBound"]) {
+    window["__scrollTopBound"] = true;
     document.addEventListener("astro:after-swap", () => {
       if (!document.getElementById("main-content")) return;
       window.scrollTo({ left: 0, top: 0, behavior: "instant" });
