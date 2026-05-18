@@ -10,27 +10,40 @@ import { resolveLocale, t } from "@/i18n/utils";
 const locale = resolveLocale(Astro.currentLocale);
 const { pathname } = Astro.url;
 
-const localizePath = (path: string) =>
-  `/${locale}${path === "/" ? "" : path}/`;
+const localizePath = (path: string) => `/${locale}${path === "/" ? "" : path}/`;
 
 const currentPath =
   pathname.endsWith("/") && pathname !== "/" ? pathname.slice(0, -1) : pathname;
 
 const isActive = (path: string) => {
-  const currentParts = currentPath.split("/").filter(p => p.trim());
-  const pathParts = path.split("/").filter(p => p.trim());
-  return currentParts.slice(1).join("/") === pathParts.slice(1).join("/")
-    || currentParts[1] === pathParts[1];
+  const currentParts = currentPath.split("/").filter((p) => p.trim());
+  const pathParts = path.split("/").filter((p) => p.trim());
+  return (
+    currentParts.slice(1).join("/") === pathParts.slice(1).join("/") ||
+    currentParts[1] === pathParts[1]
+  );
 };
 ---
 
 <a
   id="skip-to-content"
   href="#main-content"
-  class="absolute start-16 -top-full z-50 bg-background px-3 py-2 text-accent backdrop-blur-lg transition-all focus:top-4"
+  data-print-hide
+  class="absolute start-16 z-50 bg-background px-3 py-2 text-accent backdrop-blur-lg transition-all"
 >
   {t(UI.nav.skipToContent, locale)}
 </a>
+
+<style is:inline>
+  #skip-to-content {
+    top: 0;
+    translate: 0 -100%;
+  }
+  #skip-to-content:focus {
+    top: 1rem;
+    translate: 0;
+  }
+</style>
 
 <header class="app-layout">
   <div
@@ -65,8 +78,14 @@ const isActive = (path: string) => {
               aria-label="auto"
               aria-live="polite"
             >
-              <Icon name="tabler:moon" class="absolute top-[50%] left-[50%] -translate-[50%] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-              <Icon name="tabler:sun-high" class="absolute top-[50%] left-[50%] -translate-[50%] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+              <Icon
+                name="tabler:moon"
+                class="absolute top-[50%] left-[50%] -translate-[50%] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90"
+              />
+              <Icon
+                name="tabler:sun-high"
+                class="absolute top-[50%] left-[50%] -translate-[50%] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"
+              />
             </button>
           </Tooltip>
         )
@@ -93,26 +112,44 @@ const isActive = (path: string) => {
     >
       <ul class="flex flex-col items-center gap-1 sm:flex-row sm:gap-x-5">
         <li class="w-full sm:w-auto">
-          <a href={localizePath("/posts")} class="block px-4 py-3 text-center font-medium hover:text-accent sm:px-2 sm:py-1" class:list={{ "active-nav": isActive(localizePath("/posts")) }}>
+          <a
+            href={localizePath("/posts")}
+            class="block px-4 py-3 text-center font-medium hover:text-accent sm:px-2 sm:py-1"
+            class:list={{ "active-nav": isActive(localizePath("/posts")) }}
+          >
             {t(UI.nav.posts, locale)}
           </a>
         </li>
         <li class="w-full sm:w-auto">
-          <a href={localizePath("/tags")} class="block px-4 py-3 text-center font-medium hover:text-accent sm:px-2 sm:py-1" class:list={{ "active-nav": isActive(localizePath("/tags")) }}>
+          <a
+            href={localizePath("/tags")}
+            class="block px-4 py-3 text-center font-medium hover:text-accent sm:px-2 sm:py-1"
+            class:list={{ "active-nav": isActive(localizePath("/tags")) }}
+          >
             {t(UI.nav.tags, locale)}
           </a>
         </li>
         {
           SITE.showArchives && (
             <li class="w-full sm:w-auto">
-              <a href={localizePath("/archives")} class="block px-4 py-3 text-center font-medium hover:text-accent sm:px-2 sm:py-1" class:list={{ "active-nav": isActive(localizePath("/archives")) }}>
+              <a
+                href={localizePath("/archives")}
+                class="block px-4 py-3 text-center font-medium hover:text-accent sm:px-2 sm:py-1"
+                class:list={{
+                  "active-nav": isActive(localizePath("/archives")),
+                }}
+              >
                 {t(UI.nav.archives, locale)}
               </a>
             </li>
           )
         }
         <li class="w-full sm:w-auto">
-          <a href={localizePath("/about")} class="block px-4 py-3 text-center font-medium hover:text-accent sm:px-2 sm:py-1" class:list={{ "active-nav": isActive(localizePath("/about")) }}>
+          <a
+            href={localizePath("/about")}
+            class="block px-4 py-3 text-center font-medium hover:text-accent sm:px-2 sm:py-1"
+            class:list={{ "active-nav": isActive(localizePath("/about")) }}
+          >
             {t(UI.nav.about, locale)}
           </a>
         </li>
