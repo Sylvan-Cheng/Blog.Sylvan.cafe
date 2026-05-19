@@ -23,11 +23,11 @@ const { Content } = page ? await render(page) : { Content: null };
   <Main pageTitle={page?.data.title ?? "About"} pageDesc={t(UI.about.desc, locale)}>
     {
       Content ? (
-        <article class="app-prose max-w-app prose-img:border-0">
+        <article class="app-prose prose-img:border-0">
           <Content />
         </article>
       ) : (
-        <section class="app-prose max-w-app prose-img:border-0">
+        <section class="app-prose prose-img:border-0">
           <p>{t(UI.notFound, locale)}</p>
         </section>
       )
