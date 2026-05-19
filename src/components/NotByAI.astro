@@ -1,0 +1,26 @@
+---
+import { resolveLocale } from "@/i18n/utils";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+
+const locale = resolveLocale(Astro.currentLocale);
+
+const svgRaw = readFileSync(
+  join(import.meta.dirname, "../../public/badges/not-by-ai", `${locale}.svg`),
+  "utf-8",
+)
+  .replace(/width="[^"]*"/, "")
+  .replace(/height="[^"]*"/, "")
+  .replace(/viewBox="[^"]*"/, 'viewBox="-1 -1 133 44"')
+  .replace(/stroke="currentColor"/, 'stroke="currentColor" stroke-width="2"');
+---
+
+<a
+  href="https://notbyai.fyi"
+  target="_blank"
+  rel="noopener"
+  class="inline-flex items-center text-foreground hover:opacity-80 transition-opacity h-6"
+  title="Produced By Human Not By AI"
+>
+  <span class="h-full w-auto" set:html={svgRaw} />
+</a>
