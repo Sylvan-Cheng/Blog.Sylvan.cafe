@@ -26,17 +26,19 @@ const i18n = {
     en: "Hello, welcome! 👋",
     ja: "こんにちは、ようこそ！👋",
     ru: "Привет, добро пожаловать! 👋",
+    eo: "Saluton, bonvenon! 👋",
   }),
   desc: t({
     zh: "这是 Sylvan 的个人博客。这里记录关于技术、代码和生活的思考。",
     en: "Sylvan's personal blog. Thoughts on technology, code, and life.",
     ja: "Sylvan の個人ブログです。技術、コード、そして生活についての考えを綴っています。",
     ru: "Личный блог Sylvan. Мысли о технологиях, коде и жизни.",
+    eo: "Persona blogo de Sylvan. Pensoj pri teknologio, kodo kaj vivo.",
   }),
-  featured: t({ zh: "精选文章", en: "Featured", ja: "注目記事", ru: "Избранное" }),
-  recent: t({ zh: "最近文章", en: "Recent Posts", ja: "最近の記事", ru: "Недавние записи" }),
-  allPosts: t({ zh: "全部文章", en: "All Posts", ja: "全ての記事", ru: "Все записи" }),
-  socialLinks: t({ zh: "社交链接：", en: "Social Links:", ja: "ソーシャルリンク:", ru: "Соцсети:" }),
+  featured: t({ zh: "精选文章", en: "Featured", ja: "注目記事", ru: "Избранное", eo: "Elstaraj" }),
+  recent: t({ zh: "最近文章", en: "Recent Posts", ja: "最近の記事", ru: "Недавние записи", eo: "Lastatempaj afiŝoj" }),
+  allPosts: t({ zh: "全部文章", en: "All Posts", ja: "全ての記事", ru: "Все записи", eo: "Ĉiuj afiŝoj" }),
+  socialLinks: t({ zh: "社交链接：", en: "Social Links:", ja: "ソーシャルリンク:", ru: "Соцсети:", eo: "Sociaj ligiloj:" }),
 };
 
 const allPosts = await getCollection("blog");
@@ -67,7 +69,7 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
 
       <p>{i18n.desc}</p>
       <p class="mt-2">
-        {t({ zh: "欢迎订阅 RSS 以获取最新文章。", en: "Subscribe to RSS for the latest posts.", ja: "RSSで最新記事を購読してください。", ru: "Подпишитесь на RSS, чтобы получать новые записи." })}
+        {t({ zh: "欢迎订阅 RSS 以获取最新文章。", en: "Subscribe to RSS for the latest posts.", ja: "RSSで最新記事を購読してください。", ru: "Подпишитесь на RSS, чтобы получать новые записи.", eo: "Abonu RSS por ricevi la plej novajn afiŝojn." })}
       </p>
       {
         // only display if at least one social link is enabled

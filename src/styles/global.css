@@ -32,10 +32,12 @@ html[lang="ja"] {
 
   html {
     @apply overflow-y-scroll scroll-smooth;
+    overflow-x: hidden;
   }
 
   body {
     @apply flex min-h-svh flex-col bg-background font-body text-foreground selection:bg-accent/75 selection:text-background;
+    width: 100%;
   }
 
   a,
@@ -62,6 +64,7 @@ html[lang="ja"] {
 
 @utility app-layout {
   @apply mx-auto w-full max-w-app px-4;
+  overflow-x: clip;
 }
 
 .active-nav {
