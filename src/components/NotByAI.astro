@@ -1,14 +1,22 @@
 ---
 import { resolveLocale } from "@/i18n/utils";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import zhSvg from "../assets/badges/not-by-ai/zh.svg?raw";
+import enSvg from "../assets/badges/not-by-ai/en.svg?raw";
+import jaSvg from "../assets/badges/not-by-ai/ja.svg?raw";
+import ruSvg from "../assets/badges/not-by-ai/ru.svg?raw";
+import eoSvg from "../assets/badges/not-by-ai/eo.svg?raw";
 
 const locale = resolveLocale(Astro.currentLocale);
 
-const svgRaw = readFileSync(
-  join(import.meta.dirname, "../../public/badges/not-by-ai", `${locale}.svg`),
-  "utf-8",
-)
+const svgMap: Record<string, string> = {
+  zh: zhSvg,
+  en: enSvg,
+  ja: jaSvg,
+  ru: ruSvg,
+  eo: eoSvg,
+};
+
+const svg = (svgMap[locale] ?? "")
   .replace(/width="[^"]*"/, "")
   .replace(/height="[^"]*"/, "")
   .replace(/viewBox="[^"]*"/, 'viewBox="-1 -1 133 44"')
@@ -22,5 +30,5 @@ const svgRaw = readFileSync(
   class="inline-flex items-center text-foreground hover:opacity-80 transition-opacity h-6"
   title="Produced By Human Not By AI"
 >
-  <span class="h-full w-auto" set:html={svgRaw} />
+  <span class="h-full w-auto" set:html={svg} />
 </a>
