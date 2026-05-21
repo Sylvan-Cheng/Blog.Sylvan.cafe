@@ -64,7 +64,6 @@ html[lang="ja"] {
 
 @utility app-layout {
   @apply mx-auto w-full max-w-app px-4;
-  overflow-x: clip;
 }
 
 .active-nav {

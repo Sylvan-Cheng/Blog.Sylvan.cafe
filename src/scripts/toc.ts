@@ -263,6 +263,7 @@
 
     if (document.body.contains(tocList)) {
       setupMouseEvents();
+      initTooltips();
       updateFadeEdges();
       for (let i = headings.length - 1; i >= 0; i--) {
         if ((headings[i] as Element).getBoundingClientRect().top <= HEADING_SCROLL_OFFSET) {
@@ -272,11 +273,6 @@
       }
       updateActiveLink();
     }
-
-    requestAnimationFrame(() => {
-      if (!document.body.contains(tocList!)) return;
-      initTooltips();
-    });
 
     t.scrollHandler = function () {
       if (!document.body.contains(tocList!)) return;
