@@ -1,11 +1,18 @@
-import { LOCALES, LOCALE_SET } from "./config";
-import type { Locale, Dict } from "./config";
+import { LOCALES } from "./config";
+import type { Locale, Dict, TemplateDict } from "./config";
 
 export function t(dict: Dict, locale: Locale): string {
   return dict[locale];
 }
 
+export function tp(dict: TemplateDict, locale: Locale, arg: string): string {
+  return dict[locale](arg);
+}
+
+function isLocale(s: string): s is Locale {
+  return (LOCALES as readonly string[]).includes(s);
+}
+
 export function resolveLocale(locale: string | undefined): Locale {
-  if (locale && (LOCALE_SET as Set<string>).has(locale)) return locale as Locale;
-  return LOCALES[0];
+  return locale && isLocale(locale) ? locale : LOCALES[0];
 }

@@ -16,12 +16,14 @@ import CodeFolding from "@/components/CodeFolding.astro";
 import CodeCopy from "@/components/CodeCopy.astro";
 import LicenseInfo from "@/components/LicenseInfo.astro";
 import { getPath } from "@/utils/getPath";
+import { getOgImage } from "@/utils/getOgImage";
+import { getPrevNextPosts } from "@/utils/getPrevNextPosts";
 import { slugifyStr } from "@/utils/slugify";
 import { countWords } from "@/utils/wordCount";
 import Icon from "@/components/Icon.astro";
 import { SITE } from "@/config";
 import { UI } from "@/i18n/ui";
-import { resolveLocale, t } from "@/i18n/utils";
+import { resolveLocale, t, tp } from "@/i18n/utils";
 import fs from "fs";
 import path from "path";
 
@@ -41,7 +43,6 @@ const {
   title,
   author,
   description,
-  ogImage: initOgImage,
   canonicalURL,
   pubDatetime,
   modDatetime,
@@ -54,21 +55,7 @@ const {
 const { Content, headings } = await render(post);
 const tocHeadings = headings.filter(h => h.depth === 2 || h.depth === 3);
 
-let ogImageUrl: string | undefined;
-
-// Determine OG image source
-if (typeof initOgImage === "string") {
-  ogImageUrl = initOgImage; // Remote OG image (absolute URL)
-} else if (initOgImage?.src) {
-  ogImageUrl = initOgImage.src; // Local asset
-}
-
-// Use dynamic OG image if enabled and no remote|local ogImage
-if (!ogImageUrl && SITE.dynamicOgImage) {
-  ogImageUrl = `${localizePostPath(post.id, post.filePath)}index.png`;
-}
-
-// Resolve OG image URL (or fallback to SITE.ogImage / default `og.png`)
+const ogImageUrl = getOgImage(post, locale);
 const ogImage = ogImageUrl
   ? new URL(ogImageUrl, Astro.url.origin).href
   : undefined;
@@ -85,19 +72,7 @@ const layoutProps = {
   hreflangs: translationMap,
 };
 
-/* ========== Prev/Next Posts ========== */
-
-const allPosts = posts.map(({ data: { title }, id, filePath }) => ({
-  id,
-  title,
-  filePath,
-}));
-
-const currentPostIndex = allPosts.findIndex(a => a.id === post.id);
-
-const prevPost = currentPostIndex !== 0 ? allPosts[currentPostIndex - 1] : null;
-const nextPost =
-  currentPostIndex < allPosts.length - 1 ? allPosts[currentPostIndex + 1] : null;
+const { prev: prevPost, next: nextPost } = getPrevNextPosts(posts, post.id);
 
 const kaTeXInlineCSS = post.data.math
   ? fs.readFileSync(path.resolve("public/assets/katex.min.css"), "utf-8")
@@ -114,23 +89,14 @@ const kaTeXInlineCSS = post.data.math
       <link slot="head" rel="preload" href="/assets/fonts/katex/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin />
     </>
   )}
-  {
-    Object.keys(translationMap).length > 0 && (
-      <script
-        is:inline
-        data-astro-rerun
-        set:html={`window.__translations=${JSON.stringify(translationMap)};window.__currentLocale="${locale}";`}
-      />
-    )
-  }
   <Header />
   <BackButton />
   <main
     id="main-content"
     class:list={["app-layout pb-12", { "mt-8": !SITE.showBackButton }]}
     data-pagefind-body
+    data-backurl={`/${locale}/`}
   >
-    <FloatingTOC headings={tocHeadings} />
     <h1
       transition:name={`p-${slugifyStr(title)}`}
       class="inline-block text-2xl font-bold text-accent sm:text-3xl"
@@ -141,7 +107,7 @@ const kaTeXInlineCSS = post.data.math
       <Datetime {pubDatetime} {modDatetime} {timezone} size="lg" />
       <span aria-hidden="true" class="max-sm:hidden select-none opacity-40">&middot;</span>
       <span class="text-sm text-foreground opacity-60 max-sm:hidden">
-        {UI.post.wordsCount[locale](String(countWords(post.body ?? "")))}
+        {tp(UI.post.wordsCount, locale, String(countWords(post.body ?? "")))}
       </span>
       <span
         aria-hidden="true"
@@ -158,6 +124,8 @@ const kaTeXInlineCSS = post.data.math
     >
       <Content />
     </article>
+
+    <FloatingTOC headings={tocHeadings} />
 
     <hr class="my-8 border-dashed" />
 
@@ -215,53 +183,13 @@ const kaTeXInlineCSS = post.data.math
   <CodeCopy />
 </Layout>
 
-<script is:inline data-astro-rerun>
-  /** Create a progress indicator at the top */
-  function createProgressBar() {
-    const existing = document.querySelector(".progress-container");
-    if (existing) {
-      existing.querySelector(".progress-bar").style.width = "0%";
-      return;
-    }
-    const progressContainer = document.createElement("div");
-    progressContainer.className =
-      "progress-container fixed top-0 z-10 h-1 w-full bg-background";
-    const progressBar = document.createElement("div");
-    progressBar.className = "progress-bar h-1 w-0 bg-accent";
-    progressBar.id = "myBar";
-    progressContainer.appendChild(progressBar);
-    document.body.appendChild(progressContainer);
-  }
-  createProgressBar();
+<script src="../scripts/progress.ts"></script>
 
-  /** Update the progress bar when user scrolls */
-  function updateScrollProgress() {
-    if (window["__scrollBound"]) return;
-    window["__scrollBound"] = true;
-    let ticking = false;
-    document.addEventListener("scroll", () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          const myBar = document.getElementById("myBar");
-          if (!myBar) { ticking = false; return; }
-          const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-          const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-          if (height <= 0) { myBar.style.width = "0%"; ticking = false; return; }
-          myBar.style.width = (winScroll / height) * 100 + "%";
-          ticking = false;
-        });
-        ticking = true;
-      }
-    }, { passive: true });
+<style is:inline>
+  .progress-container {
+    z-index: 10;
   }
-  updateScrollProgress();
-
-  /* Go to page start after page swap */
-  if (!window["__scrollTopBound"]) {
-    window["__scrollTopBound"] = true;
-    document.addEventListener("astro:after-swap", () => {
-      if (!document.getElementById("main-content")) return;
-      window.scrollTo({ left: 0, top: 0, behavior: "instant" });
-    });
+  .progress-bar {
+    transition: width 150ms linear;
   }
-</script>
+</style>

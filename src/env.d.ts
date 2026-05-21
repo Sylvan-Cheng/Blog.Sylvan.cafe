@@ -8,13 +8,18 @@ interface Window {
     getTheme: () => string;
     setTheme: (val: string) => void;
   };
+  __shareAC?: AbortController;
+  __progressAC?: AbortController;
   __translations?: Record<string, string>;
   __currentLocale?: string;
-  __scrollBound?: boolean;
   __toc?: {
     observer?: IntersectionObserver;
     scrollHandler?: (() => void) | null;
-    hideTimeout?: number | null;
-    showTimeout?: number | null;
+    hideTimeout?: number | undefined;
+    showTimeout?: number | undefined;
+    _init?: boolean;
+    _tocAbort?: AbortController;
+    _scrollTocTimer?: number;
+    buildTOC?: () => void;
   };
 }

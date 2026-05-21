@@ -24,17 +24,35 @@ const locale = resolveLocale(Astro.currentLocale);
 }
 
 <script>
-  /* Update Search Praam */
+  const LOCALE_RE = /^\/([a-z]{2})\//;
+
+  function extractLocale(path: string): string {
+    return LOCALE_RE.exec(path)?.[1] ?? "";
+  }
+
   function updateGoBackUrl() {
     const backButton: HTMLAnchorElement | null =
       document.querySelector("#back-button");
+    if (!backButton) return;
 
-    const backUrl = sessionStorage.getItem("backUrl");
+    const prevUrl = sessionStorage.getItem("prevUrl");
+    const currentLocale = extractLocale(window.location.pathname);
 
-    if (backUrl && backButton) {
-      backButton.href = backUrl;
+    if (prevUrl && currentLocale && extractLocale(prevUrl) === currentLocale) {
+      backButton.href = prevUrl;
+      return;
     }
+
+    const main = document.querySelector("#main-content") as HTMLElement | null;
+    const backUrl = main?.dataset?.backurl;
+    if (backUrl) backButton.href = backUrl;
   }
+
+  document.addEventListener("astro:before-swap", () => {
+    if (!/\/posts\/.+/.test(window.location.pathname)) {
+      sessionStorage.setItem("prevUrl", window.location.pathname + window.location.search);
+    }
+  });
 
   document.addEventListener("astro:page-load", updateGoBackUrl);
   updateGoBackUrl();

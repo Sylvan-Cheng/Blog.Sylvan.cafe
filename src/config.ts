@@ -32,4 +32,15 @@ export const SITE = {
   dynamicOgImage: true,
   dir: "ltr", // "rtl" | "auto"
   timezone: "Asia/Bangkok", // Default global timezone (IANA format)
+  analytics: {
+    umami: {
+      url: "https://umami.sylvan.cafe",
+      websiteId: "636e674b-026b-4730-b2dc-cd79336f463c",
+    },
+  },
+  themeScheme: "gruvbox", // "gruvbox" | "nord" | "default"
+  ogColors: {
+    bg: "#fbf1c7",
+    border: "#ebdbb2",
+  } as const,
 } as const;

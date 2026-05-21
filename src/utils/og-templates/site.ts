@@ -1,6 +1,6 @@
 import satori from "satori";
 import { SITE } from "@/config";
-import loadGoogleFonts from "../loadGoogleFont";
+import loadLocalFonts from "../loadLocalFont";
 
 export default async () => {
   return satori(
@@ -8,7 +8,7 @@ export default async () => {
       type: "div",
       props: {
         style: {
-          background: "#fbf1c7",
+          background: SITE.ogColors.bg,
           width: "100%",
           height: "100%",
           display: "flex",
@@ -24,7 +24,7 @@ export default async () => {
                 top: "-1px",
                 right: "-1px",
                 border: "4px solid #000",
-                background: "#ebdbb2",
+                background: SITE.ogColors.border,
                 opacity: "0.9",
                 borderRadius: "4px",
                 display: "flex",
@@ -40,7 +40,7 @@ export default async () => {
             props: {
               style: {
                 border: "4px solid #000",
-                background: "#fbf1c7",
+                background: SITE.ogColors.bg,
                 borderRadius: "4px",
                 display: "flex",
                 justifyContent: "center",
@@ -122,7 +122,7 @@ export default async () => {
       width: 1200,
       height: 630,
       embedFont: true,
-      fonts: await loadGoogleFonts(SITE.title + SITE.desc + SITE.website) as any,
+      fonts: await loadLocalFonts(SITE.title + SITE.desc + SITE.website) as any,
     }
   );
 };
