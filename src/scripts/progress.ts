@@ -60,7 +60,7 @@
 
   document.addEventListener("astro:after-swap", () => {
     if (!document.getElementById("main-content")) return;
-    window.scrollTo({ left: 0, top: 0, behavior: "instant" });
+    window.scrollTo({ left: 0, top: 0, behavior: "instant" as ScrollBehavior });
     requestAnimationFrame(createProgressBar);
   });
 

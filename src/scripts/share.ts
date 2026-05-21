@@ -3,7 +3,7 @@
   const ac = new AbortController();
   window.__shareAC = ac;
 
-  const mobileQuery = window.matchMedia('not all and (min-width: 768px)');
+  const mobileQuery = window.matchMedia('(max-width: 767px)');
   let mobile = mobileQuery.matches;
 
   let expanded = false;
