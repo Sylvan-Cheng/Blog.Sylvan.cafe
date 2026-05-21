@@ -10,7 +10,7 @@
   };
 
   const toc = (window.__toc ??= {}) as TocState;
-  toc.buildTOC = function () {
+  toc.buildTOC = () => {
     const t = toc;
     if (t.observer) {
       t.observer.disconnect();
@@ -56,29 +56,40 @@
 
     const HEADING_SCROLL_OFFSET = 80;
     const TOOLTIP_EDGE = 8;
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const scrollBehavior = prefersReducedMotion ? "instant" as ScrollBehavior : "smooth" as ScrollBehavior;
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const scrollBehavior = prefersReducedMotion
+      ? ("instant" as ScrollBehavior)
+      : ("smooth" as ScrollBehavior);
 
-    tocList.addEventListener("click", (e) => {
-      const a = (e.target as Element).closest("a");
-      if (!a) return;
-      e.preventDefault();
-      const id = a.getAttribute("href")?.slice(1);
-      if (!id) return;
-      const target = document.getElementById(id);
-      if (target) {
-        const top =
-          target.getBoundingClientRect().top +
-          window.scrollY -
-          HEADING_SCROLL_OFFSET;
-        window.scrollTo({ top, behavior: scrollBehavior });
-        history.replaceState(null, "", `#${id}`);
-      }
-    }, { signal: tocSignal });
+    tocList.addEventListener(
+      "click",
+      (e) => {
+        const a = (e.target as Element).closest("a");
+        if (!a) return;
+        e.preventDefault();
+        const id = a.getAttribute("href")?.slice(1);
+        if (!id) return;
+        const target = document.getElementById(id);
+        if (target) {
+          const top =
+            target.getBoundingClientRect().top +
+            window.scrollY -
+            HEADING_SCROLL_OFFSET;
+          window.scrollTo({ top, behavior: scrollBehavior });
+          history.replaceState(null, "", `#${id}`);
+        }
+      },
+      { signal: tocSignal },
+    );
 
     const tocItems = tocList.querySelectorAll("li a");
     const tooltipMap = new WeakMap<Element, HTMLElement>();
-    const tooltipDims = new WeakMap<Element, { width: number; height: number }>();
+    const tooltipDims = new WeakMap<
+      Element,
+      { width: number; height: number }
+    >();
 
     function initTooltips() {
       const truncated: { a: Element; headingId: string; label: string }[] = [];
@@ -87,7 +98,11 @@
         if (!textSpan) return;
         if (textSpan.scrollWidth > textSpan.clientWidth) {
           const href = a.getAttribute("href") || "";
-          truncated.push({ a, headingId: href.slice(1), label: textSpan.textContent || "" });
+          truncated.push({
+            a,
+            headingId: href.slice(1),
+            label: textSpan.textContent || "",
+          });
         }
       });
       const tooltips: HTMLElement[] = [];
@@ -104,7 +119,8 @@
         a.setAttribute("aria-describedby", tooltip.id);
         tooltips.push(tooltip);
       });
-      const dims: { tooltip: HTMLElement; width: number; height: number }[] = [];
+      const dims: { tooltip: HTMLElement; width: number; height: number }[] =
+        [];
       for (const tooltip of tooltips) {
         const d = tooltip.getBoundingClientRect();
         dims.push({ tooltip, width: d.width, height: d.height });
@@ -131,68 +147,80 @@
         t.hideTimeout = window.setTimeout(() => {
           if (tt.style.opacity === "0") tt.style.display = "none";
           t.hideTimeout = undefined;
-      }, 100);
+        }, 100);
       }
       currentLink = null;
     }
 
     function setupMouseEvents() {
-      tocList!.addEventListener("mouseover", (e) => {
-        const a = (e.target as Element).closest("li a");
-        if (!a || a === currentLink) return;
-        hideTooltip();
-        const tooltip = tooltipMap.get(a);
-        if (!tooltip) {
-          currentLink = null;
-          return;
-        }
-        currentLink = a;
-        tooltip.style.display = "block";
-        t.showTimeout = window.setTimeout(() => {
-          tooltip.style.opacity = "1";
-        }, 400);
-      }, { signal: tocSignal });
-
-      tocList!.addEventListener("mousemove", (e) => {
-        if (!currentLink) return;
-        if (rafId) return;
-        const link = currentLink;
-        const { clientX, clientY } = e;
-        rafId = requestAnimationFrame(() => {
-          const tt = tooltipMap.get(link);
-          if (tt) {
-            const dims = tooltipDims.get(tt);
-            const w = dims ? dims.width : 200;
-            const h = dims ? dims.height : 50;
-            let left = clientX + 12;
-            let top = clientY + 15;
-            left = Math.max(
-              TOOLTIP_EDGE,
-              Math.min(
-                left,
-                document.documentElement.clientWidth - w - TOOLTIP_EDGE,
-              ),
-            );
-            top = Math.max(
-              TOOLTIP_EDGE,
-              Math.min(
-                top,
-                document.documentElement.clientHeight - h - TOOLTIP_EDGE,
-              ),
-            );
-            tt.style.left = `${left}px`;
-            tt.style.top = `${top}px`;
+      tocList!.addEventListener(
+        "mouseover",
+        (e) => {
+          const a = (e.target as Element).closest("li a");
+          if (!a || a === currentLink) return;
+          hideTooltip();
+          const tooltip = tooltipMap.get(a);
+          if (!tooltip) {
+            currentLink = null;
+            return;
           }
-          rafId = null;
-        });
-      }, { signal: tocSignal });
+          currentLink = a;
+          tooltip.style.display = "block";
+          t.showTimeout = window.setTimeout(() => {
+            tooltip.style.opacity = "1";
+          }, 400);
+        },
+        { signal: tocSignal },
+      );
 
-      tocList!.addEventListener("mouseout", (e) => {
-        const a = (e.target as Element).closest("li a");
-        if (!a || a !== currentLink) return;
-        if (e.relatedTarget && a.contains(e.relatedTarget as Node)) return;
-        hideTooltip();
-      }, { signal: tocSignal });
+      tocList!.addEventListener(
+        "mousemove",
+        (e) => {
+          if (!currentLink) return;
+          if (rafId) return;
+          const link = currentLink;
+          const { clientX, clientY } = e;
+          rafId = requestAnimationFrame(() => {
+            const tt = tooltipMap.get(link);
+            if (tt) {
+              const dims = tooltipDims.get(tt);
+              const w = dims ? dims.width : 200;
+              const h = dims ? dims.height : 50;
+              let left = clientX + 12;
+              let top = clientY + 15;
+              left = Math.max(
+                TOOLTIP_EDGE,
+                Math.min(
+                  left,
+                  document.documentElement.clientWidth - w - TOOLTIP_EDGE,
+                ),
+              );
+              top = Math.max(
+                TOOLTIP_EDGE,
+                Math.min(
+                  top,
+                  document.documentElement.clientHeight - h - TOOLTIP_EDGE,
+                ),
+              );
+              tt.style.left = `${left}px`;
+              tt.style.top = `${top}px`;
+            }
+            rafId = null;
+          });
+        },
+        { signal: tocSignal },
+      );
+
+      tocList!.addEventListener(
+        "mouseout",
+        (e) => {
+          const a = (e.target as Element).closest("li a");
+          if (!a || a !== currentLink) return;
+          if (e.relatedTarget && a.contains(e.relatedTarget as Node)) return;
+          hideTooltip();
+        },
+        { signal: tocSignal },
+      );
     }
 
     const topFade = document.getElementById("toc-fade-top");
@@ -212,7 +240,10 @@
     }
 
     if (topFade && bottomFade) {
-      tocList.addEventListener("scroll", updateFadeEdges, { passive: true, signal: tocSignal });
+      tocList.addEventListener("scroll", updateFadeEdges, {
+        passive: true,
+        signal: tocSignal,
+      });
     }
 
     const tocLinks = Array.from(tocItems);
@@ -237,7 +268,10 @@
       t._scrollTocTimer = window.setTimeout(() => {
         const activeLink = tocList!.querySelector("a.text-accent");
         if (activeLink) {
-          activeLink.scrollIntoView({ block: "nearest", behavior: scrollBehavior });
+          activeLink.scrollIntoView({
+            block: "nearest",
+            behavior: scrollBehavior,
+          });
         }
       }, 100);
     }
@@ -266,7 +300,10 @@
       initTooltips();
       updateFadeEdges();
       for (let i = headings.length - 1; i >= 0; i--) {
-        if ((headings[i] as Element).getBoundingClientRect().top <= HEADING_SCROLL_OFFSET) {
+        if (
+          (headings[i] as Element).getBoundingClientRect().top <=
+          HEADING_SCROLL_OFFSET
+        ) {
           activeId = headings[i].id;
           break;
         }
@@ -274,7 +311,7 @@
       updateActiveLink();
     }
 
-    t.scrollHandler = function () {
+    t.scrollHandler = () => {
       if (!document.body.contains(tocList!)) return;
       const atBottom =
         window.innerHeight + window.scrollY >=
@@ -293,7 +330,9 @@
     });
   };
 
-  document.addEventListener("astro:page-load", () => requestAnimationFrame(toc.buildTOC));
+  document.addEventListener("astro:page-load", () =>
+    requestAnimationFrame(toc.buildTOC),
+  );
 })();
 
 export {};

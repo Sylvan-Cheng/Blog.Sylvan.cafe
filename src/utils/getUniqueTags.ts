@@ -1,6 +1,6 @@
 import type { CollectionEntry } from "astro:content";
-import { slugifyStr } from "./slugify";
 import postFilter from "./postFilter";
+import { slugifyStr } from "./slugify";
 
 interface Tag {
   tag: string;
@@ -11,7 +11,7 @@ const getUniqueTags = (posts: CollectionEntry<"blog">[]) => {
   const seen = new Set<string>();
   const tags: Tag[] = posts
     .filter(postFilter)
-    .flatMap(post => post.data.tags)
+    .flatMap((post) => post.data.tags)
     .reduce<Tag[]>((acc, tag) => {
       const slug = slugifyStr(tag);
       if (!seen.has(slug)) {
@@ -20,7 +20,9 @@ const getUniqueTags = (posts: CollectionEntry<"blog">[]) => {
       }
       return acc;
     }, [])
-    .sort((tagA, tagB) => tagA.tag.localeCompare(tagB.tag, "en", { sensitivity: "base" }));
+    .sort((tagA, tagB) =>
+      tagA.tag.localeCompare(tagB.tag, "en", { sensitivity: "base" }),
+    );
   return tags;
 };
 

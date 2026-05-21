@@ -10,7 +10,6 @@
    ========================================================= */
 
 @media print {
-
   /* ── 1. Browser print settings ── */
   @page {
     margin: 2cm;
@@ -30,12 +29,13 @@
     --accent: #333 !important;
     --muted: #eee !important;
     --border: #999 !important;
+
     color-scheme: light !important;
   }
 
   /* ── 3. Hide non-content elements ── */
-  body>header,
-  body>footer,
+  body > header,
+  body > footer,
   nav,
   /* dynamic UI widgets */
   .progress-container,
@@ -117,7 +117,7 @@
   }
 
   /* Unfold collapsed code blocks */
-  pre[data-collapse]>code {
+  pre[data-collapse] > code {
     max-height: none !important;
     -webkit-mask-image: none !important;
     mask-image: none !important;

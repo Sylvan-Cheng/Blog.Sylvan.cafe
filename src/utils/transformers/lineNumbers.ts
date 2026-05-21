@@ -9,7 +9,7 @@ export function transformerLineNumbers() {
     pre(node: Element) {
       if (node.properties["data-nolines"] !== undefined) return node;
       const code = (node.children || []).find(
-        (c): c is Element => c.type === "element" && c.tagName === "code"
+        (c): c is Element => c.type === "element" && c.tagName === "code",
       );
       if (!code) return node;
 
@@ -28,7 +28,10 @@ export function transformerLineNumbers() {
             });
           }
         }
-        if (el.children) el.children.forEach((c) => { if (c.type === "element") visit(c); });
+        if (el.children)
+          el.children.forEach((c) => {
+            if (c.type === "element") visit(c);
+          });
       };
       visit(code);
       return node;

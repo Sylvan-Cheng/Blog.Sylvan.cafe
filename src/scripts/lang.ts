@@ -48,10 +48,7 @@ function initLangPicker(): void {
   });
 
   document.addEventListener("click", (e) => {
-    if (
-      !trig.contains(e.target as Node) &&
-      !dd.contains(e.target as Node)
-    ) {
+    if (!trig.contains(e.target as Node) && !dd.contains(e.target as Node)) {
       close();
     }
   });

@@ -1,13 +1,13 @@
-import rss from "@astrojs/rss";
 import { getCollection } from "astro:content";
-import { LOCALE_META, LOCALES } from "@/i18n/config";
+import rss from "@astrojs/rss";
+import { SITE } from "@/config";
 import type { Locale } from "@/i18n/config";
+import { LOCALE_META, LOCALES } from "@/i18n/config";
 import { getPath } from "@/utils/getPath";
 import getSortedPosts from "@/utils/getSortedPosts";
-import { SITE } from "@/config";
 
 export async function getStaticPaths() {
-  return LOCALES.map(locale => ({ params: { locale } }));
+  return LOCALES.map((locale) => ({ params: { locale } }));
 }
 
 export async function GET({ params }: { params: { locale: string } }) {

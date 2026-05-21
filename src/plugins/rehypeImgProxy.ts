@@ -46,7 +46,9 @@ export function rehypeImgProxy() {
         : typeof cls === "string"
           ? [cls]
           : [];
-      node.properties!.className = [...classList, "img-zoomable"].filter(Boolean);
+      node.properties!.className = [...classList, "img-zoomable"].filter(
+        Boolean,
+      );
     });
   };
 }

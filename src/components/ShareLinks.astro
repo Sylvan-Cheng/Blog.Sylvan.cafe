@@ -1,65 +1,100 @@
 ---
-import LinkButton from "./LinkButton.astro";
-import Icon from "./Icon.astro";
-import Tooltip from "./Tooltip.astro";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
+import Icon from "./Icon.astro";
+import LinkButton from "./LinkButton.astro";
+import Tooltip from "./Tooltip.astro";
 
 const locale = resolveLocale(Astro.currentLocale);
 const pageUrl = Astro.url.href;
 
 const shareConfig: Record<string, { primary: string[]; more: string[] }> = {
   zh: {
-    primary: ['copy', 'brand-wechat', 'brand-telegram', 'brand-qq'],
-    more: ['brand-x', 'brand-reddit', 'brand-whatsapp', 'brand-line', 'brand-facebook', 'mail'],
+    primary: ["copy", "brand-wechat", "brand-telegram", "brand-qq"],
+    more: [
+      "brand-x",
+      "brand-reddit",
+      "brand-whatsapp",
+      "brand-line",
+      "brand-facebook",
+      "mail",
+    ],
   },
   en: {
-    primary: ['copy', 'brand-x', 'brand-reddit', 'mail'],
-    more: ['brand-whatsapp', 'brand-telegram', 'brand-facebook', 'brand-wechat', 'brand-line', 'brand-qq'],
+    primary: ["copy", "brand-x", "brand-reddit", "mail"],
+    more: [
+      "brand-whatsapp",
+      "brand-telegram",
+      "brand-facebook",
+      "brand-wechat",
+      "brand-line",
+      "brand-qq",
+    ],
   },
   ru: {
-    primary: ['copy', 'brand-telegram', 'brand-x', 'mail'],
-    more: ['brand-whatsapp', 'brand-reddit', 'brand-facebook', 'brand-line', 'brand-wechat', 'brand-qq'],
+    primary: ["copy", "brand-telegram", "brand-x", "mail"],
+    more: [
+      "brand-whatsapp",
+      "brand-reddit",
+      "brand-facebook",
+      "brand-line",
+      "brand-wechat",
+      "brand-qq",
+    ],
   },
   ja: {
-    primary: ['copy', 'brand-x', 'brand-line', 'brand-facebook'],
-    more: ['brand-reddit', 'brand-whatsapp', 'brand-telegram', 'brand-wechat', 'brand-qq', 'mail'],
+    primary: ["copy", "brand-x", "brand-line", "brand-facebook"],
+    more: [
+      "brand-reddit",
+      "brand-whatsapp",
+      "brand-telegram",
+      "brand-wechat",
+      "brand-qq",
+      "mail",
+    ],
   },
   eo: {
-    primary: ['copy', 'brand-x', 'brand-reddit', 'mail'],
-    more: ['brand-whatsapp', 'brand-telegram', 'brand-facebook', 'brand-wechat', 'brand-line', 'brand-qq'],
+    primary: ["copy", "brand-x", "brand-reddit", "mail"],
+    more: [
+      "brand-whatsapp",
+      "brand-telegram",
+      "brand-facebook",
+      "brand-wechat",
+      "brand-line",
+      "brand-qq",
+    ],
   },
 };
 
 const platformKeyMap: Record<string, keyof typeof UI.share.platforms> = {
-  'copy': 'copy',
-  'brand-wechat': 'wechat',
-  'brand-telegram': 'telegram',
-  'brand-qq': 'qq',
-  'brand-x': 'x',
-  'brand-reddit': 'reddit',
-  'brand-whatsapp': 'whatsapp',
-  'brand-line': 'line',
-  'brand-facebook': 'facebook',
-  'mail': 'mail',
+  copy: "copy",
+  "brand-wechat": "wechat",
+  "brand-telegram": "telegram",
+  "brand-qq": "qq",
+  "brand-x": "x",
+  "brand-reddit": "reddit",
+  "brand-whatsapp": "whatsapp",
+  "brand-line": "line",
+  "brand-facebook": "facebook",
+  mail: "mail",
 };
 
 const shareUrls: Record<string, string> = {
-  'brand-whatsapp': 'https://wa.me/?text=',
-  'brand-facebook': 'https://www.facebook.com/sharer.php?u=',
-  'brand-x': 'https://x.com/intent/post?url=',
-  'brand-telegram': 'https://t.me/share/url?url=',
-  'brand-reddit': 'https://www.reddit.com/submit?url=',
-  'brand-line': 'https://social-plugins.line.me/lineit/share?url=',
-  'mail': 'mailto:?subject=&body=',
+  "brand-whatsapp": "https://wa.me/?text=",
+  "brand-facebook": "https://www.facebook.com/sharer.php?u=",
+  "brand-x": "https://x.com/intent/post?url=",
+  "brand-telegram": "https://t.me/share/url?url=",
+  "brand-reddit": "https://www.reddit.com/submit?url=",
+  "brand-line": "https://social-plugins.line.me/lineit/share?url=",
+  mail: "mailto:?subject=&body=",
 };
 
 const cfg = shareConfig[locale] || shareConfig.en;
 
 function getHref(icon: string): string {
-  if (icon === 'copy') return '#';
+  if (icon === "copy") return "#";
   const base = shareUrls[icon];
-  if (!base) return '#';
+  if (!base) return "#";
   return base + encodeURIComponent(pageUrl);
 }
 
@@ -70,12 +105,12 @@ function getLabel(icon: string): string {
 }
 
 const LINK =
-  'scale-90 p-2 hover:-translate-y-0.5 sm:p-1 ' +
-  'focus-visible:ring-2 focus-visible:ring-accent focus-visible:rounded';
+  "scale-90 p-2 hover:-translate-y-0.5 sm:p-1 " +
+  "focus-visible:ring-2 focus-visible:ring-accent focus-visible:rounded";
 
 const ICON =
-  'inline-block size-6 scale-125 stroke-current ' +
-  'opacity-90 group-hover:fill-transparent sm:scale-110';
+  "inline-block size-6 scale-125 stroke-current " +
+  "opacity-90 group-hover:fill-transparent sm:scale-110";
 ---
 
 <div class="flex flex-none flex-col items-center justify-center gap-1 md:items-start" data-print-hide>

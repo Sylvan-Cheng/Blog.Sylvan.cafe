@@ -26,5 +26,3 @@ export const SOCIALS = [
     icon: "tabler:mail",
   },
 ] as const satisfies readonly Social[];
-
-

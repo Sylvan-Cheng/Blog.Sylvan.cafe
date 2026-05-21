@@ -1,11 +1,11 @@
 ---
 import Icon from "@/components/Icon.astro";
-import LinkButton from "./LinkButton.astro";
-import LanguagePicker from "./LanguagePicker.astro";
-import Tooltip from "./Tooltip.astro";
 import { SITE } from "@/config";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
+import LanguagePicker from "./LanguagePicker.astro";
+import LinkButton from "./LinkButton.astro";
+import Tooltip from "./Tooltip.astro";
 
 const locale = resolveLocale(Astro.currentLocale);
 const { pathname } = Astro.url;
@@ -39,6 +39,7 @@ const isActive = (path: string) => {
     top: 0;
     translate: 0 -100%;
   }
+
   #skip-to-content:focus {
     top: 1rem;
     translate: 0;

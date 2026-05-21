@@ -14,6 +14,7 @@ html[data-scheme="default"] {
     --muted: #e6e6e6;
     --border: #ece9e9;
   }
+
   &[data-theme="dark"] {
     --background: #212737;
     --foreground: #eaedf3;
@@ -33,6 +34,7 @@ html[data-scheme="nord"] {
     --muted: #d8dee9;
     --border: #81a1c1;
   }
+
   &[data-theme="dark"] {
     --background: #2e3440;
     --foreground: #eceff4;
@@ -54,6 +56,7 @@ html:not([data-scheme]) {
     --muted: #ebdbb2;
     --border: #d5c4a1;
   }
+
   &[data-theme="dark"] {
     --background: #282828;
     --foreground: #ebdbb2;

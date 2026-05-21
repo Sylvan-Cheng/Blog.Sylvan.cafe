@@ -1,8 +1,8 @@
 ---
-import { ClientRouter } from "astro:transitions";
 import { PUBLIC_GOOGLE_SITE_VERIFICATION } from "astro:env/client";
+import { ClientRouter } from "astro:transitions";
 import { SITE } from "@/config";
-import { LOCALES, LOCALE_META } from "@/i18n/config";
+import { LOCALE_META, LOCALES } from "@/i18n/config";
 import { resolveLocale } from "@/i18n/utils";
 import "@/styles/global.css";
 import "@fontsource/noto-sans/latin-400.css";
@@ -15,12 +15,12 @@ import "@fontsource/noto-sans-jp/japanese-400.css";
 import "@fontsource/noto-sans-jp/japanese-700.css";
 import "@fontsource/fira-code/latin-400.css";
 
+import cyrillic400 from "@fontsource/noto-sans/files/noto-sans-cyrillic-400-normal.woff2";
 // Preload font assets via Vite to get hashed URLs for <link rel="preload">
 import latin400 from "@fontsource/noto-sans/files/noto-sans-latin-400-normal.woff2";
 import latin700 from "@fontsource/noto-sans/files/noto-sans-latin-700-normal.woff2";
-import sc400 from "@fontsource/noto-sans-sc/files/noto-sans-sc-chinese-simplified-400-normal.woff2";
 import jp400 from "@fontsource/noto-sans-jp/files/noto-sans-jp-japanese-400-normal.woff2";
-import cyrillic400 from "@fontsource/noto-sans/files/noto-sans-cyrillic-400-normal.woff2";
+import sc400 from "@fontsource/noto-sans-sc/files/noto-sans-sc-chinese-simplified-400-normal.woff2";
 
 // Map locale → additional script font to preload
 const scriptFont: Record<string, string> = {
@@ -72,25 +72,27 @@ function hreflangUrl(targetLocale: string): string {
 
 const socialImageURL = new URL(ogImage, Astro.url);
 
-const structuredData = pubDatetime ? {
-  "@context": "https://schema.org",
-  "@type": "BlogPosting",
-  "@id": `${canonicalURL}#article`,
-  headline: `${title}`,
-  description: `${description}`,
-  image: `${socialImageURL}`,
-  inLanguage: locale,
-  datePublished: pubDatetime.toISOString(),
-  ...(modDatetime && { dateModified: modDatetime.toISOString() }),
-  mainEntityOfPage: { "@id": `${canonicalURL}` },
-  author: [
-    {
-      "@type": "Person",
-      name: `${author}`,
-      ...(profile && { url: profile }),
-    },
-  ],
-} : null;
+const structuredData = pubDatetime
+  ? {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "@id": `${canonicalURL}#article`,
+      headline: `${title}`,
+      description: `${description}`,
+      image: `${socialImageURL}`,
+      inLanguage: locale,
+      datePublished: pubDatetime.toISOString(),
+      ...(modDatetime && { dateModified: modDatetime.toISOString() }),
+      mainEntityOfPage: { "@id": `${canonicalURL}` },
+      author: [
+        {
+          "@type": "Person",
+          name: `${author}`,
+          ...(profile && { url: profile }),
+        },
+      ],
+    }
+  : null;
 ---
 
 <!--

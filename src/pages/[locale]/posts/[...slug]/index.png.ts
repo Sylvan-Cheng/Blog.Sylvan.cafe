@@ -1,9 +1,9 @@
+import { type CollectionEntry, getCollection } from "astro:content";
 import type { APIRoute } from "astro";
-import { getCollection, type CollectionEntry } from "astro:content";
-import { LOCALES } from "@/i18n/config";
-import { getPath } from "@/utils/getPath";
-import { generateOgImageForPost } from "@/utils/generateOgImages";
 import { SITE } from "@/config";
+import { LOCALES } from "@/i18n/config";
+import { generateOgImageForPost } from "@/utils/generateOgImages";
+import { getPath } from "@/utils/getPath";
 
 export async function getStaticPaths() {
   if (!SITE.dynamicOgImage) {
@@ -14,13 +14,13 @@ export async function getStaticPaths() {
   const allPosts = await getCollection("blog");
   const posts = allPosts.filter(({ data }) => !data.draft && !data.ogImage);
 
-  return locales.flatMap(locale =>
+  return locales.flatMap((locale) =>
     posts
-      .filter(post => post.data.locale === locale)
-      .map(post => ({
+      .filter((post) => post.data.locale === locale)
+      .map((post) => ({
         params: { locale, slug: getPath(post.id, post.filePath, false) },
         props: post,
-      }))
+      })),
   );
 }
 

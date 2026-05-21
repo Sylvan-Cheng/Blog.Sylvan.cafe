@@ -1,0 +1,2 @@
+pnpm biome check --write .
+pnpm stylelint "**/*.{css,astro}" --fix

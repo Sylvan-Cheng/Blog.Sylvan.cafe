@@ -33,29 +33,36 @@
 
   function updateScrollProgress() {
     let ticking = false;
-    document.addEventListener("scroll", () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          const bar = document.getElementById(BAR_ID);
-          if (!bar) { ticking = false; return; }
-          const winScroll = document.documentElement.scrollTop;
-          const height =
-            document.documentElement.scrollHeight -
-            document.documentElement.clientHeight;
-          if (height <= 0) {
-            bar.style.width = "0%";
-            bar.setAttribute("aria-valuenow", "0");
+    document.addEventListener(
+      "scroll",
+      () => {
+        if (!ticking) {
+          requestAnimationFrame(() => {
+            const bar = document.getElementById(BAR_ID);
+            if (!bar) {
+              ticking = false;
+              return;
+            }
+            const winScroll = document.documentElement.scrollTop;
+            const height =
+              document.documentElement.scrollHeight -
+              document.documentElement.clientHeight;
+            if (height <= 0) {
+              bar.style.width = "0%";
+              bar.setAttribute("aria-valuenow", "0");
+              ticking = false;
+              return;
+            }
+            const pct = Math.round((winScroll / height) * 100);
+            bar.style.width = pct + "%";
+            bar.setAttribute("aria-valuenow", String(pct));
             ticking = false;
-            return;
-          }
-          const pct = Math.round((winScroll / height) * 100);
-          bar.style.width = pct + "%";
-          bar.setAttribute("aria-valuenow", String(pct));
-          ticking = false;
-        });
-        ticking = true;
-      }
-    }, { passive: true, signal: ac.signal });
+          });
+          ticking = true;
+        }
+      },
+      { passive: true, signal: ac.signal },
+    );
   }
 
   document.addEventListener("astro:after-swap", () => {
