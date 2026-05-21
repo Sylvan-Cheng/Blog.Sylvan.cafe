@@ -26,9 +26,7 @@ const tocHeadings = (headings ?? []).filter(h => h.depth === 2 || h.depth === 3)
     style="left: min(calc(50% + var(--toc-offset-content, 26rem)), calc(100vw - var(--toc-offset-edge, 14rem)));"
   >
     <div class="border-s-2 border-accent/30 ps-3">
-      <div
-        class="mb-2 flex items-center gap-1.5 text-xs font-semibold text-foreground/70"
-      >
+      <div class="mb-2 flex items-center gap-1.5 text-xs font-semibold text-foreground/70">
         <Icon name="tabler:list-tree" class="inline-block size-3.5" />
         <span>{t(UI.toc, locale)}</span>
       </div>
@@ -58,7 +56,7 @@ const tocHeadings = (headings ?? []).filter(h => h.depth === 2 || h.depth === 3)
               <li>
                 <a
                   href={`#${h.slug}`}
-                  class={`block border-s-2 py-1 pe-2 transition-all duration-200 hover:text-accent hover:translate-x-0.5 ${isH3 ? "ps-6" : "ps-3"} ${isFirst ? "text-accent font-semibold border-accent/60" : "text-foreground/60 border-transparent"} hover:border-accent/40`}
+                  class={`block border-s-2 py-1 pe-2 transition duration-200 origin-left hover:text-accent hover:border-accent/40 hover:scale-[1.02] ${isH3 ? "ps-6" : "ps-3"} ${isFirst ? "text-accent font-semibold border-accent/60" : "text-foreground/60 border-transparent"}`}
                 >
                   <span class={`block truncate${isH3 ? " text-xs" : ""}`}>
                     {label}

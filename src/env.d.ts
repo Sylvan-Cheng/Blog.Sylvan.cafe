@@ -19,6 +19,7 @@ interface Window {
     showTimeout?: number | undefined;
     _init?: boolean;
     _tocAbort?: AbortController;
+    _scrollTocTimer?: number;
     buildTOC?: () => void;
   };
 }

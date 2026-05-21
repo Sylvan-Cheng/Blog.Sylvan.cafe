@@ -6,11 +6,12 @@
     showTimeout?: number | null;
     _tocAbort?: AbortController;
     buildTOC: () => void;
+    _scrollTocTimer?: number;
   };
 
   const toc: TocState = (window as any).__toc ??= {} as TocState;
   toc.buildTOC = function () {
-    const t: TocState = (window as any).__toc ??= {} as TocState;
+    const t = toc;
     if (t.observer) {
       t.observer.disconnect();
     }
@@ -25,6 +26,10 @@
     if (t.showTimeout) {
       clearTimeout(t.showTimeout);
       t.showTimeout = null;
+    }
+    if (t._scrollTocTimer) {
+      clearTimeout(t._scrollTocTimer);
+      t._scrollTocTimer = undefined;
     }
     t._tocAbort?.abort();
     t._tocAbort = new AbortController();
@@ -131,7 +136,7 @@
         t.hideTimeout = window.setTimeout(() => {
           if (tt.style.opacity === "0") tt.style.display = "none";
           t.hideTimeout = null;
-        }, 200);
+      }, 100);
       }
       currentLink = null;
     }
@@ -219,7 +224,6 @@
     let activeId: string | null = (headings[0] as HTMLElement)?.id || null;
 
     function updateActiveLink() {
-      let activeLink: Element | null = null;
       for (const link of tocLinks) {
         const href = link.getAttribute("href");
         if (!href) continue;
@@ -230,11 +234,14 @@
         link.classList.toggle("border-accent/60", isActive);
         link.classList.toggle("text-foreground/60", !isActive);
         link.classList.toggle("border-transparent", !isActive);
-        if (isActive) activeLink = link;
       }
-      if (activeLink) {
-        activeLink.scrollIntoView({ block: "nearest", behavior: scrollBehavior });
-      }
+      clearTimeout(t._scrollTocTimer);
+      t._scrollTocTimer = window.setTimeout(() => {
+        const activeLink = tocList!.querySelector("a.text-accent");
+        if (activeLink) {
+          activeLink.scrollIntoView({ block: "nearest", behavior: scrollBehavior });
+        }
+      }, 200);
     }
 
     t.observer = new IntersectionObserver(
@@ -256,7 +263,7 @@
       t.observer.observe(heading);
     }
 
-    if (document.getElementById("article") && document.body.contains(tocList)) {
+    if (document.body.contains(tocList)) {
       setupMouseEvents();
       updateFadeEdges();
       for (let i = headings.length - 1; i >= 0; i--) {
