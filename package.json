@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro check && astro build && pagefind --site dist",
-    "preview": "astro preview",
+    "preview": "astro check && astro build && pagefind --site dist && astro preview",
     "sync": "astro sync",
     "astro": "astro",
     "format:check": "prettier --check .",
