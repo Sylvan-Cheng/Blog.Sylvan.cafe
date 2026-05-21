@@ -2,14 +2,14 @@
   type TocState = {
     observer?: IntersectionObserver;
     scrollHandler?: (() => void) | null;
-    hideTimeout?: number | null;
-    showTimeout?: number | null;
+    hideTimeout?: number | undefined;
+    showTimeout?: number | undefined;
     _tocAbort?: AbortController;
     buildTOC: () => void;
     _scrollTocTimer?: number;
   };
 
-  const toc: TocState = (window as any).__toc ??= {} as TocState;
+  const toc = (window.__toc ??= {}) as TocState;
   toc.buildTOC = function () {
     const t = toc;
     if (t.observer) {
@@ -19,15 +19,15 @@
       document.removeEventListener("scroll", t.scrollHandler);
       t.scrollHandler = null;
     }
-    if (t.hideTimeout) {
+    if (t.hideTimeout !== undefined) {
       clearTimeout(t.hideTimeout);
-      t.hideTimeout = null;
+      t.hideTimeout = undefined;
     }
-    if (t.showTimeout) {
+    if (t.showTimeout !== undefined) {
       clearTimeout(t.showTimeout);
-      t.showTimeout = null;
+      t.showTimeout = undefined;
     }
-    if (t._scrollTocTimer) {
+    if (t._scrollTocTimer !== undefined) {
       clearTimeout(t._scrollTocTimer);
       t._scrollTocTimer = undefined;
     }
@@ -43,6 +43,7 @@
     const article = document.getElementById("article");
     const tocContainer = document.getElementById("floating-toc");
     const tocList = document.getElementById("toc-list");
+
     if (!article || !tocContainer || !tocList) return;
 
     if (!tooltipRoot) {
@@ -52,17 +53,6 @@
     }
 
     const headings = Array.from(article.querySelectorAll("h2, h3"));
-
-    headings.forEach((heading: Element, i: number) => {
-      if (!heading.id) {
-        heading.id =
-          heading.textContent
-            ?.trim()
-            .toLowerCase()
-            .replace(/[^\p{L}\p{N}]+/gu, "-")
-            .replace(/^-|-$/g, "") || `heading-${i}`;
-      }
-    });
 
     const HEADING_SCROLL_OFFSET = 80;
     const TOOLTIP_EDGE = 8;
@@ -88,6 +78,7 @@
 
     const tocItems = tocList.querySelectorAll("li a");
     const tooltipMap = new WeakMap<Element, HTMLElement>();
+    const tooltipDims = new WeakMap<Element, { width: number; height: number }>();
 
     function initTooltips() {
       const truncated: { a: Element; headingId: string; label: string }[] = [];
@@ -110,12 +101,16 @@
         tooltip.style.display = "block";
         tooltipRoot!.appendChild(tooltip);
         tooltipMap.set(a, tooltip);
+        a.setAttribute("aria-describedby", tooltip.id);
         tooltips.push(tooltip);
       });
+      const dims: { tooltip: HTMLElement; width: number; height: number }[] = [];
       for (const tooltip of tooltips) {
         const d = tooltip.getBoundingClientRect();
-        (tooltip as any)._width = d.width;
-        (tooltip as any)._height = d.height;
+        dims.push({ tooltip, width: d.width, height: d.height });
+      }
+      for (const { tooltip, width, height } of dims) {
+        tooltipDims.set(tooltip, { width, height });
         tooltip.style.display = "none";
       }
     }
@@ -127,7 +122,7 @@
       if (!currentLink) return;
       const tt = tooltipMap.get(currentLink);
       if (tt) {
-        clearTimeout(t.showTimeout ?? undefined);
+        clearTimeout(t.showTimeout);
         if (rafId) {
           cancelAnimationFrame(rafId);
           rafId = null;
@@ -135,7 +130,7 @@
         tt.style.opacity = "0";
         t.hideTimeout = window.setTimeout(() => {
           if (tt.style.opacity === "0") tt.style.display = "none";
-          t.hideTimeout = null;
+          t.hideTimeout = undefined;
       }, 100);
       }
       currentLink = null;
@@ -166,8 +161,9 @@
         rafId = requestAnimationFrame(() => {
           const tt = tooltipMap.get(link);
           if (tt) {
-            const w = (tt as any)._width || 200;
-            const h = (tt as any)._height || 50;
+            const dims = tooltipDims.get(tt);
+            const w = dims ? dims.width : 200;
+            const h = dims ? dims.height : 50;
             let left = clientX + 12;
             let top = clientY + 15;
             left = Math.max(
@@ -229,6 +225,8 @@
         if (!href) continue;
         const id = href.slice(1);
         const isActive = id === activeId;
+        const wasActive = link.classList.contains("text-accent");
+        if (isActive === wasActive) continue;
         link.classList.toggle("text-accent", isActive);
         link.classList.toggle("font-semibold", isActive);
         link.classList.toggle("border-accent/60", isActive);
@@ -241,7 +239,7 @@
         if (activeLink) {
           activeLink.scrollIntoView({ block: "nearest", behavior: scrollBehavior });
         }
-      }, 200);
+      }, 100);
     }
 
     t.observer = new IntersectionObserver(
@@ -267,7 +265,7 @@
       setupMouseEvents();
       updateFadeEdges();
       for (let i = headings.length - 1; i >= 0; i--) {
-        if ((headings[i] as HTMLElement).getBoundingClientRect().top <= HEADING_SCROLL_OFFSET) {
+        if ((headings[i] as Element).getBoundingClientRect().top <= HEADING_SCROLL_OFFSET) {
           activeId = headings[i].id;
           break;
         }
@@ -295,6 +293,7 @@
     };
     document.addEventListener("scroll", t.scrollHandler, {
       passive: true,
+      signal: tocSignal,
     });
   };
 
