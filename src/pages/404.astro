@@ -19,9 +19,10 @@ const locale = resolveLocale(Astro.currentLocale);
   >
     <div class="mb-14 flex flex-col items-center justify-center">
       <h1 class="text-9xl font-bold text-accent">404</h1>
-      <span aria-hidden="true">¯\_(ツ)_/¯</span>
-      <p class="mt-4 text-2xl sm:text-3xl">{t(UI.notFound, locale)}</p>
+      <span aria-hidden="true">&macr;\_(ツ)_/&macr;</span>
+      <p id="not-found-text" class="mt-4 text-2xl sm:text-3xl">{t(UI.notFound, locale)}</p>
       <LinkButton
+        id="go-home-link"
         href={`/${locale}/`}
         class="my-6 text-lg underline decoration-dashed underline-offset-8"
       >
@@ -32,3 +33,28 @@ const locale = resolveLocale(Astro.currentLocale);
 
   <Footer />
 </Layout>
+
+<script is:inline>
+  (function () {
+    var path = window.location.pathname;
+    var m = path.match(/^\/(zh|en|ja|ru|eo)\b/);
+    var locale = m ? m[1] : "zh";
+
+    var text = {
+      notFound: { zh:"页面未找到。", en:"Page not found.", ja:"ページが見つかりません。", ru:"Страница не найдена.", eo:"Paĝo ne trovita." },
+      goHome: { zh:"返回首页", en:"Go back home", ja:"ホームに戻る", ru:"На главную", eo:"Reiri al la ĉefpaĝo" },
+    };
+
+    var langMap = { zh:"zh-CN", en:"en-US", ja:"ja", ru:"ru", eo:"eo" };
+
+    var notFoundEl = document.getElementById("not-found-text");
+    var goHomeEl = document.getElementById("go-home-link");
+
+    if (notFoundEl) notFoundEl.textContent = text.notFound[locale] || text.notFound.zh;
+    if (goHomeEl) {
+      goHomeEl.textContent = text.goHome[locale] || text.goHome.zh;
+      goHomeEl.href = "/" + locale + "/";
+    }
+    document.documentElement.lang = langMap[locale] || "zh-CN";
+  })();
+</script>

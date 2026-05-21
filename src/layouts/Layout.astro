@@ -107,7 +107,7 @@ const structuredData = pubDatetime ? {
 <html
   dir={SITE.dir}
   data-scheme={SITE.themeScheme}
-  lang={locale}
+  lang={LOCALE_META[locale].lang}
   class={`${scrollSmooth && "scroll-smooth"}`}
 >
   <head>

@@ -23,7 +23,7 @@ import { countWords } from "@/utils/wordCount";
 import Icon from "@/components/Icon.astro";
 import { SITE } from "@/config";
 import { UI } from "@/i18n/ui";
-import { resolveLocale, t } from "@/i18n/utils";
+import { resolveLocale, t, tp } from "@/i18n/utils";
 import fs from "fs";
 import path from "path";
 
@@ -95,8 +95,8 @@ const kaTeXInlineCSS = post.data.math
     id="main-content"
     class:list={["app-layout pb-12", { "mt-8": !SITE.showBackButton }]}
     data-pagefind-body
+    data-backurl={`/${locale}/`}
   >
-    <FloatingTOC headings={tocHeadings} />
     <h1
       transition:name={`p-${slugifyStr(title)}`}
       class="inline-block text-2xl font-bold text-accent sm:text-3xl"
@@ -107,7 +107,7 @@ const kaTeXInlineCSS = post.data.math
       <Datetime {pubDatetime} {modDatetime} {timezone} size="lg" />
       <span aria-hidden="true" class="max-sm:hidden select-none opacity-40">&middot;</span>
       <span class="text-sm text-foreground opacity-60 max-sm:hidden">
-        {UI.post.wordsCount[locale](String(countWords(post.body ?? "")))}
+        {tp(UI.post.wordsCount, locale, String(countWords(post.body ?? "")))}
       </span>
       <span
         aria-hidden="true"
@@ -124,6 +124,8 @@ const kaTeXInlineCSS = post.data.math
     >
       <Content />
     </article>
+
+    <FloatingTOC headings={tocHeadings} />
 
     <hr class="my-8 border-dashed" />
 

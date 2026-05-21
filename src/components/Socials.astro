@@ -5,13 +5,13 @@ import Icon from "./Icon.astro";
 import Tooltip from "./Tooltip.astro";
 import { SITE } from "@/config";
 import { UI } from "@/i18n/ui";
-import { resolveLocale } from "@/i18n/utils";
+import { resolveLocale, tp } from "@/i18n/utils";
 
 const locale = resolveLocale(Astro.currentLocale);
 
 const socialLabelMap: Record<string, string> = {
-  GitHub: UI.social.github[locale](SITE.title),
-  Mail: UI.social.email[locale](SITE.title),
+  GitHub: tp(UI.social.github, locale, SITE.author),
+  Mail: tp(UI.social.email, locale, SITE.title),
 };
 ---
 

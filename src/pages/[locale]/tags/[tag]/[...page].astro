@@ -1,7 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import { LOCALES } from "@/i18n/config";
-import { resolveLocale, t } from "@/i18n/utils";
+import { resolveLocale, t, tp } from "@/i18n/utils";
 import { UI } from "@/i18n/ui";
 import { translateTag } from "@/i18n/tags";
 import type { GetStaticPathsOptions } from "astro";
@@ -48,7 +48,7 @@ const displayTag = translateTag(tag, "en", locale) ?? tagName;
   <Main
     pageTitle={[`${t(UI.tags.label, locale)}:`, `${displayTag}`]}
     titleTransition={tag}
-    pageDesc={UI.tags.descFiltered[locale](displayTag)}
+    pageDesc={tp(UI.tags.descFiltered, locale, displayTag)}
   >
     <h1 slot="title" transition:name={`p-${tag}`}>{`${t(UI.tags.label, locale)}:${displayTag}`}</h1>
     <ul>

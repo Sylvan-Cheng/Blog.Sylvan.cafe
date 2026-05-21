@@ -1,0 +1,192 @@
+import type { Dict, TemplateDict } from "./config";
+
+export const miscSection = {
+  notFound: {
+    zh: "页面未找到。",
+    en: "Page not found.",
+    ja: "ページが見つかりません。",
+    ru: "Страница не найдена.",
+    eo: "Paĝo ne trovita.",
+  } satisfies Dict,
+  goHome: {
+    zh: "返回首页",
+    en: "Go back home",
+    ja: "ホームに戻る",
+    ru: "На главную",
+    eo: "Reiri al la ĉefpaĝo",
+  } satisfies Dict,
+
+  /** Search */
+  search: {
+    title: {
+      zh: "搜索",
+      en: "Search",
+      ja: "検索",
+      ru: "Поиск",
+      eo: "Serĉi",
+    } satisfies Dict,
+    desc: {
+      zh: "搜索任意文章 ...",
+      en: "Search any article ...",
+      ja: "記事を検索 ...",
+      ru: "Поиск статей ...",
+      eo: "Serĉi ajnan artikolon...",
+    } satisfies Dict,
+  },
+
+  /** Posts list */
+  posts: {
+    title: {
+      zh: "文章",
+      en: "Posts",
+      ja: "記事",
+      ru: "Записи",
+      eo: "Afiŝoj",
+    } satisfies Dict,
+    desc: {
+      zh: "所有已发布的文章。",
+      en: "All the articles I've posted.",
+      ja: "公開された全ての記事です。",
+      ru: "Все опубликованные записи.",
+      eo: "Ĉiuj artikoloj, kiujn mi afiŝis.",
+    } satisfies Dict,
+  },
+
+  /** Tags */
+  tags: {
+    title: {
+      zh: "标签",
+      en: "Tags",
+      ja: "タグ",
+      ru: "Теги",
+      eo: "Etikedoj",
+    } satisfies Dict,
+    desc: {
+      zh: "文章所使用的所有标签。",
+      en: "All the tags used in posts.",
+      ja: "記事で使用されている全てのタグです。",
+      ru: "Все теги, используемые в записях.",
+      eo: "Ĉiuj etikedoj uzataj en afiŝoj.",
+    } satisfies Dict,
+    label: {
+      zh: "标签",
+      en: "Tag",
+      ja: "タグ",
+      ru: "Тег",
+      eo: "Etikedo",
+    } satisfies Dict,
+    descFiltered: {
+      zh: (tag: string) => `所有带有 "${tag}" 标签的文章。`,
+      en: (tag: string) => `All the articles with the tag "${tag}".`,
+      ja: (tag: string) => `「${tag}」タグの付いた全ての記事です。`,
+      ru: (tag: string) => `Все записи с тегом "${tag}".`,
+      eo: (tag: string) => `Ĉiuj artikoloj kun la etikedo "${tag}".`,
+    } satisfies TemplateDict,
+  },
+
+  /** Archives */
+  archives: {
+    title: {
+      zh: "归档",
+      en: "Archives",
+      ja: "アーカイブ",
+      ru: "Архив",
+      eo: "Arkivoj",
+    } satisfies Dict,
+    desc: {
+      zh: "所有归档的文章。",
+      en: "All the articles I've archived.",
+      ja: "アーカイブされた全ての記事です。",
+      ru: "Все архивные записи.",
+      eo: "Ĉiuj arkivitaj artikoloj.",
+    } satisfies Dict,
+  },
+
+  /** About page */
+  about: {
+    desc: {
+      zh: "这里是 Sylvan。",
+      en: "This is Sylvan.",
+      ja: "ここは Sylvan です。",
+      ru: "Это Sylvan.",
+      eo: "Jen Sylvan.",
+    } satisfies Dict,
+  },
+
+  backToTop: {
+    zh: "回到顶部",
+    en: "Back to top",
+    ja: "トップへ戻る",
+    ru: "Наверх",
+    eo: "Reiri al supro",
+  } satisfies Dict,
+  toc: {
+    zh: "目录",
+    en: "Contents",
+    ja: "目次",
+    ru: "Содержание",
+    eo: "Enhavo",
+  } satisfies Dict,
+  footnotes: {
+    zh: "脚注",
+    en: "Footnotes",
+    ja: "脚注",
+    ru: "Сноски",
+    eo: "Piednotoj",
+  } satisfies Dict,
+  edit: {
+    zh: "编辑页面",
+    en: "Edit page",
+    ja: "ページを編集",
+    ru: "Редактировать",
+    eo: "Redakti paĝon",
+  } satisfies Dict,
+  pagination: {
+    prev: {
+      zh: "上一页",
+      en: "Prev",
+      ja: "前へ",
+      ru: "Назад",
+      eo: "Antaŭa",
+    } satisfies Dict,
+    next: {
+      zh: "下一页",
+      en: "Next",
+      ja: "次へ",
+      ru: "Вперёд",
+      eo: "Sekva",
+    } satisfies Dict,
+  },
+  notByAI: {
+    zh: "人类创作，而非 AI",
+    en: "Produced By Human Not By AI",
+    ja: "AI ではなく人間による制作",
+    ru: "Создано человеком, а не ИИ",
+    eo: "Kreita de Homo, Ne de AI",
+  } satisfies Dict,
+  breadcrumb: {
+    home: {
+      zh: "首页",
+      en: "Home",
+      ja: "ホーム",
+      ru: "Главная",
+      eo: "Hejmo",
+    } satisfies Dict,
+  },
+  social: {
+    github: {
+      zh: (site: string) => `${site} 的 GitHub`,
+      en: (site: string) => `${site} on GitHub`,
+      ja: (site: string) => `${site} の GitHub`,
+      ru: (site: string) => `${site} на GitHub`,
+      eo: (site: string) => `${site} ĉe GitHub`,
+    } satisfies TemplateDict,
+    email: {
+      zh: (site: string) => `发送邮件至 ${site}`,
+      en: (site: string) => `Send an email to ${site}`,
+      ja: (site: string) => `${site} にメールを送信`,
+      ru: (site: string) => `Отправить email на ${site}`,
+      eo: (site: string) => `Sendi retmesaĝon al ${site}`,
+    } satisfies TemplateDict,
+  },
+};
