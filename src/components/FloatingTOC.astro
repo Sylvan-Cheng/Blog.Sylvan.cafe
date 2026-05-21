@@ -50,7 +50,7 @@ const tocHeadings = (headings ?? []).filter(h => h.depth === 2 || h.depth === 3)
             const isH3 = h.depth === 3;
             const label = h.slug === "footnote-label"
               ? t(UI.footnotes, locale)
-              : h.text;
+              : h.text.replace(/\s*#+$/, "");
             const isFirst = idx === 0;
             return (
               <li>

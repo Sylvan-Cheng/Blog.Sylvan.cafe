@@ -1,14 +1,19 @@
 import type { Element, Root } from "hast";
 import { visit } from "unist-util-visit";
+import { slugifyStr } from "../utils/slugify";
+
+function getTextContent(node: Element): string {
+  return node.children
+    .map(c => (c.type === "text" ? c.value : "children" in c ? getTextContent(c as Element) : ""))
+    .join("");
+}
 
 export function rehypeA11y() {
   return (tree: Root) => {
+    let headingIndex = 0;
+
     visit(tree, "element", (node: Element) => {
-      /*
-       * 1. Task list checkboxes
-       *    Astro 的 GFM task list 渲染 <input type="checkbox" disabled>
-       *    缺少 label 关联或 aria-label，屏幕阅读器无法识别其含义。
-       */
+      // 1. Task list checkboxes — missing aria-label for screen readers
       if (
         node.tagName === "input" &&
         node.properties &&
@@ -23,26 +28,47 @@ export function rehypeA11y() {
           : "Incomplete task";
       }
 
-      /*
-       * 2. Heading group class
-       *    给 h2-h6 添加 `group` 类，配合 rehype-autolink-headings 的
-       *    md:group-hover:opacity-100 实现悬停时显示锚点链接。
-       */
-      if (
-        node.tagName &&
-        /^h[2-6]$/.test(node.tagName) &&
-        node.properties
-      ) {
-        const cls = node.properties.className;
-        const classList = Array.isArray(cls)
-          ? cls
-          : typeof cls === "string"
-            ? [cls]
-            : [];
-        node.properties.className = classList
-          .concat("group")
-          .filter(Boolean);
+      // 2. Heading anchors — group class + ID + # link, single traversal
+      if (!node.properties || !/^h[2-6]$/.test(node.tagName)) return;
+
+      const existingId = node.properties.id;
+      let id: string | undefined =
+        typeof existingId === "string" ? existingId : undefined;
+
+      if (!id) {
+        const text = getTextContent(node);
+        id = slugifyStr(text) || `heading-${headingIndex}`;
+        node.properties.id = id;
       }
+
+      headingIndex++;
+
+      const cls = node.properties.className;
+      const classList = Array.isArray(cls)
+        ? cls
+        : typeof cls === "string"
+          ? [cls]
+          : [];
+      node.properties.className = classList.concat("group").filter(Boolean);
+
+      (node.children as Element[]).push({
+        type: "element",
+        tagName: "a",
+        properties: {
+          className:
+              "heading-link ms-2 no-underline opacity-0 md:group-hover:opacity-100 md:focus:opacity-100",
+          ariaLabel: "Jump to heading",
+          href: `#${id}`,
+        },
+        children: [
+          {
+            type: "element",
+            tagName: "span",
+            properties: { ariaHidden: "true" },
+            children: [{ type: "text", value: "#" }],
+          },
+        ],
+      });
     });
   };
 }

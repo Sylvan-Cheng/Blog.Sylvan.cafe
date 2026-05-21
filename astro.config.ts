@@ -8,7 +8,6 @@ import remarkCollapse from "remark-collapse";
 import remarkMath from "remark-math";
 import rehypeRaw from "rehype-raw";
 import rehypeKatex from "rehype-katex";
-import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { rehypeA11y } from "./src/plugins/rehype-a11y";
 import { rehypeImgProxy } from "./src/plugins/rehypeImgProxy";
 import {
@@ -49,23 +48,6 @@ export default defineConfig({
       rehypeImgProxy,
       rehypeKatex,
       rehypeA11y,
-      [
-        rehypeAutolinkHeadings,
-        {
-          behavior: "append",
-          properties: {
-            className:
-              "heading-link ms-2 no-underline opacity-75 md:opacity-0 md:group-hover:opacity-100 md:focus:opacity-100",
-            ariaLabel: "Jump to heading",
-          },
-          content: {
-            type: "element",
-            tagName: "span",
-            properties: { ariaHidden: "true" },
-            children: [{ type: "text", value: "#" }],
-          },
-        },
-      ],
     ],
     shikiConfig: {
       /*
