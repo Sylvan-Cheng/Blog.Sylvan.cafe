@@ -29,15 +29,3 @@ const backUrl = SITE.showBackButton ? Astro.url.pathname : "/";
   {props.pageDesc && <p class="mt-2 mb-6 italic">{props.pageDesc}</p>}
   <slot />
 </main>
-
-<script>
-  import { BACK_URL_KEY } from "@/constants";
-  document.addEventListener("astro:page-load", () => {
-    const mainContent: HTMLElement | null =
-      document.querySelector("#main-content");
-    const backUrl = mainContent?.dataset?.backurl;
-    if (backUrl) {
-      sessionStorage.setItem(BACK_URL_KEY, backUrl);
-    }
-  });
-</script>

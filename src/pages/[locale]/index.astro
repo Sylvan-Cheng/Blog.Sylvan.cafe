@@ -103,15 +103,3 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
   </main>
   <Footer />
 </Layout>
-
-<script>
-  import { BACK_URL_KEY } from "@/constants";
-  document.addEventListener("astro:page-load", () => {
-    const main = document.querySelector("#main-content") as HTMLElement;
-    const indexLayout = main?.dataset?.layout;
-    const backUrl = main?.dataset?.backurl;
-    if (indexLayout && backUrl) {
-      sessionStorage.setItem(BACK_URL_KEY, backUrl);
-    }
-  });
-</script>
