@@ -10,7 +10,9 @@ interface Social {
   icon: string;
 }
 
-export const SOCIALS: Social[] = [
+export const BACK_URL_KEY = "backUrl";
+
+export const SOCIALS = [
   {
     name: "GitHub",
     href: "https://github.com/Ruixi-Cheng",
@@ -23,6 +25,6 @@ export const SOCIALS: Social[] = [
     linkTitle: `Send an email to ${SITE.title}`,
     icon: "tabler:mail",
   },
-] as const;
+] as const satisfies readonly Social[];
 
 

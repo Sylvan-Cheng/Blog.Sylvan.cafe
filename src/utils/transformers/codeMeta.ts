@@ -1,3 +1,15 @@
+import type { Element } from "hast";
+
+interface TransformerCtx {
+  options: { meta?: { __raw?: string } };
+  addClassToHast(node: Element, cls: string): void;
+}
+
+interface CodeMetaOptions {
+  style?: "v1" | "v2";
+  hideDot?: boolean;
+}
+
 /**
  * Shiki transformer：解析 Markdown 代码块 meta 字符串，添加属性到 <pre>。
  *
@@ -9,12 +21,12 @@
 export const transformerCodeMeta = ({
   style = "v2",
   hideDot = false,
-} = {}) => ({
-  pre(node) {
-    const raw = this.options.meta?.__raw?.split(" ");
+}: CodeMetaOptions = {}) => ({
+  pre(node: Element) {
+    const raw = (this as unknown as TransformerCtx).options.meta?.__raw?.split(" ");
     if (!raw) return;
 
-    const metaMap = new Map();
+    const metaMap = new Map<string, string>();
 
     for (const item of raw) {
       const eqIdx = item.indexOf("=");
@@ -39,14 +51,14 @@ export const transformerCodeMeta = ({
     const fileNameOffset = style === "v1" ? "0.75rem" : "-0.75rem";
     const existingStyle = Array.isArray(node.properties.style)
       ? node.properties.style.join(";") + ";"
-      : (node.properties.style || "");
+      : (node.properties.style as string) || "";
     node.properties.style =
       existingStyle + `--file-name-offset: ${fileNameOffset};`;
 
     // 标记 copy 按钮需偏移（避免运行时 getComputedStyle 强制重排）
     node.properties["data-filename"] = "true";
 
-    this.addClassToHast(
+    (this as unknown as TransformerCtx).addClassToHast(
       node,
       `mt-8 ${style === "v1" ? "rounded-tl-none" : ""}`
     );

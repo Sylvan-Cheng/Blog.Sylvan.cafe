@@ -24,12 +24,13 @@ const locale = resolveLocale(Astro.currentLocale);
 }
 
 <script>
+  import { BACK_URL_KEY } from "@/constants";
   /* Update Search Praam */
   function updateGoBackUrl() {
     const backButton: HTMLAnchorElement | null =
       document.querySelector("#back-button");
 
-    const backUrl = sessionStorage.getItem("backUrl");
+    const backUrl = sessionStorage.getItem(BACK_URL_KEY);
 
     if (backUrl && backButton) {
       backButton.href = backUrl;

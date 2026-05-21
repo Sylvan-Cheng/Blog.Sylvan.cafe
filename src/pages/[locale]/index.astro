@@ -1,7 +1,8 @@
 ---
 import { getCollection } from "astro:content";
 import { LOCALES } from "@/i18n/config";
-import { resolveLocale } from "@/i18n/utils";
+import { UI } from "@/i18n/ui";
+import { t, resolveLocale } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
@@ -18,28 +19,6 @@ export function getStaticPaths() {
 }
 
 const locale = resolveLocale(Astro.currentLocale);
-const t = (dict: Record<string, string>) => dict[locale] ?? dict.zh ?? "";
-
-const i18n = {
-  greeting: t({
-    zh: "你好，欢迎来访 👋",
-    en: "Hello, welcome! 👋",
-    ja: "こんにちは、ようこそ！👋",
-    ru: "Привет, добро пожаловать! 👋",
-    eo: "Saluton, bonvenon! 👋",
-  }),
-  desc: t({
-    zh: "这是 Sylvan 的个人博客。这里记录关于技术、代码和生活的思考。",
-    en: "Sylvan's personal blog. Thoughts on technology, code, and life.",
-    ja: "Sylvan の個人ブログです。技術、コード、そして生活についての考えを綴っています。",
-    ru: "Личный блог Sylvan. Мысли о технологиях, коде и жизни.",
-    eo: "Persona blogo de Sylvan. Pensoj pri teknologio, kodo kaj vivo.",
-  }),
-  featured: t({ zh: "精选文章", en: "Featured", ja: "注目記事", ru: "Избранное", eo: "Elstaraj" }),
-  recent: t({ zh: "最近文章", en: "Recent Posts", ja: "最近の記事", ru: "Недавние записи", eo: "Lastatempaj afiŝoj" }),
-  allPosts: t({ zh: "全部文章", en: "All Posts", ja: "全ての記事", ru: "Все записи", eo: "Ĉiuj afiŝoj" }),
-  socialLinks: t({ zh: "社交链接：", en: "Social Links:", ja: "ソーシャルリンク:", ru: "Соцсети:", eo: "Sociaj ligiloj:" }),
-};
 
 const allPosts = await getCollection("blog");
 const posts = allPosts.filter(p => p.data.locale === locale);
@@ -51,10 +30,10 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
 
 <Layout>
   <Header />
-  <main id="main-content" data-layout="index" class="app-layout">
+  <main id="main-content" data-layout="index" data-backurl={`/${locale}/`} class="app-layout">
     <section id="hero" class:list={["pt-8 pb-6", "border-b border-border"]}>
       <h1 class="my-4 inline-block text-4xl font-bold sm:my-8 sm:text-5xl">
-        {i18n.greeting}
+        {t(UI.home.greeting, locale)}
       </h1>
       <LinkButton
         href={`/${locale}/rss.xml`}
@@ -67,15 +46,15 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
         <span class="sr-only">RSS Feed</span>
       </LinkButton>
 
-      <p>{i18n.desc}</p>
+      <p>{t(UI.home.desc, locale)}</p>
       <p class="mt-2">
-        {t({ zh: "欢迎订阅 RSS 以获取最新文章。", en: "Subscribe to RSS for the latest posts.", ja: "RSSで最新記事を購読してください。", ru: "Подпишитесь на RSS, чтобы получать новые записи.", eo: "Abonu RSS por ricevi la plej novajn afiŝojn." })}
+        {t(UI.rss.subscribe, locale)}
       </p>
       {
         // only display if at least one social link is enabled
         SOCIALS.length > 0 && (
           <div class="mt-4 flex max-sm:flex-col sm:items-center">
-            <div class="me-2 mb-1 whitespace-nowrap sm:mb-0">{i18n.socialLinks}</div>
+            <div class="me-2 mb-1 whitespace-nowrap sm:mb-0">{t(UI.home.socialLinks, locale)}</div>
             <Socials />
           </div>
         )
@@ -91,7 +70,7 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
             { "border-b border-border": recentPosts.length > 0 },
           ]}
         >
-          <h2 class="text-2xl font-semibold tracking-wide">{i18n.featured}</h2>
+          <h2 class="text-2xl font-semibold tracking-wide">{t(UI.home.featured, locale)}</h2>
           <ul>
             {featuredPosts.map(data => (
               <Card variant="h3" {...data} locale={locale} />
@@ -104,7 +83,7 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
     {
       recentPosts.length > 0 && (
         <section id="recent-posts" class="pt-12 pb-6">
-          <h2 class="text-2xl font-semibold tracking-wide">{i18n.recent}</h2>
+          <h2 class="text-2xl font-semibold tracking-wide">{t(UI.home.recent, locale)}</h2>
           <ul>
             {recentPosts.map(
               (data, index) =>
@@ -117,7 +96,7 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
 
     <div class="my-8 text-center">
       <LinkButton href={`/${locale}/posts/`}>
-        {i18n.allPosts}
+        {t(UI.home.allPosts, locale)}
         <Icon name="tabler:arrow-right" class="inline-block rtl:-rotate-180" />
       </LinkButton>
     </div>
@@ -126,11 +105,13 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
 </Layout>
 
 <script>
+  import { BACK_URL_KEY } from "@/constants";
   document.addEventListener("astro:page-load", () => {
-    const indexLayout = (document.querySelector("#main-content") as HTMLElement)
-      ?.dataset?.layout;
-    if (indexLayout) {
-      sessionStorage.setItem("backUrl", "/");
+    const main = document.querySelector("#main-content") as HTMLElement;
+    const indexLayout = main?.dataset?.layout;
+    const backUrl = main?.dataset?.backurl;
+    if (indexLayout && backUrl) {
+      sessionStorage.setItem(BACK_URL_KEY, backUrl);
     }
   });
 </script>

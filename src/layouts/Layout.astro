@@ -106,7 +106,7 @@ const structuredData = pubDatetime ? {
 <!doctype html>
 <html
   dir={SITE.dir}
-  data-scheme="gruvbox"
+  data-scheme={SITE.themeScheme}
   lang={locale}
   class={`${scrollSmooth && "scroll-smooth"}`}
 >
@@ -118,8 +118,8 @@ const structuredData = pubDatetime ? {
     <meta name="generator" content={Astro.generator} />
 
     <!-- Preconnect to Umami analytics early -->
-    <link rel="preconnect" href="https://umami.sylvan.cafe" crossorigin />
-    <link rel="dns-prefetch" href="https://umami.sylvan.cafe" />
+    <link rel="preconnect" href={SITE.analytics.umami.url} crossorigin />
+    <link rel="dns-prefetch" href={SITE.analytics.umami.url} />
 
     <!-- Preconnect to Giscus comments -->
     <link rel="preconnect" href="https://giscus.app" crossorigin />
@@ -227,7 +227,7 @@ const structuredData = pubDatetime ? {
     <ClientRouter />
 
     <!-- Umami Analytics (Partytown) -->
-    <script is:inline type="text/partytown" src="https://umami.sylvan.cafe/script.js" data-website-id="636e674b-026b-4730-b2dc-cd79336f463c"></script>
+    <script is:inline type="text/partytown" src={`${SITE.analytics.umami.url}/script.js`} data-website-id={SITE.analytics.umami.websiteId}></script>
 
     <!-- Minimal inline script to prevent FOUC - sets theme immediately -->
     <script is:inline>

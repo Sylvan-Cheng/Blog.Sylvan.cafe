@@ -17,7 +17,7 @@ async function loadLocalFont(
   ) as ArrayBuffer;
 }
 
-async function loadGoogleFonts(
+async function loadLocalFonts(
   _text: string
 ): Promise<
   Array<{ name: string; data: ArrayBuffer; weight: number; style: string }>
@@ -55,4 +55,4 @@ async function loadGoogleFonts(
   return fonts;
 }
 
-export default loadGoogleFonts;
+export default loadLocalFonts;

@@ -9,15 +9,15 @@ import remarkMath from "remark-math";
 import rehypeRaw from "rehype-raw";
 import rehypeKatex from "rehype-katex";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import { rehypeA11y } from "./src/utils/rehype-a11y";
+import { rehypeA11y } from "./src/plugins/rehype-a11y";
 import { rehypeImgProxy } from "./src/plugins/rehypeImgProxy";
 import {
   transformerNotationDiff,
   transformerNotationHighlight,
   transformerNotationWordHighlight,
 } from "@shikijs/transformers";
-import { transformerCodeMeta } from "./src/utils/transformers/codeMeta.js";
-import { transformerLineNumbers } from "./src/utils/transformers/lineNumbers.js";
+import { transformerCodeMeta } from "./src/utils/transformers/codeMeta";
+import { transformerLineNumbers } from "./src/utils/transformers/lineNumbers";
 import { SITE } from "./src/config";
 import { LOCALES } from "./src/i18n/config";
 
