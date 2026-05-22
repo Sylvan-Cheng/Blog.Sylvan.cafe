@@ -23,7 +23,9 @@ export const transformerCodeMeta = ({
   hideDot = false,
 }: CodeMetaOptions = {}) => ({
   pre(node: Element) {
-    const raw = (this as unknown as TransformerCtx).options.meta?.__raw?.split(" ");
+    const raw = (this as unknown as TransformerCtx).options.meta?.__raw?.split(
+      " ",
+    );
     if (!raw) return;
 
     const metaMap = new Map<string, string>();
@@ -31,7 +33,8 @@ export const transformerCodeMeta = ({
     for (const item of raw) {
       const eqIdx = item.indexOf("=");
       const key = eqIdx === -1 ? item : item.slice(0, eqIdx);
-      const value = eqIdx === -1 ? undefined : item.slice(eqIdx + 1).replace(/["'`]/g, "");
+      const value =
+        eqIdx === -1 ? undefined : item.slice(eqIdx + 1).replace(/["'`]/g, "");
       if (!key) continue;
       metaMap.set(key, value || "true");
     }
@@ -60,7 +63,7 @@ export const transformerCodeMeta = ({
 
     (this as unknown as TransformerCtx).addClassToHast(
       node,
-      `mt-8 ${style === "v1" ? "rounded-tl-none" : ""}`
+      `mt-8 ${style === "v1" ? "rounded-tl-none" : ""}`,
     );
 
     node.children.push({

@@ -1,24 +1,24 @@
-import { defineConfig, envField } from "astro/config";
 import partytown from "@astrojs/partytown";
-import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
-import icon from "astro-icon";
-import remarkToc from "remark-toc";
-import remarkCollapse from "remark-collapse";
-import remarkMath from "remark-math";
-import rehypeRaw from "rehype-raw";
-import rehypeKatex from "rehype-katex";
-import { rehypeA11y } from "./src/plugins/rehype-a11y";
-import { rehypeImgProxy } from "./src/plugins/rehypeImgProxy";
 import {
   transformerNotationDiff,
   transformerNotationHighlight,
   transformerNotationWordHighlight,
 } from "@shikijs/transformers";
-import { transformerCodeMeta } from "./src/utils/transformers/codeMeta";
-import { transformerLineNumbers } from "./src/utils/transformers/lineNumbers";
+import tailwindcss from "@tailwindcss/vite";
+import { defineConfig, envField } from "astro/config";
+import icon from "astro-icon";
+import rehypeKatex from "rehype-katex";
+import rehypeRaw from "rehype-raw";
+import remarkCollapse from "remark-collapse";
+import remarkMath from "remark-math";
+import remarkToc from "remark-toc";
 import { SITE } from "./src/config";
 import { LOCALES } from "./src/i18n/config";
+import { rehypeA11y } from "./src/plugins/rehype-a11y";
+import { rehypeImgProxy } from "./src/plugins/rehypeImgProxy";
+import { transformerCodeMeta } from "./src/utils/transformers/codeMeta";
+import { transformerLineNumbers } from "./src/utils/transformers/lineNumbers";
 
 // https://astro.build/config
 export default defineConfig({
@@ -37,18 +37,18 @@ export default defineConfig({
   integrations: [
     partytown(),
     sitemap({
-      filter: page => SITE.showArchives || !page.replace(/\/$/, "").endsWith("/archives"),
+      filter: (page) =>
+        SITE.showArchives || !page.replace(/\/$/, "").endsWith("/archives"),
     }),
     icon(),
   ],
   markdown: {
-    remarkPlugins: [remarkToc, remarkMath, [remarkCollapse, { test: "Table of contents" }]],
-    rehypePlugins: [
-      rehypeRaw,
-      rehypeImgProxy,
-      rehypeKatex,
-      rehypeA11y,
+    remarkPlugins: [
+      remarkToc,
+      remarkMath,
+      [remarkCollapse, { test: "Table of contents" }],
     ],
+    rehypePlugins: [rehypeRaw, rehypeImgProxy, rehypeKatex, rehypeA11y],
     shikiConfig: {
       /*
       Shiki 在构建时静态编译，不支持运行时跟随 data-scheme 切换。

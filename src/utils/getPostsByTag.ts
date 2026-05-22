@@ -4,9 +4,7 @@ import { slugifyStr } from "./slugify";
 
 const getPostsByTag = (posts: CollectionEntry<"blog">[], tag: string) =>
   getSortedPosts(
-    posts.filter(post =>
-      post.data.tags.some(t => slugifyStr(t) === tag)
-    )
+    posts.filter((post) => post.data.tags.some((t) => slugifyStr(t) === tag)),
   );
 
 export default getPostsByTag;

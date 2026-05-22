@@ -1,13 +1,13 @@
 ---
 import { Icon } from "astro-icon/components";
-import { LOCALES, LOCALE_META } from "@/i18n/config";
+import { LOCALE_META, LOCALES } from "@/i18n/config";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
 
 const currentLocale = resolveLocale(Astro.currentLocale);
 const pathname = Astro.url.pathname;
 
-const locales = LOCALES.map(code => ({
+const locales = LOCALES.map((code) => ({
   code,
   label: LOCALE_META[code].label,
 }));

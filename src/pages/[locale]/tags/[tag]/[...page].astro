@@ -1,26 +1,26 @@
 ---
 import { getCollection } from "astro:content";
-import { LOCALES } from "@/i18n/config";
-import { resolveLocale, t, tp } from "@/i18n/utils";
-import { UI } from "@/i18n/ui";
-import { translateTag } from "@/i18n/tags";
 import type { GetStaticPathsOptions } from "astro";
-import Main from "@/layouts/Main.astro";
-import Layout from "@/layouts/Layout.astro";
-import Header from "@/components/Header.astro";
-import Footer from "@/components/Footer.astro";
 import Card from "@/components/Card.astro";
+import Footer from "@/components/Footer.astro";
+import Header from "@/components/Header.astro";
 import Pagination from "@/components/Pagination.astro";
-import getUniqueTags from "@/utils/getUniqueTags";
-import getPostsByTag from "@/utils/getPostsByTag";
 import { SITE } from "@/config";
+import { LOCALES } from "@/i18n/config";
+import { translateTag } from "@/i18n/tags";
+import { UI } from "@/i18n/ui";
+import { resolveLocale, t, tp } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+import Main from "@/layouts/Main.astro";
+import getPostsByTag from "@/utils/getPostsByTag";
+import getUniqueTags from "@/utils/getUniqueTags";
 
 export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
   const allPosts = await getCollection("blog");
   const locales = LOCALES;
   const results = [];
   for (const loc of locales) {
-    const localePosts = allPosts.filter(p => p.data.locale === loc);
+    const localePosts = allPosts.filter((p) => p.data.locale === loc);
     const tags = getUniqueTags(localePosts);
     for (const { tag, tagName } of tags) {
       const tagPosts = getPostsByTag(localePosts, tag);

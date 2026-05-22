@@ -1,5 +1,6 @@
 import satori from "satori";
 import { SITE } from "@/config";
+import type { FontConfig } from "../loadLocalFont";
 import loadLocalFonts from "../loadLocalFont";
 
 export default async () => {
@@ -105,7 +106,13 @@ export default async () => {
                           type: "span",
                           props: {
                             style: { overflow: "hidden", fontWeight: "bold" },
-                            children: (() => { try { return new URL(SITE.website).hostname } catch { return SITE.website } })(),
+                            children: (() => {
+                              try {
+                                return new URL(SITE.website).hostname;
+                              } catch {
+                                return SITE.website;
+                              }
+                            })(),
                           },
                         },
                       },
@@ -122,7 +129,9 @@ export default async () => {
       width: 1200,
       height: 630,
       embedFont: true,
-      fonts: await loadLocalFonts(SITE.title + SITE.desc + SITE.website) as any,
-    }
+      fonts: (await loadLocalFonts(
+        SITE.title + SITE.desc + SITE.website,
+      )) as FontConfig[],
+    },
   );
 };

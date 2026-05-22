@@ -14,10 +14,13 @@ export function getPrevNextPosts(
     title,
     filePath,
   }));
-  const currentPostIndex = allPosts.findIndex(p => p.id === currentId);
+  const currentPostIndex = allPosts.findIndex((p) => p.id === currentId);
   if (currentPostIndex === -1) return { prev: null, next: null };
   return {
     prev: currentPostIndex !== 0 ? allPosts[currentPostIndex - 1] : null,
-    next: currentPostIndex < allPosts.length - 1 ? allPosts[currentPostIndex + 1] : null,
+    next:
+      currentPostIndex < allPosts.length - 1
+        ? allPosts[currentPostIndex + 1]
+        : null,
   };
 }

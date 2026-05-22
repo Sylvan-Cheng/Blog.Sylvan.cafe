@@ -1,16 +1,16 @@
 ---
 import "@pagefind/default-ui/css/ui.css";
-import { LOCALES } from "@/i18n/config";
-import { resolveLocale, t } from "@/i18n/utils";
-import { UI } from "@/i18n/ui";
-import Main from "@/layouts/Main.astro";
-import Layout from "@/layouts/Layout.astro";
-import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
+import Header from "@/components/Header.astro";
 import { SITE } from "@/config";
+import { LOCALES } from "@/i18n/config";
+import { UI } from "@/i18n/ui";
+import { resolveLocale, t } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+import Main from "@/layouts/Main.astro";
 
 export function getStaticPaths() {
-  return LOCALES.map(locale => ({ params: { locale } }));
+  return LOCALES.map((locale) => ({ params: { locale } }));
 }
 
 const locale = resolveLocale(Astro.currentLocale);
@@ -140,7 +140,7 @@ const backUrl = SITE.showBackButton ? `${Astro.url.pathname}` : "/";
       border-bottom: 0;
     }
 
-    .pagefind-ui__result-nested .pagefind-ui__result-link:before {
+    .pagefind-ui__result-nested .pagefind-ui__result-link::before {
       font-family: system-ui;
     }
   }

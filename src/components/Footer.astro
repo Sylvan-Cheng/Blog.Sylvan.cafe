@@ -1,8 +1,8 @@
 ---
 import type { HTMLAttributes } from "astro/types";
-import Socials from "./Socials.astro";
-import NotByAI from "./NotByAI.astro";
 import { resolveLocale } from "@/i18n/utils";
+import NotByAI from "./NotByAI.astro";
+import Socials from "./Socials.astro";
 
 const currentYear = new Date().getFullYear();
 const locale = resolveLocale(Astro.currentLocale);

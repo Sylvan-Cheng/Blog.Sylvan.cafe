@@ -26,17 +26,20 @@ html[lang="ja"] {
 @layer base {
   * {
     @apply border-border outline-accent/75;
+
     scrollbar-width: auto;
     scrollbar-color: var(--color-muted) transparent;
   }
 
   html {
     @apply overflow-y-scroll scroll-smooth;
+
     overflow-x: hidden;
   }
 
   body {
     @apply flex min-h-svh flex-col bg-background font-body text-foreground selection:bg-accent/75 selection:text-background;
+
     width: 100%;
   }
 
@@ -84,6 +87,7 @@ html[data-theme="dark"] .katex {
 }
 
 /* Source: https://piccalil.li/blog/a-more-modern-css-reset/ */
+
 /* Anything that has been anchored to should have extra scroll margin */
 :target {
   scroll-margin-block: 1rem;

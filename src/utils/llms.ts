@@ -4,7 +4,7 @@ import { getPath } from "./getPath";
 
 export function buildPostUrl(
   post: CollectionEntry<"blog">,
-  base: string
+  base: string,
 ): string {
   const path = `/${post.data.locale}${getPath(post.id, post.filePath)}index.md`;
   return new URL(path, base).href;
@@ -12,7 +12,7 @@ export function buildPostUrl(
 
 export function buildLlmsIndex(
   posts: CollectionEntry<"blog">[],
-  base: string
+  base: string,
 ): string[] {
   const lines: string[] = [];
 
@@ -31,14 +31,20 @@ export function buildLlmsIndex(
 
   lines.push("## Pages");
   lines.push("");
-  lines.push(`- [关于](${new URL("zh/about/", base).href}): 了解作者和这个博客`);
+  lines.push(
+    `- [关于](${new URL("zh/about/", base).href}): 了解作者和这个博客`,
+  );
   lines.push("");
 
   lines.push("## Optional");
   lines.push("");
-  lines.push(`- [许可证](${new URL("zh/license/", base).href}): 网站内容许可协议`);
+  lines.push(
+    `- [许可证](${new URL("zh/license/", base).href}): 网站内容许可协议`,
+  );
   lines.push(`- [RSS Feed](${new URL("zh/rss.xml", base).href}): 订阅博客更新`);
-  lines.push(`- [Sitemap](${new URL("sitemap-index.xml", base).href}): 网站完整页面索引`);
+  lines.push(
+    `- [Sitemap](${new URL("sitemap-index.xml", base).href}): 网站完整页面索引`,
+  );
   lines.push("");
 
   return lines;

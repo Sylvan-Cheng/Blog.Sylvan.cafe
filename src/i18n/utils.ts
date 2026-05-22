@@ -1,5 +1,5 @@
+import type { Dict, Locale, TemplateDict } from "./config";
 import { LOCALES } from "./config";
-import type { Locale, Dict, TemplateDict } from "./config";
 
 export function t(dict: Dict, locale: Locale): string {
   return dict[locale];

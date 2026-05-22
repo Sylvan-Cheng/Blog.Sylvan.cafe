@@ -4,7 +4,7 @@ import slugify from "slugify";
 /**
  * Check if string contains non-Latin characters
  */
-const hasNonLatin = (str: string): boolean => /[^\x00-\x7F]/.test(str);
+const hasNonLatin = (str: string): boolean => /[^\x20-\x7E]/u.test(str);
 
 /**
  * Slugify a string using a hybrid approach:
@@ -20,4 +20,4 @@ export const slugifyStr = (str: string): string => {
   return slugify(str, { lower: true });
 };
 
-export const slugifyAll = (arr: string[]) => arr.map(str => slugifyStr(str));
+export const slugifyAll = (arr: string[]) => arr.map((str) => slugifyStr(str));

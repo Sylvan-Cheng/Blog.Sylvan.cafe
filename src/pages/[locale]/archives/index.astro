@@ -1,18 +1,18 @@
 ---
 import { getCollection } from "astro:content";
-import { LOCALES } from "@/i18n/config";
-import { resolveLocale, t } from "@/i18n/utils";
-import { UI } from "@/i18n/ui";
-import Main from "@/layouts/Main.astro";
-import Layout from "@/layouts/Layout.astro";
-import Header from "@/components/Header.astro";
-import Footer from "@/components/Footer.astro";
 import Card from "@/components/Card.astro";
-import getPostsByGroupCondition from "@/utils/getPostsByGroupCondition";
+import Footer from "@/components/Footer.astro";
+import Header from "@/components/Header.astro";
 import { SITE } from "@/config";
+import { LOCALES } from "@/i18n/config";
+import { UI } from "@/i18n/ui";
+import { resolveLocale, t } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+import Main from "@/layouts/Main.astro";
+import getPostsByGroupCondition from "@/utils/getPostsByGroupCondition";
 
 export function getStaticPaths() {
-  return LOCALES.map(locale => ({ params: { locale } }));
+  return LOCALES.map((locale) => ({ params: { locale } }));
 }
 
 // Redirect to 404 page if `showArchives` config is false
@@ -23,14 +23,79 @@ if (!SITE.showArchives) {
 const locale = resolveLocale(Astro.currentLocale);
 
 const allPosts = await getCollection("blog", ({ data }) => !data.draft);
-const posts = allPosts.filter(p => p.data.locale === locale);
+const posts = allPosts.filter((p) => p.data.locale === locale);
 
 const monthNames: Record<string, Record<number, string>> = {
-  zh: ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"],
-  ja: ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"],
-  ru: ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"],
-  en: ["January","February","March","April","May","June","July","August","September","October","November","December"],
-  eo: ["Januaro","Februaro","Marto","Aprilo","Majo","Junio","Julio","Aŭgusto","Septembro","Oktobro","Novembro","Decembro"],
+  zh: [
+    "一月",
+    "二月",
+    "三月",
+    "四月",
+    "五月",
+    "六月",
+    "七月",
+    "八月",
+    "九月",
+    "十月",
+    "十一月",
+    "十二月",
+  ],
+  ja: [
+    "1月",
+    "2月",
+    "3月",
+    "4月",
+    "5月",
+    "6月",
+    "7月",
+    "8月",
+    "9月",
+    "10月",
+    "11月",
+    "12月",
+  ],
+  ru: [
+    "Январь",
+    "Февраль",
+    "Март",
+    "Апрель",
+    "Май",
+    "Июнь",
+    "Июль",
+    "Август",
+    "Сентябрь",
+    "Октябрь",
+    "Ноябрь",
+    "Декабрь",
+  ],
+  en: [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ],
+  eo: [
+    "Januaro",
+    "Februaro",
+    "Marto",
+    "Aprilo",
+    "Majo",
+    "Junio",
+    "Julio",
+    "Aŭgusto",
+    "Septembro",
+    "Oktobro",
+    "Novembro",
+    "Decembro",
+  ],
 };
 ---
 

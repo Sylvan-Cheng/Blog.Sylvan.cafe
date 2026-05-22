@@ -1,6 +1,6 @@
 import { BLOG_PATH } from "@/content.config";
-import { slugifyStr } from "./slugify";
 import { LOCALES } from "@/i18n/config";
+import { slugifyStr } from "./slugify";
 
 /**
  * Get full path of a blog post
@@ -12,18 +12,18 @@ import { LOCALES } from "@/i18n/config";
 export function getPath(
   id: string,
   filePath: string | undefined,
-  includeBase = true
+  includeBase = true,
 ) {
   const KNOWN_LOCALES: readonly string[] = LOCALES;
 
   const pathSegments = filePath
     ?.replace(BLOG_PATH, "")
     .split("/")
-    .filter(path => path !== "")
-    .filter(path => !path.startsWith("_"))
-    .filter(path => !KNOWN_LOCALES.includes(path))
+    .filter((path) => path !== "")
+    .filter((path) => !path.startsWith("_"))
+    .filter((path) => !KNOWN_LOCALES.includes(path))
     .slice(0, -1) // remove the filename, keep only directory segments
-    .map(segment => slugifyStr(segment));
+    .map((segment) => slugifyStr(segment));
 
   const basePath = includeBase ? "/posts" : "";
 
@@ -45,9 +45,10 @@ export function getPath(
     pathSegments.pop();
   }
 
-  const raw = !pathSegments || pathSegments.length < 1
-    ? [basePath, ...slug].join("/")
-    : [basePath, ...pathSegments, ...slug].join("/");
+  const raw =
+    !pathSegments || pathSegments.length < 1
+      ? [basePath, ...slug].join("/")
+      : [basePath, ...pathSegments, ...slug].join("/");
 
   return includeBase ? raw + "/" : raw;
 }

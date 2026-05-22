@@ -1,17 +1,17 @@
 ---
-import type { GetStaticPaths } from "astro";
 import { getCollection } from "astro:content";
-import { LOCALES } from "@/i18n/config";
-import { resolveLocale, t } from "@/i18n/utils";
-import { UI } from "@/i18n/ui";
-import Main from "@/layouts/Main.astro";
-import Layout from "@/layouts/Layout.astro";
-import Header from "@/components/Header.astro";
-import Footer from "@/components/Footer.astro";
+import type { GetStaticPaths } from "astro";
 import Card from "@/components/Card.astro";
+import Footer from "@/components/Footer.astro";
+import Header from "@/components/Header.astro";
 import Pagination from "@/components/Pagination.astro";
-import getSortedPosts from "@/utils/getSortedPosts";
 import { SITE } from "@/config";
+import { LOCALES } from "@/i18n/config";
+import { UI } from "@/i18n/ui";
+import { resolveLocale, t } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+import Main from "@/layouts/Main.astro";
+import getSortedPosts from "@/utils/getSortedPosts";
 
 const locale = resolveLocale(Astro.currentLocale);
 
@@ -20,7 +20,7 @@ export const getStaticPaths = (async ({ paginate }) => {
   const allPosts = await getCollection("blog", ({ data }) => !data.draft);
   const results = [];
   for (const loc of locales) {
-    const localePosts = allPosts.filter(p => p.data.locale === loc);
+    const localePosts = allPosts.filter((p) => p.data.locale === loc);
     const pages = paginate(getSortedPosts(localePosts), {
       params: { locale: loc },
       pageSize: SITE.postPerPage,

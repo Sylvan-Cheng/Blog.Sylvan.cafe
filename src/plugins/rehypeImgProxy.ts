@@ -37,16 +37,17 @@ export function rehypeImgProxy() {
         thumbUrl = `${PROXY_BASE}w:800/plain/${path}`;
       }
 
-      node.properties!.src = thumbUrl;
-      node.properties!["data-zoom-src"] = fullUrl;
+      const props = node.properties ?? {};
+      props.src = thumbUrl;
+      props["data-zoom-src"] = fullUrl;
 
-      const cls = node.properties?.className;
+      const cls = props.className;
       const classList = Array.isArray(cls)
         ? cls
         : typeof cls === "string"
           ? [cls]
           : [];
-      node.properties!.className = [...classList, "img-zoomable"].filter(Boolean);
+      props.className = [...classList, "img-zoomable"].filter(Boolean);
     });
   };
 }

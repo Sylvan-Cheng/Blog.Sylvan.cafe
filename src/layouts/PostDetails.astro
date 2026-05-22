@@ -1,31 +1,31 @@
 ---
-import { render, type CollectionEntry } from "astro:content";
-import Layout from "@/layouts/Layout.astro";
-import Header from "@/components/Header.astro";
-import Footer from "@/components/Footer.astro";
-import Tag from "@/components/Tag.astro";
-import Datetime from "@/components/Datetime.astro";
-import EditPost from "@/components/EditPost.astro";
-import ShareLinks from "@/components/ShareLinks.astro";
+import { type CollectionEntry, render } from "astro:content";
+import fs from "fs";
+import path from "path";
 import BackButton from "@/components/BackButton.astro";
 import BackToTopButton from "@/components/BackToTopButton.astro";
-import Giscus from "@/components/Giscus.astro";
-import FloatingTOC from "@/components/FloatingTOC.astro";
-import ImageZoom from "@/components/ImageZoom.astro";
-import CodeFolding from "@/components/CodeFolding.astro";
 import CodeCopy from "@/components/CodeCopy.astro";
-import LicenseInfo from "@/components/LicenseInfo.astro";
-import { getPath } from "@/utils/getPath";
-import { getOgImage } from "@/utils/getOgImage";
-import { getPrevNextPosts } from "@/utils/getPrevNextPosts";
-import { slugifyStr } from "@/utils/slugify";
-import { countWords } from "@/utils/wordCount";
+import CodeFolding from "@/components/CodeFolding.astro";
+import Datetime from "@/components/Datetime.astro";
+import EditPost from "@/components/EditPost.astro";
+import FloatingTOC from "@/components/FloatingTOC.astro";
+import Footer from "@/components/Footer.astro";
+import Giscus from "@/components/Giscus.astro";
+import Header from "@/components/Header.astro";
 import Icon from "@/components/Icon.astro";
+import ImageZoom from "@/components/ImageZoom.astro";
+import LicenseInfo from "@/components/LicenseInfo.astro";
+import ShareLinks from "@/components/ShareLinks.astro";
+import Tag from "@/components/Tag.astro";
 import { SITE } from "@/config";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t, tp } from "@/i18n/utils";
-import fs from "fs";
-import path from "path";
+import Layout from "@/layouts/Layout.astro";
+import { getOgImage } from "@/utils/getOgImage";
+import { getPath } from "@/utils/getPath";
+import { getPrevNextPosts } from "@/utils/getPrevNextPosts";
+import { slugifyStr } from "@/utils/slugify";
+import { countWords } from "@/utils/wordCount";
 
 type Props = {
   post: CollectionEntry<"blog">;
@@ -53,7 +53,7 @@ const {
 } = post.data;
 
 const { Content, headings } = await render(post);
-const tocHeadings = headings.filter(h => h.depth === 2 || h.depth === 3);
+const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
 
 const ogImageUrl = getOgImage(post, locale);
 const ogImage = ogImageUrl

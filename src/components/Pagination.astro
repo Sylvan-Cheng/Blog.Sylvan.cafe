@@ -1,10 +1,10 @@
 ---
-import type { Page } from "astro";
 import type { CollectionEntry } from "astro:content";
+import type { Page } from "astro";
 import Icon from "@/components/Icon.astro";
-import LinkButton from "./LinkButton.astro";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
+import LinkButton from "./LinkButton.astro";
 
 type Props = {
   page: Page<CollectionEntry<"blog">>;

@@ -34,7 +34,9 @@ const cachedBg: Record<string, string> = {};
 
 function getBgColor(): string {
   if (!cachedBg[themeValue]) {
-    cachedBg[themeValue] = window.getComputedStyle(document.body).backgroundColor;
+    cachedBg[themeValue] = window.getComputedStyle(
+      document.body,
+    ).backgroundColor;
   }
   return cachedBg[themeValue];
 }
@@ -91,7 +93,7 @@ document.addEventListener("astro:after-swap", setThemeFeature);
 
 // Set theme-color value before page transition
 // to avoid navigation bar color flickering in Android dark mode
-document.addEventListener("astro:before-swap", event => {
+document.addEventListener("astro:before-swap", (event) => {
   const astroEvent = event;
   const bgColor = document
     .querySelector("meta[name='theme-color']")

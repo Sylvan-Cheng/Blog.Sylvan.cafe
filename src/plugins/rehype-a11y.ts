@@ -4,7 +4,13 @@ import { slugifyStr } from "../utils/slugify";
 
 function getTextContent(node: Element): string {
   return node.children
-    .map(c => (c.type === "text" ? c.value : "children" in c ? getTextContent(c as Element) : ""))
+    .map((c) =>
+      c.type === "text"
+        ? c.value
+        : "children" in c
+          ? getTextContent(c as Element)
+          : "",
+    )
     .join("");
 }
 
@@ -56,7 +62,7 @@ export function rehypeA11y() {
         tagName: "a",
         properties: {
           className:
-              "heading-link ms-2 no-underline opacity-0 md:group-hover:opacity-100 md:focus:opacity-100",
+            "heading-link ms-2 no-underline opacity-0 md:group-hover:opacity-100 md:focus:opacity-100",
           ariaLabel: "Jump to heading",
           href: `#${id}`,
         },
