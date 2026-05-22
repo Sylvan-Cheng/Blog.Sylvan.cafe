@@ -49,7 +49,7 @@
 
   function expand() {
     const els = getEls();
-    if (!els || !els.wrapper || !els.toggle) return;
+    if (!els?.wrapper || !els?.toggle) return;
     clearTimeout(timerWrap);
     if (mobile) {
       els.wrapper.style.maxWidth = "none";
@@ -88,7 +88,7 @@
 
   function collapse() {
     const els = getEls();
-    if (!els || !els.wrapper || !els.toggle) return;
+    if (!els?.wrapper || !els?.toggle) return;
     clearTimeout(timerWrap);
     els.toggleExpanded?.classList.add("hidden");
     els.toggleCollapsed?.classList.remove("hidden");
@@ -104,7 +104,7 @@
     });
     timerWrap = setTimeout(() => {
       const els2 = getEls();
-      if (!els2 || !els2.wrapper) return;
+      if (!els2?.wrapper) return;
       els2.wrapper.style.transition = mobile
         ? "max-height 300ms ease-out"
         : "max-width 300ms ease-out";

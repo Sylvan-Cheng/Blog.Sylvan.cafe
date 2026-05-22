@@ -4,7 +4,7 @@ import slugify from "slugify";
 /**
  * Check if string contains non-Latin characters
  */
-const hasNonLatin = (str: string): boolean => /[^\x00-\x7F]/.test(str);
+const hasNonLatin = (str: string): boolean => /[^\x20-\x7E]/u.test(str);
 
 /**
  * Slugify a string using a hybrid approach:

@@ -18,7 +18,10 @@ export async function getStaticPaths() {
   const postsByKey: Record<string, CollectionEntry<"blog">[]> = {};
   for (const p of allPosts) {
     const key = p.id.split("/").slice(0, -1).join("/");
-    if (key) (postsByKey[key] ??= []).push(p);
+    if (key) {
+      postsByKey[key] ??= [];
+      postsByKey[key].push(p);
+    }
   }
 
   // Pre-compute sorted posts per locale

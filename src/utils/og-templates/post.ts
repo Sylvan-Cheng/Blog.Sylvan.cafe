@@ -1,6 +1,7 @@
 ﻿import type { CollectionEntry } from "astro:content";
 import satori from "satori";
 import { SITE } from "@/config";
+import type { FontConfig } from "../loadLocalFont";
 import loadLocalFonts from "../loadLocalFont";
 
 export default async (post: CollectionEntry<"blog">) => {
@@ -133,7 +134,7 @@ export default async (post: CollectionEntry<"blog">) => {
       embedFont: true,
       fonts: (await loadLocalFonts(
         post.data.title + post.data.author + SITE.title + "by",
-      )) as any,
+      )) as FontConfig[],
     },
   );
 };

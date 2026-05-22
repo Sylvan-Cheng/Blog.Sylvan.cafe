@@ -9,7 +9,8 @@
     _scrollTocTimer?: number;
   };
 
-  const toc = (window.__toc ??= {}) as TocState;
+  window.__toc ??= {};
+  const toc = window.__toc as TocState;
   toc.buildTOC = () => {
     const t = toc;
     if (t.observer) {
@@ -45,6 +46,7 @@
     const tocList = document.getElementById("toc-list");
 
     if (!article || !tocContainer || !tocList) return;
+    const list = tocList;
 
     if (!tooltipRoot) {
       tooltipRoot = document.createElement("div");
@@ -114,7 +116,8 @@
         tooltip.className =
           "toc-dynamic-tooltip pointer-events-none fixed z-[9999] w-max max-w-[200px] whitespace-normal rounded bg-foreground px-2 py-1 text-xs text-background opacity-0 shadow-md transition-opacity duration-200";
         tooltip.style.display = "block";
-        tooltipRoot!.appendChild(tooltip);
+        if (!tooltipRoot) return;
+        tooltipRoot.appendChild(tooltip);
         tooltipMap.set(a, tooltip);
         a.setAttribute("aria-describedby", tooltip.id);
         tooltips.push(tooltip);
@@ -153,7 +156,7 @@
     }
 
     function setupMouseEvents() {
-      tocList!.addEventListener(
+      list.addEventListener(
         "mouseover",
         (e) => {
           const a = (e.target as Element).closest("li a");
@@ -173,7 +176,7 @@
         { signal: tocSignal },
       );
 
-      tocList!.addEventListener(
+      list.addEventListener(
         "mousemove",
         (e) => {
           if (!currentLink) return;
@@ -211,7 +214,7 @@
         { signal: tocSignal },
       );
 
-      tocList!.addEventListener(
+      list.addEventListener(
         "mouseout",
         (e) => {
           const a = (e.target as Element).closest("li a");
@@ -228,14 +231,14 @@
 
     function updateFadeEdges() {
       if (!topFade || !bottomFade) return;
-      if (tocList!.scrollHeight <= tocList!.clientHeight) {
+      if (list.scrollHeight <= list.clientHeight) {
         topFade.classList.add("hidden");
         bottomFade.classList.add("hidden");
         return;
       }
-      topFade.classList.toggle("hidden", tocList!.scrollTop <= 0);
+      topFade.classList.toggle("hidden", list.scrollTop <= 0);
       const atBottom =
-        tocList!.scrollTop + tocList!.clientHeight >= tocList!.scrollHeight - 2;
+        list.scrollTop + list.clientHeight >= list.scrollHeight - 2;
       bottomFade.classList.toggle("hidden", atBottom);
     }
 
@@ -266,7 +269,7 @@
       }
       clearTimeout(t._scrollTocTimer);
       t._scrollTocTimer = window.setTimeout(() => {
-        const activeLink = tocList!.querySelector("a.text-accent");
+        const activeLink = list.querySelector("a.text-accent");
         if (activeLink) {
           activeLink.scrollIntoView({
             block: "nearest",
@@ -312,7 +315,7 @@
     }
 
     t.scrollHandler = () => {
-      if (!document.body.contains(tocList!)) return;
+      if (!document.body.contains(list)) return;
       const atBottom =
         window.innerHeight + window.scrollY >=
         document.documentElement.scrollHeight - 10;

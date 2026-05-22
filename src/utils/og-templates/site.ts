@@ -1,5 +1,6 @@
 import satori from "satori";
 import { SITE } from "@/config";
+import type { FontConfig } from "../loadLocalFont";
 import loadLocalFonts from "../loadLocalFont";
 
 export default async () => {
@@ -130,7 +131,7 @@ export default async () => {
       embedFont: true,
       fonts: (await loadLocalFonts(
         SITE.title + SITE.desc + SITE.website,
-      )) as any,
+      )) as FontConfig[],
     },
   );
 };
