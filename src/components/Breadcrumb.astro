@@ -32,7 +32,7 @@ if (breadcrumbList[0] === "tags" && !Number.isNaN(Number(breadcrumbList[2]))) {
     class="font-light [&>li]:inline [&>li:not(:last-child)>a]:hover:opacity-100"
   >
     <li>
-      <a href={`/${locale}/`} class="opacity-80">{t(UI.breadcrumb.home, locale)}</a>
+      <a href={`/${locale}/`} class="opacity-80 transition-[opacity] duration-100">{t(UI.breadcrumb.home, locale)}</a>
       <span aria-hidden="true" class="opacity-80">&raquo;</span>
     </li>
     {
@@ -48,7 +48,7 @@ if (breadcrumbList[0] === "tags" && !Number.isNaN(Number(breadcrumbList[2]))) {
           </li>
         ) : (
           <li>
-            <a href={`/${locale}/${breadcrumb}/`} class="capitalize opacity-70">
+            <a href={`/${locale}/${breadcrumb}/`} class="capitalize opacity-70 transition-[opacity] duration-100">
               {breadcrumb}
             </a>
             <span aria-hidden="true">&raquo;</span>
