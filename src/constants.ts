@@ -10,8 +10,6 @@ interface Social {
   icon: string;
 }
 
-export const BACK_URL_KEY = "backUrl";
-
 export const SOCIALS = [
   {
     name: "GitHub",

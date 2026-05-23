@@ -9,7 +9,10 @@ const giscusLang = { zh: "zh-CN", en: "en", ja: "ja", ru: "ru", eo: "eo" }[
 ];
 
 // Strip locale prefix for cross-language comment sharing
-const path = Astro.url.pathname.replace(/^\/[a-z]{2}\//, "/");
+const localePrefix = Astro.currentLocale;
+const path = localePrefix
+  ? Astro.url.pathname.replace(new RegExp(`^/${localePrefix}/`), "/")
+  : Astro.url.pathname;
 const giscusTerm = path.replace(/\/$/, "") || "/";
 ---
 

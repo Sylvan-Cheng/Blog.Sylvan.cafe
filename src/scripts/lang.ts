@@ -8,22 +8,6 @@ function initLangPicker(): void {
   const trig = trigger;
   const dd = dropdown;
 
-  const isPostPage = /^\/[a-z]{2}\/posts\/.+/.test(window.location.pathname);
-  if (window.__translations && isPostPage) {
-    const translations = window.__translations;
-    const currentLocale = window.__currentLocale || "";
-
-    dd.querySelectorAll("a").forEach((link) => {
-      const locale = link.dataset.locale || "";
-      if (locale === currentLocale) return;
-      if (translations[locale]) {
-        link.href = translations[locale];
-      } else {
-        link.href = `/${locale}/404`;
-      }
-    });
-  }
-
   function open(): void {
     dd.hidden = false;
     trig.setAttribute("aria-expanded", "true");

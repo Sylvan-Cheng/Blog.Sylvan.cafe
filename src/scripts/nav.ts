@@ -1,23 +1,35 @@
-function initNav(): void {
-  const menuBtn = document.querySelector<HTMLButtonElement>("#menu-btn");
-  const navMenu = document.querySelector("#nav-menu");
-  const menuIcon = document.querySelector("#menu-icon");
-  const closeIcon = document.querySelector("#close-icon");
+(() => {
+  if (window.__navAC) window.__navAC.abort();
+  const ac = new AbortController();
+  window.__navAC = ac;
 
-  if (!menuBtn || !navMenu || !menuIcon || !closeIcon) return;
+  function initNav(): void {
+    const menuBtn = document.querySelector<HTMLButtonElement>("#menu-btn");
+    const navMenu = document.querySelector("#nav-menu");
+    const menuIcon = document.querySelector("#menu-icon");
+    const closeIcon = document.querySelector("#close-icon");
 
-  const openLabel = menuBtn.dataset.openLabel || "Open Menu";
-  const closeLabel = menuBtn.dataset.closeLabel || "Close Menu";
+    if (!menuBtn || !navMenu || !menuIcon || !closeIcon) return;
 
-  menuBtn.addEventListener("click", () => {
-    const openMenu = menuBtn.getAttribute("aria-expanded") === "true";
-    menuBtn.setAttribute("aria-expanded", openMenu ? "false" : "true");
-    menuBtn.setAttribute("aria-label", openMenu ? openLabel : closeLabel);
-    navMenu.classList.toggle("hidden");
-    menuIcon.classList.toggle("hidden");
-    closeIcon.classList.toggle("hidden");
-  });
-}
+    const openLabel = menuBtn.dataset.openLabel || "Open Menu";
+    const closeLabel = menuBtn.dataset.closeLabel || "Close Menu";
 
-document.addEventListener("astro:after-swap", initNav);
-initNav();
+    menuBtn.addEventListener(
+      "click",
+      () => {
+        const openMenu = menuBtn.getAttribute("aria-expanded") === "true";
+        menuBtn.setAttribute("aria-expanded", openMenu ? "false" : "true");
+        menuBtn.setAttribute("aria-label", openMenu ? openLabel : closeLabel);
+        navMenu.classList.toggle("hidden");
+        menuIcon.classList.toggle("hidden");
+        closeIcon.classList.toggle("hidden");
+      },
+      { signal: ac.signal },
+    );
+  }
+
+  document.addEventListener("astro:after-swap", initNav);
+  initNav();
+})();
+
+export {};

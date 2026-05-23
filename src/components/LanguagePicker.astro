@@ -28,7 +28,7 @@ const items = locales.map(({ code, label }) => ({
 <div class="relative inline-flex">
     <button
       id="lang-trigger"
-      class="focus-outline flex p-3 sm:p-1 hover:text-accent text-foreground"
+      class="focus-outline flex p-3 sm:p-1 hover:text-accent text-foreground transition-colors duration-100"
       aria-label={t(UI.selectLanguage, currentLocale)}
       aria-expanded="false"
       aria-haspopup="listbox"
@@ -49,7 +49,7 @@ const items = locales.map(({ code, label }) => ({
             href={url}
             data-locale={code}
             class:list={[
-              "block px-3 py-1.5 text-sm no-underline whitespace-nowrap transition-colors",
+              "block px-3 py-1.5 text-sm no-underline whitespace-nowrap transition-colors duration-100",
               "hover:bg-muted",
               code === currentLocale
                 ? "text-accent font-semibold"

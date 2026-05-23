@@ -42,5 +42,5 @@ export const SITE = {
   ogColors: {
     bg: "#fbf1c7",
     border: "#ebdbb2",
-  } as const,
+  },
 } as const;
