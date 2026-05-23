@@ -36,9 +36,8 @@ export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
   return results;
 }
 
-const params = Astro.params;
 const locale = resolveLocale(Astro.currentLocale);
-const { tag } = params;
+const { tag } = Astro.params;
 const { page, tagName } = Astro.props;
 const displayTag = translateTag(tag, "en", locale) ?? tagName;
 ---

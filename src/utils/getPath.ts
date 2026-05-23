@@ -2,6 +2,8 @@ import { BLOG_PATH } from "@/content.config";
 import { LOCALES } from "@/i18n/config";
 import { slugifyStr } from "./slugify";
 
+const LOCALE_LIST: readonly string[] = LOCALES;
+
 /**
  * Get full path of a blog post
  * @param id - id of the blog post (from glob loader, e.g. "hello-world/zh" or "zh/hello-world")
@@ -14,14 +16,12 @@ export function getPath(
   filePath: string | undefined,
   includeBase = true,
 ) {
-  const KNOWN_LOCALES: readonly string[] = LOCALES;
-
   const pathSegments = filePath
     ?.replace(BLOG_PATH, "")
     .split("/")
     .filter((path) => path !== "")
     .filter((path) => !path.startsWith("_"))
-    .filter((path) => !KNOWN_LOCALES.includes(path))
+    .filter((path) => !LOCALE_LIST.includes(path))
     .slice(0, -1) // remove the filename, keep only directory segments
     .map((segment) => slugifyStr(segment));
 
@@ -30,7 +30,7 @@ export function getPath(
   // Strip known locale from the end of the id (e.g. "hello-world/zh" → "hello-world")
   const blogId = id.split("/");
   const lastPart = blogId[blogId.length - 1];
-  const cleanParts = KNOWN_LOCALES.includes(lastPart)
+  const cleanParts = LOCALE_LIST.includes(lastPart)
     ? blogId.slice(0, -1)
     : blogId;
   const slug = cleanParts.slice(-1);

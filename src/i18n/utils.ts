@@ -14,5 +14,11 @@ function isLocale(s: string): s is Locale {
 }
 
 export function resolveLocale(locale: string | undefined): Locale {
-  return locale && isLocale(locale) ? locale : LOCALES[0];
+  if (locale && isLocale(locale)) return locale;
+  if (import.meta.env.DEV && locale) {
+    console.warn(
+      `[i18n] Unrecognized locale "${locale}", falling back to "${LOCALES[0]}"`,
+    );
+  }
+  return LOCALES[0];
 }

@@ -28,7 +28,7 @@ const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
 const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
 ---
 
-<Layout>
+<Layout title={t(UI.home.greeting, locale)} description={t(UI.home.desc, locale)}>
   <Header />
   <main id="main-content" data-layout="index" data-backurl={`/${locale}/`} class="app-layout overflow-x-clip">
     <section id="hero" class:list={["pt-8 pb-6", "border-b border-border"]}>

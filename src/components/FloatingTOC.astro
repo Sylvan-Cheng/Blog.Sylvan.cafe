@@ -1,13 +1,8 @@
 ---
+import type { MarkdownHeading } from "astro";
 import Icon from "@/components/Icon.astro";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
-
-interface MarkdownHeading {
-  depth: number;
-  slug: string;
-  text: string;
-}
 
 interface Props {
   headings: MarkdownHeading[];
