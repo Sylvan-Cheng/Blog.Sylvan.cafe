@@ -30,13 +30,6 @@
       get toggleExpanded() {
         return this.toggle?.querySelector(".share-toggle-expanded") ?? null;
       },
-      get tooltipSpan() {
-        return (
-          this.toggle?.parentElement?.querySelector<HTMLElement>(
-            "[data-tooltip-text]",
-          ) ?? null
-        );
-      },
       copyDefault: container.querySelector(
         ".share-copy-default",
       ) as HTMLElement | null,
@@ -52,19 +45,46 @@
     if (!els?.wrapper || !els?.toggle) return;
     clearTimeout(timerWrap);
     if (mobile) {
+      els.wrapper.style.overflow = "hidden";
       els.wrapper.style.maxWidth = "none";
-      els.wrapper.style.transition = "max-height 500ms ease-out";
-      els.wrapper.style.maxHeight = "12rem";
+      els.wrapper.style.transition = "none";
+      els.wrapper.style.maxHeight = "none";
+      els.wrapper.offsetHeight;
+      const fullH = els.wrapper.scrollHeight;
+      els.wrapper.style.maxHeight = "0";
+      els.wrapper.offsetHeight;
+      els.wrapper.style.transition = "max-height 350ms ease-out";
+      els.wrapper.style.maxHeight = `${fullH}px`;
+      const wrapper = els.wrapper;
+      const prev = (wrapper as any).__shareExpandEnd as
+        | ((e: TransitionEvent) => void)
+        | undefined;
+      if (prev) wrapper.removeEventListener("transitionend", prev);
+      const onEnd = (e: TransitionEvent) => {
+        if (e.propertyName !== "max-height") return;
+        wrapper.style.overflow = "";
+        wrapper.removeEventListener("transitionend", onEnd);
+        (wrapper as any).__shareExpandEnd = undefined;
+      };
+      (wrapper as any).__shareExpandEnd = onEnd;
+      wrapper.addEventListener("transitionend", onEnd);
     } else {
       els.wrapper.style.maxHeight = "none";
-      els.wrapper.style.transition = "max-width 500ms ease-out";
+      els.wrapper.style.transition = "max-width 350ms ease-out";
+      els.wrapper.offsetWidth;
       els.wrapper.style.maxWidth = "30rem";
     }
     els.items.forEach((item, i) => {
-      item.style.transitionDelay = i * expandStagger + "ms";
-      item.style.transitionDuration = expandDuration + "ms";
+      const delay = i * expandStagger;
+      const dur = expandDuration;
+      const base = `${dur}ms ease-out ${delay}ms`;
+      item.style.transition = mobile
+        ? `opacity ${base}`
+        : `opacity ${base}, transform ${base}`;
+      item.offsetHeight;
       item.style.transform = mobile ? "" : "translateX(0)";
       item.setAttribute("tabindex", "0");
+      item.removeAttribute("aria-hidden");
       item.classList.add("opacity-100", "pointer-events-auto");
       item.classList.remove("opacity-0", "pointer-events-none");
     });
@@ -82,7 +102,6 @@
     const tip = expanded
       ? els.toggle.dataset.tipExpanded
       : els.toggle.dataset.tipCollapsed;
-    if (els.tooltipSpan && tip) els.tooltipSpan.textContent = tip;
     if (tip) els.toggle.setAttribute("aria-label", tip);
   }
 
@@ -95,23 +114,37 @@
     els.toggle.setAttribute("aria-expanded", "false");
     updateToggleTip(els, false);
     els.items.forEach((item) => {
-      item.style.transitionDelay = "0ms";
-      item.style.transitionDuration = "150ms";
+      item.style.transition = mobile
+        ? "opacity 150ms ease-out 0ms"
+        : "opacity 150ms ease-out 0ms, transform 150ms ease-out 0ms";
+      item.offsetHeight;
       item.style.transform = mobile ? "" : "translateX(-0.75rem)";
       item.setAttribute("tabindex", "-1");
+      item.setAttribute("aria-hidden", "true");
       item.classList.add("opacity-0", "pointer-events-none");
       item.classList.remove("opacity-100", "pointer-events-auto");
     });
+    if (mobile) {
+      const prev = (els.wrapper as any).__shareExpandEnd as
+        | ((e: TransitionEvent) => void)
+        | undefined;
+      if (prev) {
+        els.wrapper.removeEventListener("transitionend", prev);
+        (els.wrapper as any).__shareExpandEnd = undefined;
+      }
+      els.wrapper.style.overflow = "hidden";
+    }
     timerWrap = setTimeout(() => {
       const els2 = getEls();
       if (!els2?.wrapper) return;
       els2.wrapper.style.transition = mobile
-        ? "max-height 300ms ease-out"
-        : "max-width 300ms ease-out";
+        ? "max-height 250ms ease-out"
+        : "max-width 250ms ease-out";
+      els2.wrapper.offsetHeight;
       if (mobile) els2.wrapper.style.maxHeight = "0";
       else els2.wrapper.style.maxWidth = "0";
       timerWrap = undefined;
-    }, 100);
+    }, 50);
   }
 
   function reset() {
@@ -120,15 +153,24 @@
     expanded = false;
     clearTimeout(timerWrap);
     if (els.wrapper) {
+      const prev = (els.wrapper as any).__shareExpandEnd as
+        | ((e: TransitionEvent) => void)
+        | undefined;
+      if (prev) {
+        els.wrapper.removeEventListener("transitionend", prev);
+        (els.wrapper as any).__shareExpandEnd = undefined;
+      }
       els.wrapper.style.transition = "none";
       els.wrapper.style.maxWidth = "0";
       els.wrapper.style.maxHeight = "0";
+      els.wrapper.style.overflow = "";
     }
     els.items.forEach((item) => {
-      item.style.transitionDelay = "0ms";
-      item.style.transitionDuration = "0ms";
+      item.style.transition = "none";
+      item.offsetHeight;
       item.style.transform = "";
       item.setAttribute("tabindex", "-1");
+      item.setAttribute("aria-hidden", "true");
       item.classList.add("opacity-0", "pointer-events-none");
       item.classList.remove("opacity-100", "pointer-events-auto");
     });

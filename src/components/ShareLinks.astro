@@ -165,6 +165,8 @@ const ICON =
             class={`more-item shrink-0 ${LINK} opacity-0 pointer-events-none transition-[opacity,transform] duration-300 ease-out`}
             data-share-btn={icon}
             aria-label={getLabel(icon)}
+            aria-hidden="true"
+            tabindex="-1"
           >
             <Icon name={`tabler:${icon}`} class={ICON} />
           </LinkButton>
@@ -173,19 +175,17 @@ const ICON =
     </span>
 
     <!-- toggle button -->
-    <Tooltip text={t(UI.share.more, locale)}>
-      <button
-        data-share-toggle
-        data-tip-collapsed={t(UI.share.more, locale)}
-        data-tip-expanded={t(UI.share.less, locale)}
-        aria-label={t(UI.share.more, locale)}
-        aria-expanded="false"
-        class="group inline-flex items-center gap-1 scale-90 p-2 sm:p-1 hover:text-accent border-0 bg-transparent cursor-pointer max-md:order-1 opacity-60 hover:opacity-100 transition-opacity duration-200 focus-visible:ring-2 focus-visible:ring-accent focus-visible:rounded"
-      >
-        <span class="share-toggle-collapsed"><Icon name="tabler:plus" class={ICON} /></span>
-        <span class="share-toggle-expanded hidden"><Icon name="tabler:minus" class={ICON} /></span>
-      </button>
-    </Tooltip>
+    <button
+      data-share-toggle
+      data-tip-collapsed={t(UI.share.more, locale)}
+      data-tip-expanded={t(UI.share.less, locale)}
+      aria-label={t(UI.share.more, locale)}
+      aria-expanded="false"
+      class="group inline-flex items-center gap-1 scale-90 p-2 sm:p-1 hover:text-accent border-0 bg-transparent cursor-pointer max-md:order-1 opacity-60 hover:opacity-100 transition-opacity duration-200 focus-visible:ring-2 focus-visible:ring-accent focus-visible:rounded"
+    >
+      <span class="share-toggle-collapsed"><Icon name="tabler:plus" class={ICON} /></span>
+      <span class="share-toggle-expanded hidden"><Icon name="tabler:minus" class={ICON} /></span>
+    </button>
   </div>
 </div>
 

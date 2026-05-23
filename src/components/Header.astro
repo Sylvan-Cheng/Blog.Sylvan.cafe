@@ -63,7 +63,7 @@ const isActive = (path: string) => {
         <LinkButton
           href={localizePath("/search")}
           class="focus-outline flex p-3 sm:p-1"
-          aria-label="search"
+          aria-label={t(UI.nav.search, locale)}
         >
           <Icon name="tabler:search" />
           <span class="sr-only">{t(UI.nav.search, locale)}</span>
@@ -76,7 +76,7 @@ const isActive = (path: string) => {
             <button
               id="theme-btn"
               class="focus-outline relative size-12 p-4 sm:size-8"
-              aria-label="auto"
+              aria-label={t(UI.themeToggle, locale)}
               aria-live="polite"
             >
               <Icon

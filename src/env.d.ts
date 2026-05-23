@@ -10,8 +10,8 @@ interface Window {
   };
   __shareAC?: AbortController;
   __progressAC?: AbortController;
-  __translations?: Record<string, string>;
-  __currentLocale?: string;
+  __bttAC?: AbortController;
+  __navAC?: AbortController;
   __toc?: {
     observer?: IntersectionObserver;
     scrollHandler?: (() => void) | null;

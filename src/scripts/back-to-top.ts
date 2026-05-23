@@ -1,23 +1,17 @@
-function initBackToTop(): void {
-  const rootElement = document.documentElement;
-  const btnContainer = document.querySelector("#btt-btn-container");
-  const backToTopBtn = document.querySelector<HTMLButtonElement>(
-    "[data-button='back-to-top']",
-  );
-  const progressIndicator = document.querySelector("#progress-indicator");
-
-  if (!rootElement || !btnContainer || !backToTopBtn || !progressIndicator)
-    return;
-
-  const container = btnContainer;
-
-  backToTopBtn.addEventListener("click", () => {
-    document.body.scrollTop = 0;
-    rootElement.scrollTop = 0;
-  });
+(() => {
+  if (window.__bttAC) window.__bttAC.abort();
+  const ac = new AbortController();
+  window.__bttAC = ac;
 
   let lastVisible: boolean | null = null;
+  let ticking = false;
+
   function handleScroll(): void {
+    const rootElement = document.documentElement;
+    const container = document.querySelector("#btt-btn-container");
+    const progressIndicator = document.querySelector("#progress-indicator");
+    if (!rootElement || !container || !progressIndicator) return;
+
     const scrollTotal = rootElement.scrollHeight - rootElement.clientHeight;
     const scrollTop = rootElement.scrollTop;
     const scrollPercent = Math.floor((scrollTop / scrollTotal) * 100);
@@ -38,17 +32,42 @@ function initBackToTop(): void {
     }
   }
 
-  let ticking = false;
-  document.addEventListener("scroll", () => {
-    if (!ticking) {
-      window.requestAnimationFrame(() => {
-        handleScroll();
-        ticking = false;
-      });
-      ticking = true;
-    }
-  });
-}
+  document.addEventListener(
+    "scroll",
+    () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    },
+    { passive: true, signal: ac.signal },
+  );
 
-document.addEventListener("astro:after-swap", initBackToTop);
-initBackToTop();
+  function initBackToTop(): void {
+    const rootElement = document.documentElement;
+    const backToTopBtn = document.querySelector<HTMLButtonElement>(
+      "[data-button='back-to-top']",
+    );
+    if (!rootElement || !backToTopBtn) return;
+
+    backToTopBtn.addEventListener(
+      "click",
+      () => {
+        document.body.scrollTop = 0;
+        rootElement.scrollTop = 0;
+      },
+      { signal: ac.signal },
+    );
+
+    lastVisible = null;
+    handleScroll();
+  }
+
+  document.addEventListener("astro:after-swap", initBackToTop);
+  initBackToTop();
+})();
+
+export {};
