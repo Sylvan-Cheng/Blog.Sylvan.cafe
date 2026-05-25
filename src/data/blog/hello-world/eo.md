@@ -90,6 +90,23 @@ Jen **grasa** teksto, jen *kursiva* teksto, jen ***grasa kursiva*** teksto, jen 
 >
 > > Jen ingita blokcitaĵo. Teknike ebla, sed devus esti ŝpareme uzata praktike.
 
+Krome, blokcitaĵoj povas esti stiligitaj kiel atentigoj per la sintakso `[!TYPE]`:
+
+> [!NOTE]
+> Jen noto &mdash; suplementa informo, kiun la leganto eble trovos utila.
+
+> [!TIP]
+> Jen konsileto &mdash; helpema sugesto por fari aferojn pli bone aŭ pli facile.
+
+> [!IMPORTANT]
+> Jen grava &mdash; ŝlosila informo, kiun la leganto bezonas scii.
+
+> [!WARNING]
+> Jen averto &mdash; urĝa informo, kiu bezonas tujan atenton por eviti problemojn.
+
+> [!CAUTION]
+> Jen singardo &mdash; konsilo pri eblaj riskoj aŭ negativaj rezultoj.
+
 ---
 
 ## Listoj kaj Aranĝo

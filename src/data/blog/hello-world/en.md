@@ -89,6 +89,23 @@ This is **bold** text, this is *italic* text, this is ***bold italic*** text, th
 >
 > > This is a nested blockquote. Technically feasible, but should be used sparingly in practice.
 
+Blockquotes can also be styled as alerts using the `[!TYPE]` syntax:
+
+> [!NOTE]
+> This is a note &mdash; supplementary information the reader may find useful.
+
+> [!TIP]
+> This is a tip &mdash; a helpful suggestion for doing things better or more easily.
+
+> [!IMPORTANT]
+> This is important &mdash; key information the reader needs to know.
+
+> [!WARNING]
+> This is a warning &mdash; urgent info that needs immediate attention to avoid problems.
+
+> [!CAUTION]
+> This is a caution &mdash; advice about potential risks or negative outcomes.
+
 ---
 
 ## Lists & Layout
