@@ -297,6 +297,88 @@ print(build_dashboard_report({"worker-0": sample[:2], "worker-1": sample[2:]}, i
 
 ---
 
+## Mermaid ダイアグラム
+
+ブログは Mermaid ダイアグラムをサポートするようになりました。コードブロックと同じフェンス構文で、言語タグは `mermaid` です。ダイアグラムは beautiful-mermaid によってビルド時に SVG にレンダリングされ、CSS 変数でライト/ダークテーマに自動適応します。
+
+### フローチャート
+
+```mermaid
+graph TD
+    A[開始] --> B{条件判断}
+    B -->|はい| C[処理]
+    B -->|いいえ| D[終了]
+    C --> D
+```
+
+### シーケンス図
+
+```mermaid
+sequenceDiagram
+    participant クライアント
+    participant サーバー
+    participant データベース
+    クライアント->>サーバー: リクエスト送信
+    サーバー->>データベース: データ照会
+    データベース-->>サーバー: 結果返却
+    サーバー-->>クライアント: レスポンス
+```
+
+### クラス図
+
+```mermaid
+classDiagram
+    Animal <|-- Duck
+    Animal <|-- Fish
+    Animal: +int age
+    Animal: +String gender
+    Animal: +isMammal() bool
+    Duck: +String beakColor
+    Duck: +swim()
+    Duck: +quack()
+    Fish: -int size
+    Fish: -canEat()
+```
+
+### 状態図
+
+```mermaid
+stateDiagram-v2
+    [*] --> 待機中
+    待機中 --> 処理中: 開始
+    処理中 --> 完了: 成功
+    処理中 --> エラー: 失敗
+    エラー --> 待機中: リトライ
+    完了 --> [*]
+```
+
+### セマンティック配色
+
+`classDef` で CSS 変数を参照することで、ノードに意味的な強調色を付与し、ライト/ダークテーマに自動適応できます：
+
+```mermaid
+graph TD
+    Start[ビルド開始] --> Check{構文チェック}
+    Check -->|成功| Build[ビルド生成]
+    Check -->|失敗| Err[コンパイルエラー]
+    Build --> Test{テスト実行}
+    Test -->|成功| Deploy[デプロイ]
+    Test -->|失敗| Fix[コード修正]
+    Err --> Fix
+    Fix --> Check
+
+    classDef ok fill:var(--mermaid-green),color:var(--mermaid-bg)
+    classDef err fill:var(--mermaid-red),color:var(--mermaid-bg)
+    classDef warn fill:var(--mermaid-yellow),color:var(--mermaid-bg)
+    classDef info fill:var(--mermaid-blue),color:var(--mermaid-bg)
+    class Start,Build,Deploy ok
+    class Err err
+    class Fix warn
+    class Check,Test info
+```
+
+---
+
 ## 数式
 
 ### インライン数式

@@ -297,6 +297,88 @@ print(build_dashboard_report({"worker-0": sample[:2], "worker-1": sample[2:]}, i
 
 ---
 
+## Mermaid Diagrams
+
+The blog now supports Mermaid diagrams — use the same fenced code block syntax with the `mermaid` language tag. Diagrams are rendered to SVG at build time via beautiful-mermaid, using CSS variables to automatically adapt to light/dark themes.
+
+### Flowchart
+
+```mermaid
+graph TD
+    A[Start] --> B{Condition?}
+    B -->|Yes| C[Action]
+    B -->|No| D[End]
+    C --> D
+```
+
+### Sequence Diagram
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Server
+    participant Database
+    Client->>Server: Send request
+    Server->>Database: Query data
+    Database-->>Server: Return result
+    Server-->>Client: Response
+```
+
+### Class Diagram
+
+```mermaid
+classDiagram
+    Animal <|-- Duck
+    Animal <|-- Fish
+    Animal: +int age
+    Animal: +String gender
+    Animal: +isMammal() bool
+    Duck: +String beakColor
+    Duck: +swim()
+    Duck: +quack()
+    Fish: -int size
+    Fish: -canEat()
+```
+
+### State Diagram
+
+```mermaid
+stateDiagram-v2
+    [*] --> Idle
+    Idle --> Processing: start
+    Processing --> Done: success
+    Processing --> Error: failure
+    Error --> Idle: retry
+    Done --> [*]
+```
+
+### Semantic Colors
+
+Use `classDef` with CSS variables to apply semantic emphasis colors to nodes, auto-adapting to light/dark themes:
+
+```mermaid
+graph TD
+    Start[Build Start] --> Check{Syntax Check}
+    Check -->|Pass| Build[Build Artifact]
+    Check -->|Fail| Err[Compile Error]
+    Build --> Test{Run Tests}
+    Test -->|Pass| Deploy[Deploy]
+    Test -->|Fail| Fix[Fix Code]
+    Err --> Fix
+    Fix --> Check
+
+    classDef ok fill:var(--mermaid-green),color:var(--mermaid-bg)
+    classDef err fill:var(--mermaid-red),color:var(--mermaid-bg)
+    classDef warn fill:var(--mermaid-yellow),color:var(--mermaid-bg)
+    classDef info fill:var(--mermaid-blue),color:var(--mermaid-bg)
+    class Start,Build,Deploy ok
+    class Err err
+    class Fix warn
+    class Check,Test info
+```
+
+---
+
 ## Mathematical Formulas
 
 ### Inline Formulas

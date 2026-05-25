@@ -321,6 +321,88 @@ print(build_dashboard_report({"worker-0": sample[:2], "worker-1": sample[2:]}, i
 
 ---
 
+## Mermaid 图表
+
+博客现已支持 Mermaid 图表——使用和代码块相同的栅栏语法，语言标记为 `mermaid`。图表通过 beautiful-mermaid 在构建时渲染为 SVG，使用 CSS 变量自动适配亮暗主题。
+
+### 流程图
+
+```mermaid
+graph TD
+    A[开始] --> B{检查条件}
+    B -->|满足| C[执行操作]
+    B -->|不满足| D[结束]
+    C --> D
+```
+
+### 时序图
+
+```mermaid
+sequenceDiagram
+    participant 客户端
+    participant 服务器
+    participant 数据库
+    客户端->>服务器: 发送请求
+    服务器->>数据库: 查询数据
+    数据库-->>服务器: 返回结果
+    服务器-->>客户端: 响应数据
+```
+
+### 类图
+
+```mermaid
+classDiagram
+    Animal <|-- Duck
+    Animal <|-- Fish
+    Animal: +int age
+    Animal: +String gender
+    Animal: +isMammal() bool
+    Duck: +String beakColor
+    Duck: +swim()
+    Duck: +quack()
+    Fish: -int size
+    Fish: -canEat()
+```
+
+### 状态图
+
+```mermaid
+stateDiagram-v2
+    [*] --> 空闲
+    空闲 --> 处理中: 开始
+    处理中 --> 完成: 成功
+    处理中 --> 失败: 出错
+    失败 --> 空闲: 重试
+    完成 --> [*]
+```
+
+### 语义配色
+
+通过 `classDef` 引用 CSS 变量，可以给节点赋予语义强调色，自动适配亮暗主题：
+
+```mermaid
+graph TD
+    Start[开始编译] --> Check{检查语法}
+    Check -->|通过| Build[构建产物]
+    Check -->|失败| Err[编译错误]
+    Build --> Test{运行测试}
+    Test -->|通过| Deploy[部署上线]
+    Test -->|失败| Fix[修复代码]
+    Err --> Fix
+    Fix --> Check
+
+    classDef ok fill:var(--mermaid-green),color:var(--mermaid-bg)
+    classDef err fill:var(--mermaid-red),color:var(--mermaid-bg)
+    classDef warn fill:var(--mermaid-yellow),color:var(--mermaid-bg)
+    classDef info fill:var(--mermaid-blue),color:var(--mermaid-bg)
+    class Start,Build,Deploy ok
+    class Err err
+    class Fix warn
+    class Check,Test info
+```
+
+---
+
 ## 数学公式
 
 通过 remark-math 和 rehype-katex 插件，博客支持 LaTeX 数学公式渲染。

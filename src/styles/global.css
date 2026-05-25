@@ -88,6 +88,15 @@ html[data-theme="dark"] .katex {
 
 /* Source: https://piccalil.li/blog/a-more-modern-css-reset/ */
 
+/* Mermaid diagrams */
+.mermaid-diagram {
+  @apply my-8 flex justify-center overflow-x-auto;
+}
+
+.mermaid-diagram svg {
+  @apply max-w-full h-auto rounded-lg;
+}
+
 /* Anything that has been anchored to should have extra scroll margin */
 :target {
   scroll-margin-block: 1rem;

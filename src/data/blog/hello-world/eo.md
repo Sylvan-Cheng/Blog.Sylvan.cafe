@@ -298,6 +298,88 @@ print(build_dashboard_report({"worker-0": sample[:2], "worker-1": sample[2:]}, i
 
 ---
 
+## Mermaid-diagramoj
+
+La blogo nun subtenas Mermaid-diagramojn — uzu la saman baritan kodosintakson kun la `mermaid` lingvoetikedo. Diagramoj estas bildigitaj al SVG dum konstruado per beautiful-mermaid, uzante CSS-variablojn por aŭtomate adaptiĝi al hela/malhela etoso.
+
+### Fludiagramo
+
+```mermaid
+graph TD
+    A[Komenco] --> B{Kondiĉo?}
+    B -->|Jes| C[Ago]
+    B -->|Ne| D[Fino]
+    C --> D
+```
+
+### Sekvencodiagramo
+
+```mermaid
+sequenceDiagram
+    participant Kliento
+    participant Servilo
+    participant Datumbazo
+    Kliento->>Servilo: Sendu peton
+    Servilo->>Datumbazo: Informpetu datumojn
+    Datumbazo-->>Servilo: Redonu rezulton
+    Servilo-->>Kliento: Respondo
+```
+
+### Klasodiagramo
+
+```mermaid
+classDiagram
+    Animal <|-- Duck
+    Animal <|-- Fish
+    Animal: +int age
+    Animal: +String gender
+    Animal: +isMammal() bool
+    Duck: +String beakColor
+    Duck: +swim()
+    Duck: +quack()
+    Fish: -int size
+    Fish: -canEat()
+```
+
+### Statodiagramo
+
+```mermaid
+stateDiagram-v2
+    [*] --> Atendado
+    Atendado --> Prilaborado: starto
+    Prilaborado --> Preta: sukceso
+    Prilaborado --> Eraro: fiasko
+    Eraro --> Atendado: reprovo
+    Preta --> [*]
+```
+
+### Semantikaj Koloroj
+
+Uzu `classDef` kun CSS-variabloj por apliki semantikajn emfazkolorojn al nodoj, aŭtomate adaptiĝante al hela/malhela etoso:
+
+```mermaid
+graph TD
+    Start[Komenco de konstruado] --> Check{Kontrolo de sintakso}
+    Check -->|Sukceso| Build[Konstrui artifakton]
+    Check -->|Eraro| Err[Kompila eraro]
+    Build --> Test{Ruli testojn}
+    Test -->|Sukceso| Deploy[Eliversurmeti]
+    Test -->|Eraro| Fix[Ripari kodon]
+    Err --> Fix
+    Fix --> Check
+
+    classDef ok fill:var(--mermaid-green),color:var(--mermaid-bg)
+    classDef err fill:var(--mermaid-red),color:var(--mermaid-bg)
+    classDef warn fill:var(--mermaid-yellow),color:var(--mermaid-bg)
+    classDef info fill:var(--mermaid-blue),color:var(--mermaid-bg)
+    class Start,Build,Deploy ok
+    class Err err
+    class Fix warn
+    class Check,Test info
+```
+
+---
+
 ## Matematikaj Formuloj
 
 ### Enliniaj Formuloj

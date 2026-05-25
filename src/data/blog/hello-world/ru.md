@@ -297,6 +297,88 @@ print(build_dashboard_report({"worker-0": sample[:2], "worker-1": sample[2:]}, i
 
 ---
 
+## Mermaid-диаграммы
+
+Блог теперь поддерживает Mermaid-диаграммы — используется тот же синтаксис огороженных блоков кода с языковым тегом `mermaid`. Диаграммы рендерятся в SVG на этапе сборки с помощью beautiful-mermaid, используя CSS-переменные для автоматической адаптации к светлой/тёмной теме.
+
+### Блок-схема
+
+```mermaid
+graph TD
+    A[Начало] --> B{Условие?}
+    B -->|Да| C[Действие]
+    B -->|Нет| D[Конец]
+    C --> D
+```
+
+### Диаграмма последовательности
+
+```mermaid
+sequenceDiagram
+    participant Клиент
+    participant Сервер
+    participant База данных
+    Клиент->>Сервер: Отправить запрос
+    Сервер->>База данных: Запросить данные
+    База данных-->>Сервер: Вернуть результат
+    Сервер-->>Клиент: Ответ
+```
+
+### Диаграмма классов
+
+```mermaid
+classDiagram
+    Animal <|-- Duck
+    Animal <|-- Fish
+    Animal: +int age
+    Animal: +String gender
+    Animal: +isMammal() bool
+    Duck: +String beakColor
+    Duck: +swim()
+    Duck: +quack()
+    Fish: -int size
+    Fish: -canEat()
+```
+
+### Диаграмма состояний
+
+```mermaid
+stateDiagram-v2
+    [*] --> Ожидание
+    Ожидание --> Обработка: старт
+    Обработка --> Готово: успех
+    Обработка --> Ошибка: сбой
+    Ошибка --> Ожидание: повтор
+    Готово --> [*]
+```
+
+### Семантические цвета
+
+Используйте `classDef` с CSS-переменными для смыслового выделения узлов, с автоматической адаптацией к светлой/тёмной теме:
+
+```mermaid
+graph TD
+    Start[Начало сборки] --> Check{Проверка синтаксиса}
+    Check -->|ОК| Build[Сборка артефакта]
+    Check -->|Ошибка| Err[Ошибка компиляции]
+    Build --> Test{Запуск тестов}
+    Test -->|ОК| Deploy[Развёртывание]
+    Test -->|Ошибка| Fix[Исправление кода]
+    Err --> Fix
+    Fix --> Check
+
+    classDef ok fill:var(--mermaid-green),color:var(--mermaid-bg)
+    classDef err fill:var(--mermaid-red),color:var(--mermaid-bg)
+    classDef warn fill:var(--mermaid-yellow),color:var(--mermaid-bg)
+    classDef info fill:var(--mermaid-blue),color:var(--mermaid-bg)
+    class Start,Build,Deploy ok
+    class Err err
+    class Fix warn
+    class Check,Test info
+```
+
+---
+
 ## Математические формулы
 
 ### Встроенные формулы
