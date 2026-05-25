@@ -48,13 +48,51 @@
     }
 
     table {
-      th,
-      td {
-        @apply border border-border p-2;
+      @apply w-full border-separate border-spacing-0 border border-border/50 rounded-lg text-left;
+
+      thead {
+        th {
+          @apply bg-muted/30 text-sm font-semibold tracking-wider;
+        }
+
+        th:first-child {
+          @apply rounded-tl-lg;
+        }
+
+        th:last-child {
+          @apply rounded-tr-lg;
+        }
       }
 
-      th {
-        @apply py-1.5;
+      th,
+      td {
+        @apply px-4 py-3 border-b border-border/60;
+      }
+
+tbody tr {
+        @apply transition-colors duration-150;
+
+        &:nth-child(even) {
+          @apply bg-muted/10;
+        }
+        
+        &:hover {
+          @apply bg-muted/40;
+        }
+      }
+
+      tbody tr:last-child {
+        td {
+          @apply border-b-0;
+        }
+
+        td:first-child {
+          @apply rounded-bl-lg;
+        }
+
+        td:last-child {
+          @apply rounded-br-lg;
+        }
       }
 
       code {
