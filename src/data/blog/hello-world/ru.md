@@ -89,6 +89,23 @@ TOC включает только h2 и h3, но статья содержит �
 >
 > > Это вложенная цитата. Технически возможно, но на практике следует использовать умеренно.
 
+Кроме того, цитаты можно оформить как предупреждения с помощью синтаксиса `[!TYPE]`:
+
+> [!NOTE]
+> Это примечание &mdash; дополнительная информация, которая может быть полезна читателю.
+
+> [!TIP]
+> Это совет &mdash; полезное предложение, как сделать лучше или проще.
+
+> [!IMPORTANT]
+> Это важно &mdash; ключевая информация, которую читатель должен знать.
+
+> [!WARNING]
+> Это предупреждение &mdash; срочная информация, требующая немедленного внимания во избежание проблем.
+
+> [!CAUTION]
+> Это предостережение &mdash; совет о потенциальных рисках или негативных последствиях.
+
 ---
 
 ## Списки и вёрстка
@@ -293,6 +310,88 @@ print(build_dashboard_report({"worker-0": sample[:2], "worker-1": sample[2:]}, i
 .astro-code .line {
   min-height: 1.5rem;
 }
+```
+
+---
+
+## Mermaid-диаграммы
+
+Блог теперь поддерживает Mermaid-диаграммы — используется тот же синтаксис огороженных блоков кода с языковым тегом `mermaid`. Диаграммы рендерятся в SVG на этапе сборки с помощью beautiful-mermaid, используя CSS-переменные для автоматической адаптации к светлой/тёмной теме.
+
+### Блок-схема
+
+```mermaid
+graph TD
+    A[Начало] --> B{Условие?}
+    B -->|Да| C[Действие]
+    B -->|Нет| D[Конец]
+    C --> D
+```
+
+### Диаграмма последовательности
+
+```mermaid
+sequenceDiagram
+    participant Клиент
+    participant Сервер
+    participant База данных
+    Клиент->>Сервер: Отправить запрос
+    Сервер->>База данных: Запросить данные
+    База данных-->>Сервер: Вернуть результат
+    Сервер-->>Клиент: Ответ
+```
+
+### Диаграмма классов
+
+```mermaid
+classDiagram
+    Animal <|-- Duck
+    Animal <|-- Fish
+    Animal: +int age
+    Animal: +String gender
+    Animal: +isMammal() bool
+    Duck: +String beakColor
+    Duck: +swim()
+    Duck: +quack()
+    Fish: -int size
+    Fish: -canEat()
+```
+
+### Диаграмма состояний
+
+```mermaid
+stateDiagram-v2
+    [*] --> Ожидание
+    Ожидание --> Обработка: старт
+    Обработка --> Готово: успех
+    Обработка --> Ошибка: сбой
+    Ошибка --> Ожидание: повтор
+    Готово --> [*]
+```
+
+### Семантические цвета
+
+Используйте `classDef` с CSS-переменными для смыслового выделения узлов, с автоматической адаптацией к светлой/тёмной теме:
+
+```mermaid
+graph TD
+    Start[Начало сборки] --> Check{Проверка синтаксиса}
+    Check -->|ОК| Build[Сборка артефакта]
+    Check -->|Ошибка| Err[Ошибка компиляции]
+    Build --> Test{Запуск тестов}
+    Test -->|ОК| Deploy[Развёртывание]
+    Test -->|Ошибка| Fix[Исправление кода]
+    Err --> Fix
+    Fix --> Check
+
+    classDef ok fill:var(--mermaid-green),color:var(--mermaid-bg)
+    classDef err fill:var(--mermaid-red),color:var(--mermaid-bg)
+    classDef warn fill:var(--mermaid-yellow),color:var(--mermaid-bg)
+    classDef info fill:var(--mermaid-blue),color:var(--mermaid-bg)
+    class Start,Build,Deploy ok
+    class Err err
+    class Fix warn
+    class Check,Test info
 ```
 
 ---

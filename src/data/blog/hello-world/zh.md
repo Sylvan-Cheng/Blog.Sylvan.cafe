@@ -97,6 +97,23 @@ Markdown 的文本样式非常直观。使用双星号或双下划线包裹文�
 
 引用是 Markdown 中非常实用的功能，常用于引用外部资料、标注重点内容或添加附注。在 Gruvbox 色板下，引用块会使用左侧边框和半透明文字效果。
 
+此外，引用还可以通过 `[!TYPE]` 语法转换为警告块：
+
+> [!NOTE]
+> 这是一条备注——对读者可能有用的补充信息。
+
+> [!TIP]
+> 这是一条提示——让事情变得更好或更简单的建议。
+
+> [!IMPORTANT]
+> 这是一条重要信息——读者需要了解的关键内容。
+
+> [!WARNING]
+> 这是一条警告——需要立即注意以免出现问题。
+
+> [!CAUTION]
+> 这是一条注意——关于潜在风险或不良后果的提醒。
+
 ---
 
 ## 列表与排版
@@ -317,6 +334,88 @@ print(build_dashboard_report({"worker-0": sample[:2], "worker-1": sample[2:]}, i
 .astro-code .line {
   min-height: 1.5rem;
 }
+```
+
+---
+
+## Mermaid 图表
+
+博客现已支持 Mermaid 图表——使用和代码块相同的栅栏语法，语言标记为 `mermaid`。图表通过 beautiful-mermaid 在构建时渲染为 SVG，使用 CSS 变量自动适配亮暗主题。
+
+### 流程图
+
+```mermaid
+graph TD
+    A[开始] --> B{检查条件}
+    B -->|满足| C[执行操作]
+    B -->|不满足| D[结束]
+    C --> D
+```
+
+### 时序图
+
+```mermaid
+sequenceDiagram
+    participant 客户端
+    participant 服务器
+    participant 数据库
+    客户端->>服务器: 发送请求
+    服务器->>数据库: 查询数据
+    数据库-->>服务器: 返回结果
+    服务器-->>客户端: 响应数据
+```
+
+### 类图
+
+```mermaid
+classDiagram
+    Animal <|-- Duck
+    Animal <|-- Fish
+    Animal: +int age
+    Animal: +String gender
+    Animal: +isMammal() bool
+    Duck: +String beakColor
+    Duck: +swim()
+    Duck: +quack()
+    Fish: -int size
+    Fish: -canEat()
+```
+
+### 状态图
+
+```mermaid
+stateDiagram-v2
+    [*] --> 空闲
+    空闲 --> 处理中: 开始
+    处理中 --> 完成: 成功
+    处理中 --> 失败: 出错
+    失败 --> 空闲: 重试
+    完成 --> [*]
+```
+
+### 语义配色
+
+通过 `classDef` 引用 CSS 变量，可以给节点赋予语义强调色，自动适配亮暗主题：
+
+```mermaid
+graph TD
+    Start[开始编译] --> Check{检查语法}
+    Check -->|通过| Build[构建产物]
+    Check -->|失败| Err[编译错误]
+    Build --> Test{运行测试}
+    Test -->|通过| Deploy[部署上线]
+    Test -->|失败| Fix[修复代码]
+    Err --> Fix
+    Fix --> Check
+
+    classDef ok fill:var(--mermaid-green),color:var(--mermaid-bg)
+    classDef err fill:var(--mermaid-red),color:var(--mermaid-bg)
+    classDef warn fill:var(--mermaid-yellow),color:var(--mermaid-bg)
+    classDef info fill:var(--mermaid-blue),color:var(--mermaid-bg)
+    class Start,Build,Deploy ok
+    class Err err
+    class Fix warn
+    class Check,Test info
 ```
 
 ---

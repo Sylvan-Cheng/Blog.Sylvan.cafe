@@ -89,6 +89,23 @@ This is **bold** text, this is *italic* text, this is ***bold italic*** text, th
 >
 > > This is a nested blockquote. Technically feasible, but should be used sparingly in practice.
 
+Blockquotes can also be styled as alerts using the `[!TYPE]` syntax:
+
+> [!NOTE]
+> This is a note &mdash; supplementary information the reader may find useful.
+
+> [!TIP]
+> This is a tip &mdash; a helpful suggestion for doing things better or more easily.
+
+> [!IMPORTANT]
+> This is important &mdash; key information the reader needs to know.
+
+> [!WARNING]
+> This is a warning &mdash; urgent info that needs immediate attention to avoid problems.
+
+> [!CAUTION]
+> This is a caution &mdash; advice about potential risks or negative outcomes.
+
 ---
 
 ## Lists & Layout
@@ -293,6 +310,88 @@ print(build_dashboard_report({"worker-0": sample[:2], "worker-1": sample[2:]}, i
 .astro-code .line {
   min-height: 1.5rem;
 }
+```
+
+---
+
+## Mermaid Diagrams
+
+The blog now supports Mermaid diagrams — use the same fenced code block syntax with the `mermaid` language tag. Diagrams are rendered to SVG at build time via beautiful-mermaid, using CSS variables to automatically adapt to light/dark themes.
+
+### Flowchart
+
+```mermaid
+graph TD
+    A[Start] --> B{Condition?}
+    B -->|Yes| C[Action]
+    B -->|No| D[End]
+    C --> D
+```
+
+### Sequence Diagram
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Server
+    participant Database
+    Client->>Server: Send request
+    Server->>Database: Query data
+    Database-->>Server: Return result
+    Server-->>Client: Response
+```
+
+### Class Diagram
+
+```mermaid
+classDiagram
+    Animal <|-- Duck
+    Animal <|-- Fish
+    Animal: +int age
+    Animal: +String gender
+    Animal: +isMammal() bool
+    Duck: +String beakColor
+    Duck: +swim()
+    Duck: +quack()
+    Fish: -int size
+    Fish: -canEat()
+```
+
+### State Diagram
+
+```mermaid
+stateDiagram-v2
+    [*] --> Idle
+    Idle --> Processing: start
+    Processing --> Done: success
+    Processing --> Error: failure
+    Error --> Idle: retry
+    Done --> [*]
+```
+
+### Semantic Colors
+
+Use `classDef` with CSS variables to apply semantic emphasis colors to nodes, auto-adapting to light/dark themes:
+
+```mermaid
+graph TD
+    Start[Build Start] --> Check{Syntax Check}
+    Check -->|Pass| Build[Build Artifact]
+    Check -->|Fail| Err[Compile Error]
+    Build --> Test{Run Tests}
+    Test -->|Pass| Deploy[Deploy]
+    Test -->|Fail| Fix[Fix Code]
+    Err --> Fix
+    Fix --> Check
+
+    classDef ok fill:var(--mermaid-green),color:var(--mermaid-bg)
+    classDef err fill:var(--mermaid-red),color:var(--mermaid-bg)
+    classDef warn fill:var(--mermaid-yellow),color:var(--mermaid-bg)
+    classDef info fill:var(--mermaid-blue),color:var(--mermaid-bg)
+    class Start,Build,Deploy ok
+    class Err err
+    class Fix warn
+    class Check,Test info
 ```
 
 ---

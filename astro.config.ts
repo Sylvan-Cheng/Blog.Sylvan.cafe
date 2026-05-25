@@ -11,12 +11,14 @@ import icon from "astro-icon";
 import rehypeKatex from "rehype-katex";
 import rehypeRaw from "rehype-raw";
 import remarkCollapse from "remark-collapse";
+import remarkGithubBlockquoteAlert from "remark-github-blockquote-alert";
 import remarkMath from "remark-math";
 import remarkToc from "remark-toc";
 import { SITE } from "./src/config";
 import { LOCALES } from "./src/i18n/config";
 import { rehypeA11y } from "./src/plugins/rehype-a11y";
 import { rehypeImgProxy } from "./src/plugins/rehypeImgProxy";
+import { remarkMermaid } from "./src/plugins/remarkMermaid";
 import { transformerCodeMeta } from "./src/utils/transformers/codeMeta";
 import { transformerLineNumbers } from "./src/utils/transformers/lineNumbers";
 
@@ -46,6 +48,8 @@ export default defineConfig({
     remarkPlugins: [
       remarkToc,
       remarkMath,
+      remarkMermaid,
+      remarkGithubBlockquoteAlert,
       [remarkCollapse, { test: "Table of contents" }],
     ],
     rehypePlugins: [rehypeRaw, rehypeImgProxy, rehypeKatex, rehypeA11y],
