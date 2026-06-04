@@ -24,7 +24,7 @@ async function loadLocalFont(
   ) as ArrayBuffer;
 }
 
-async function loadLocalFonts(_text: string): Promise<FontConfig[]> {
+async function loadLocalFonts(): Promise<FontConfig[]> {
   const fonts = await Promise.all([
     loadLocalFont("noto-sans", "noto-sans-latin-400-normal.woff").then(
       (data) => ({

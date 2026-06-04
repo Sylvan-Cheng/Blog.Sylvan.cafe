@@ -46,12 +46,9 @@ function reflectPreference(): void {
 
   document.querySelector("#theme-btn")?.setAttribute("aria-label", themeValue);
 
-  const body = document.body;
-  if (body) {
-    document
-      .querySelector("meta[name='theme-color']")
-      ?.setAttribute("content", getBgColor());
-  }
+  document
+    .querySelector("meta[name='theme-color']")
+    ?.setAttribute("content", getBgColor());
 }
 
 // Update the global theme API

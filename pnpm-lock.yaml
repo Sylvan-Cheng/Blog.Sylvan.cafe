@@ -117,6 +117,9 @@ importers:
       '@types/lodash.kebabcase':
         specifier: ^4.1.9
         version: 4.1.9
+      '@types/mdast':
+        specifier: ^4.0.4
+        version: 4.0.4
       husky:
         specifier: ^9.1.7
         version: 9.1.7

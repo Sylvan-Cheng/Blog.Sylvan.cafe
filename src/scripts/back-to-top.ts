@@ -13,6 +13,7 @@
     if (!rootElement || !container || !progressIndicator) return;
 
     const scrollTotal = rootElement.scrollHeight - rootElement.clientHeight;
+    if (scrollTotal <= 0) return;
     const scrollTop = rootElement.scrollTop;
     const scrollPercent = Math.floor((scrollTop / scrollTotal) * 100);
 

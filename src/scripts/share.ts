@@ -96,10 +96,10 @@
 
   function updateToggleTip(
     els: NonNullable<ReturnType<typeof getEls>>,
-    expanded: boolean,
+    isExpanded: boolean,
   ) {
     if (!els.toggle) return;
-    const tip = expanded
+    const tip = isExpanded
       ? els.toggle.dataset.tipExpanded
       : els.toggle.dataset.tipCollapsed;
     if (tip) els.toggle.setAttribute("aria-label", tip);

@@ -1,4 +1,5 @@
 import { renderMermaidSVG } from "beautiful-mermaid";
+import type { Root, RootContent } from "mdast";
 
 const STYLE_INJECTION = `<style>
   svg {
@@ -19,12 +20,12 @@ const STYLE_INJECTION = `<style>
 </style>`;
 
 export function remarkMermaid() {
-  return (tree: any) => {
+  return (tree: Root) => {
     walk(tree);
   };
 }
 
-function walk(node: any): void {
+function walk(node: Root | RootContent): void {
   if (!("children" in node) || !Array.isArray(node.children)) return;
 
   for (let i = 0; i < node.children.length; i++) {
