@@ -36,7 +36,7 @@ export const transformerCodeMeta = ({
       const value =
         eqIdx === -1 ? undefined : item.slice(eqIdx + 1).replace(/["'`]/g, "");
       if (!key) continue;
-      metaMap.set(key, value || "true");
+      metaMap.set(key, value !== undefined ? value : "true");
     }
 
     if (metaMap.get("collapse") === "true") {

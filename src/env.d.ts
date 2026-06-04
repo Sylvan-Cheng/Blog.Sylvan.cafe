@@ -11,6 +11,7 @@ interface Window {
   __shareAC?: AbortController;
   __progressAC?: AbortController;
   __bttAC?: AbortController;
+  __langAC?: AbortController;
   __navAC?: AbortController;
   __toc?: {
     observer?: IntersectionObserver;

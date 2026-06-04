@@ -31,7 +31,12 @@ export function rehypeImgProxy() {
       const h = node.properties?.height;
 
       let thumbUrl: string;
-      if (w !== undefined && h !== undefined) {
+      if (
+        w !== undefined &&
+        h !== undefined &&
+        Number(w) > 0 &&
+        Number(h) > 0
+      ) {
         thumbUrl = `${PROXY_BASE}rs:fit:${Number(w)}:${Number(h)}/plain/${path}`;
       } else {
         thumbUrl = `${PROXY_BASE}w:800/plain/${path}`;

@@ -28,7 +28,7 @@ export async function GET({ params }: { params: { locale: string } }) {
       title: data.title,
       description: data.description,
       pubDate: data.modDatetime ?? data.pubDatetime,
-      guid: `${SITE.website}${locale}${getPath(id, filePath)}`,
+      guid: new URL(`/${locale}${getPath(id, filePath)}`, SITE.website).href,
     })),
   });
 }

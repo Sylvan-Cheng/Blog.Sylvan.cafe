@@ -38,7 +38,6 @@ type Props = {
   canonicalURL?: string;
   pubDatetime?: Date;
   modDatetime?: Date | null;
-  scrollSmooth?: boolean;
   hreflangs?: Record<string, string>;
 };
 
@@ -51,7 +50,6 @@ const {
   canonicalURL = new URL(Astro.url.pathname, Astro.url),
   pubDatetime,
   modDatetime,
-  scrollSmooth = false,
   hreflangs,
 } = Astro.props;
 
@@ -110,7 +108,6 @@ const structuredData = pubDatetime
   dir={SITE.dir}
   data-scheme={SITE.themeScheme}
   lang={LOCALE_META[locale].lang}
-  class={`${scrollSmooth && "scroll-smooth"}`}
 >
   <head>
     <meta charset="UTF-8" />
