@@ -13,6 +13,7 @@ html[data-scheme="default"] {
     --accent: #006cac;
     --muted: #e6e6e6;
     --border: #ece9e9;
+
     /* palette */
     --palette-red: #dc2626;
     --palette-green: #16a34a;
@@ -20,6 +21,7 @@ html[data-scheme="default"] {
     --palette-blue: #2563eb;
     --palette-orange: #ea580c;
     --palette-purple: #9333ea;
+
     /* mermaid */
     --mermaid-bg: #fdfdfd;
     --mermaid-fg: #282728;
@@ -35,6 +37,7 @@ html[data-scheme="default"] {
     --mermaid-blue: var(--palette-blue);
     --mermaid-orange: var(--palette-orange);
     --mermaid-purple: var(--palette-purple);
+
     /* alerts */
     --alert-note: var(--palette-blue);
     --alert-tip: var(--palette-green);
@@ -49,6 +52,7 @@ html[data-scheme="default"] {
     --accent: #ff6b01;
     --muted: #343f60;
     --border: #ab4b08;
+
     /* palette */
     --palette-red: #ef4444;
     --palette-green: #22c55e;
@@ -56,6 +60,7 @@ html[data-scheme="default"] {
     --palette-blue: #3b82f6;
     --palette-orange: #f97316;
     --palette-purple: #a855f7;
+
     /* mermaid */
     --mermaid-bg: #212737;
     --mermaid-fg: #eaedf3;
@@ -71,6 +76,7 @@ html[data-scheme="default"] {
     --mermaid-blue: var(--palette-blue);
     --mermaid-orange: var(--palette-orange);
     --mermaid-purple: var(--palette-purple);
+
     /* alerts */
     --alert-note: var(--palette-blue);
     --alert-tip: var(--palette-green);
@@ -89,6 +95,7 @@ html[data-scheme="nord"] {
     --accent: #5e81ac;
     --muted: #d8dee9;
     --border: #81a1c1;
+
     /* palette */
     --palette-red: #bf616a;
     --palette-green: #a3be8c;
@@ -96,6 +103,7 @@ html[data-scheme="nord"] {
     --palette-blue: #5e81ac;
     --palette-orange: #d08770;
     --palette-purple: #b48ead;
+
     /* mermaid */
     --mermaid-bg: #eceff4;
     --mermaid-fg: #2e3440;
@@ -111,6 +119,7 @@ html[data-scheme="nord"] {
     --mermaid-blue: var(--palette-blue);
     --mermaid-orange: var(--palette-orange);
     --mermaid-purple: var(--palette-purple);
+
     /* alerts */
     --alert-note: var(--palette-blue);
     --alert-tip: var(--palette-green);
@@ -125,6 +134,7 @@ html[data-scheme="nord"] {
     --accent: #88c0d0;
     --muted: #3b4252;
     --border: #4c566a;
+
     /* palette */
     --palette-red: #bf616a;
     --palette-green: #a3be8c;
@@ -132,6 +142,7 @@ html[data-scheme="nord"] {
     --palette-blue: #5e81ac;
     --palette-orange: #d08770;
     --palette-purple: #b48ead;
+
     /* mermaid */
     --mermaid-bg: #2e3440;
     --mermaid-fg: #eceff4;
@@ -147,6 +158,7 @@ html[data-scheme="nord"] {
     --mermaid-blue: var(--palette-blue);
     --mermaid-orange: var(--palette-orange);
     --mermaid-purple: var(--palette-purple);
+
     /* alerts */
     --alert-note: var(--palette-blue);
     --alert-tip: var(--palette-green);
@@ -167,6 +179,7 @@ html:not([data-scheme]) {
     --accent: #af3a03;
     --muted: #ebdbb2;
     --border: #d5c4a1;
+
     /* palette — Gruvbox colors */
     --palette-red: #cc241d;
     --palette-green: #98971a;
@@ -174,6 +187,7 @@ html:not([data-scheme]) {
     --palette-blue: #458588;
     --palette-orange: #d65d0e;
     --palette-purple: #b16286;
+
     /* mermaid */
     --mermaid-bg: #fbf1c7;
     --mermaid-fg: #3c3836;
@@ -189,6 +203,7 @@ html:not([data-scheme]) {
     --mermaid-blue: var(--palette-blue);
     --mermaid-orange: var(--palette-orange);
     --mermaid-purple: var(--palette-purple);
+
     /* alerts */
     --alert-note: var(--palette-blue);
     --alert-tip: var(--palette-green);
@@ -203,6 +218,7 @@ html:not([data-scheme]) {
     --accent: #fe8019;
     --muted: #3c3836;
     --border: #504945;
+
     /* palette — Gruvbox dark */
     --palette-red: #fb4934;
     --palette-green: #b8bb26;
@@ -210,6 +226,7 @@ html:not([data-scheme]) {
     --palette-blue: #83a598;
     --palette-orange: #fe8019;
     --palette-purple: #d3869b;
+
     /* mermaid */
     --mermaid-bg: #282828;
     --mermaid-fg: #ebdbb2;
@@ -225,6 +242,7 @@ html:not([data-scheme]) {
     --mermaid-blue: var(--palette-blue);
     --mermaid-orange: var(--palette-orange);
     --mermaid-purple: var(--palette-purple);
+
     /* alerts */
     --alert-note: var(--palette-blue);
     --alert-tip: var(--palette-green);
