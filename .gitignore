@@ -5,3 +5,5 @@ dist
 .opencode/
 .agents
 AGENTS.md
+CLAUDE.md
+.playwright-mcp/
