@@ -3,6 +3,17 @@
 @import "./theme.css";
 @import "./print.css";
 
+/* =========================================================
+   z-index Scale (project-wide convention)
+   ---------------------------------------------------------
+   0    — default stacking
+   10   — progress bar (progress.ts)
+   20   — fixed nav, back-to-top button
+   30   — mobile nav drawer (nav-menu)
+   40   — floating TOC, tooltips
+   50   — medium-zoom overlay
+   ========================================================= */
+
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @theme inline {
@@ -10,6 +21,8 @@
   --font-code: "Fira Code", monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
   --color-accent: var(--accent);
   --color-muted: var(--muted);
   --color-border: var(--border);
@@ -58,6 +71,29 @@ html[lang="ja"] {
   kbd,
   samp {
     font-family: var(--font-code);
+  }
+}
+
+/* Respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .mermaid-diagram {
+    @apply overflow-x-clip;
+  }
+
+  html::view-transition-group(*),
+  html::view-transition-image-pair(*),
+  html::view-transition-old(*),
+  html::view-transition-new(*) {
+    animation: none !important;
   }
 }
 

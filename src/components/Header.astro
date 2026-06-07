@@ -53,7 +53,7 @@ const isActive = (path: string) => {
   >
     <a
       href={localizePath("/")}
-      class="py-1 text-xl leading-8 font-semibold whitespace-nowrap sm:text-2xl sm:leading-none hover:text-accent transition-colors duration-100"
+      class="py-1 text-xl leading-8 font-semibold whitespace-nowrap sm:text-2xl sm:leading-none hover:text-accent transition-colors duration-200"
     >
       {SITE.title}
     </a>
@@ -94,7 +94,7 @@ const isActive = (path: string) => {
       <Tooltip text={t(UI.openMenu, locale)}>
         <button
           id="menu-btn"
-          class="p-2 sm:hidden hover:text-accent transition-colors duration-100"
+          class="p-2 sm:hidden hover:text-accent transition-colors duration-200"
           aria-label={t(UI.openMenu, locale)}
           data-open-label={t(UI.openMenu, locale)}
           data-close-label={t(UI.closeMenu, locale)}
@@ -115,7 +115,7 @@ const isActive = (path: string) => {
         <li class="w-full sm:w-auto">
           <a
             href={localizePath("/posts")}
-            class="block px-4 py-3 text-center font-medium hover:text-accent transition-colors duration-100 sm:px-2 sm:py-1"
+            class="block px-4 py-3 text-center font-medium hover:text-accent transition-colors duration-200 sm:px-2 sm:py-1"
             class:list={{ "active-nav": isActive(localizePath("/posts")) }}
           >
             {t(UI.nav.posts, locale)}
@@ -124,7 +124,7 @@ const isActive = (path: string) => {
         <li class="w-full sm:w-auto">
           <a
             href={localizePath("/tags")}
-            class="block px-4 py-3 text-center font-medium hover:text-accent transition-colors duration-100 sm:px-2 sm:py-1"
+            class="block px-4 py-3 text-center font-medium hover:text-accent transition-colors duration-200 sm:px-2 sm:py-1"
             class:list={{ "active-nav": isActive(localizePath("/tags")) }}
           >
             {t(UI.nav.tags, locale)}
@@ -135,7 +135,7 @@ const isActive = (path: string) => {
             <li class="w-full sm:w-auto">
               <a
                 href={localizePath("/archives")}
-                class="block px-4 py-3 text-center font-medium hover:text-accent transition-colors duration-100 sm:px-2 sm:py-1"
+                class="block px-4 py-3 text-center font-medium hover:text-accent transition-colors duration-200 sm:px-2 sm:py-1"
                 class:list={{
                   "active-nav": isActive(localizePath("/archives")),
                 }}
@@ -148,7 +148,7 @@ const isActive = (path: string) => {
         <li class="w-full sm:w-auto">
           <a
             href={localizePath("/about")}
-            class="block px-4 py-3 text-center font-medium hover:text-accent transition-colors duration-100 sm:px-2 sm:py-1"
+            class="block px-4 py-3 text-center font-medium hover:text-accent transition-colors duration-200 sm:px-2 sm:py-1"
             class:list={{ "active-nav": isActive(localizePath("/about")) }}
           >
             {t(UI.nav.about, locale)}
