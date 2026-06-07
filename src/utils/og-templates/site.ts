@@ -1,6 +1,8 @@
 import satori from "satori";
-import { SITE } from "@/config";
+import { SITE, THEME_DEFS } from "@/config";
 import loadLocalFonts from "../loadLocalFont";
+
+const og = THEME_DEFS[SITE.themeScheme].og;
 
 export default async () => {
   return satori(
@@ -8,7 +10,7 @@ export default async () => {
       type: "div",
       props: {
         style: {
-          background: SITE.ogColors.bg,
+          background: og.bg,
           width: "100%",
           height: "100%",
           display: "flex",
@@ -24,7 +26,7 @@ export default async () => {
                 top: "-1px",
                 right: "-1px",
                 border: "4px solid #000",
-                background: SITE.ogColors.border,
+                background: og.border,
                 opacity: "0.9",
                 borderRadius: "4px",
                 display: "flex",
@@ -40,7 +42,7 @@ export default async () => {
             props: {
               style: {
                 border: "4px solid #000",
-                background: SITE.ogColors.bg,
+                background: og.bg,
                 borderRadius: "4px",
                 display: "flex",
                 justifyContent: "center",

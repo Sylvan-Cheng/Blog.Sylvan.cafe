@@ -1,74 +1,56 @@
-(() => {
-  if (window.__bttAC) window.__bttAC.abort();
-  const ac = new AbortController();
-  window.__bttAC = ac;
+import { initScript, onSwap, throttleRAF } from "./lifecycle";
 
-  let lastVisible: boolean | null = null;
-  let ticking = false;
+const signal = initScript("__bttAC");
 
-  function handleScroll(): void {
-    const rootElement = document.documentElement;
-    const container = document.querySelector("#btt-btn-container");
-    const progressIndicator = document.querySelector("#progress-indicator");
-    if (!rootElement || !container || !progressIndicator) return;
+let lastVisible: boolean | null = null;
 
-    const scrollTotal = rootElement.scrollHeight - rootElement.clientHeight;
-    if (scrollTotal <= 0) return;
-    const scrollTop = rootElement.scrollTop;
-    const scrollPercent = Math.floor((scrollTop / scrollTotal) * 100);
+function handleScroll(): void {
+  const rootElement = document.documentElement;
+  const container = document.querySelector("#btt-btn-container");
+  const progressIndicator = document.querySelector("#progress-indicator");
+  if (!rootElement || !container || !progressIndicator) return;
 
-    (progressIndicator as HTMLElement).style.setProperty(
-      "background-image",
-      `conic-gradient(var(--accent), var(--accent) ${scrollPercent}%, transparent ${scrollPercent}%)`,
-    );
+  const scrollTotal = rootElement.scrollHeight - rootElement.clientHeight;
+  if (scrollTotal <= 0) return;
+  const scrollTop = rootElement.scrollTop;
+  const scrollPercent = Math.floor((scrollTop / scrollTotal) * 100);
 
-    const isVisible = scrollTop / scrollTotal > 0.3;
-
-    if (isVisible !== lastVisible) {
-      container.classList.toggle("opacity-100", isVisible);
-      container.classList.toggle("translate-y-0", isVisible);
-      container.classList.toggle("opacity-0", !isVisible);
-      container.classList.toggle("translate-y-14", !isVisible);
-      lastVisible = isVisible;
-    }
-  }
-
-  document.addEventListener(
-    "scroll",
-    () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          handleScroll();
-          ticking = false;
-        });
-        ticking = true;
-      }
-    },
-    { passive: true, signal: ac.signal },
+  (progressIndicator as HTMLElement).style.setProperty(
+    "background-image",
+    `conic-gradient(var(--accent), var(--accent) ${scrollPercent}%, transparent ${scrollPercent}%)`,
   );
 
-  function initBackToTop(): void {
-    const rootElement = document.documentElement;
-    const backToTopBtn = document.querySelector<HTMLButtonElement>(
-      "[data-button='back-to-top']",
-    );
-    if (!rootElement || !backToTopBtn) return;
+  const isVisible = scrollTop / scrollTotal > 0.3;
 
-    backToTopBtn.addEventListener(
-      "click",
-      () => {
-        document.body.scrollTop = 0;
-        rootElement.scrollTop = 0;
-      },
-      { signal: ac.signal },
-    );
-
-    lastVisible = null;
-    handleScroll();
+  if (isVisible !== lastVisible) {
+    container.classList.toggle("opacity-100", isVisible);
+    container.classList.toggle("translate-y-0", isVisible);
+    container.classList.toggle("opacity-0", !isVisible);
+    container.classList.toggle("translate-y-14", !isVisible);
+    lastVisible = isVisible;
   }
+}
 
-  document.addEventListener("astro:after-swap", initBackToTop);
-  initBackToTop();
-})();
+throttleRAF(handleScroll, signal);
 
-export {};
+function initBackToTop(): void {
+  const rootElement = document.documentElement;
+  const backToTopBtn = document.querySelector<HTMLButtonElement>(
+    "[data-button='back-to-top']",
+  );
+  if (!rootElement || !backToTopBtn) return;
+
+  backToTopBtn.addEventListener(
+    "click",
+    () => {
+      document.body.scrollTop = 0;
+      rootElement.scrollTop = 0;
+    },
+    { signal },
+  );
+
+  lastVisible = null;
+  handleScroll();
+}
+
+onSwap(initBackToTop, signal);

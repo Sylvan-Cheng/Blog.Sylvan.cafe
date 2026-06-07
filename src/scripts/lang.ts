@@ -1,71 +1,63 @@
-(() => {
-  if (window.__langAC) window.__langAC.abort();
-  const ac = new AbortController();
-  window.__langAC = ac;
+import { initScript, onSwap } from "./lifecycle";
 
-  function initLangPicker(): void {
-    const trigger = document.querySelector<HTMLButtonElement>("#lang-trigger");
-    const dropdown = document.querySelector<HTMLUListElement>("#lang-dropdown");
-    if (!trigger || !dropdown) return;
+const signal = initScript("__langAC");
 
-    const trig = trigger;
-    const dd = dropdown;
+function initLangPicker(): void {
+  const trigger = document.querySelector<HTMLButtonElement>("#lang-trigger");
+  const dropdown = document.querySelector<HTMLUListElement>("#lang-dropdown");
+  if (!trigger || !dropdown) return;
 
-    function open(): void {
-      dd.hidden = false;
-      trig.setAttribute("aria-expanded", "true");
-    }
+  const trig = trigger;
+  const dd = dropdown;
 
-    function close(): void {
-      dd.hidden = true;
-      trig.setAttribute("aria-expanded", "false");
-    }
-
-    trig.addEventListener(
-      "click",
-      (e) => {
-        e.stopPropagation();
-        dd.hidden ? open() : close();
-      },
-      { signal: ac.signal },
-    );
-
-    dd.addEventListener(
-      "click",
-      (e) => {
-        const link = (e.target as HTMLElement).closest<HTMLAnchorElement>("a");
-        if (link?.href && link.href !== window.location.href) {
-          window.location.href = link.href;
-        }
-        close();
-      },
-      { signal: ac.signal },
-    );
-
-    document.addEventListener(
-      "click",
-      (e) => {
-        if (
-          !trig.contains(e.target as Node) &&
-          !dd.contains(e.target as Node)
-        ) {
-          close();
-        }
-      },
-      { signal: ac.signal },
-    );
-
-    document.addEventListener(
-      "keydown",
-      (e) => {
-        if (e.key === "Escape") close();
-      },
-      { signal: ac.signal },
-    );
+  function open(): void {
+    dd.hidden = false;
+    trig.setAttribute("aria-expanded", "true");
   }
 
-  document.addEventListener("astro:after-swap", initLangPicker);
-  initLangPicker();
-})();
+  function close(): void {
+    dd.hidden = true;
+    trig.setAttribute("aria-expanded", "false");
+  }
 
-export {};
+  trig.addEventListener(
+    "click",
+    (e) => {
+      e.stopPropagation();
+      dd.hidden ? open() : close();
+    },
+    { signal },
+  );
+
+  dd.addEventListener(
+    "click",
+    (e) => {
+      const link = (e.target as HTMLElement).closest<HTMLAnchorElement>("a");
+      if (link?.href && link.href !== window.location.href) {
+        window.location.href = link.href;
+      }
+      close();
+    },
+    { signal },
+  );
+
+  document.addEventListener(
+    "click",
+    (e) => {
+      if (!trig.contains(e.target as Node) && !dd.contains(e.target as Node)) {
+        close();
+      }
+    },
+    { signal },
+  );
+
+  document.addEventListener(
+    "keydown",
+    (e) => {
+      if (e.key === "Escape") close();
+    },
+    { signal },
+  );
+}
+
+onSwap(initLangPicker, signal);
