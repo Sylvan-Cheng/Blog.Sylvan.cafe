@@ -225,8 +225,8 @@ html:not([data-scheme]) {
   &[data-theme="dark"] {
     --background: #282828;
     --foreground: #ebdbb2;
-    --text-secondary: #bdae93;
-    --text-muted: #a89984;
+    --text-secondary: #d5c4a1;
+    --text-muted: #bdae93;
     --accent: #fe8019;
     --muted: #3c3836;
     --border: #504945;
