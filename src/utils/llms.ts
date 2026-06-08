@@ -1,5 +1,6 @@
 import type { CollectionEntry } from "astro:content";
 import { SITE } from "@/config";
+import { LOCALES } from "@/i18n/config";
 import { getPath } from "./getPath";
 
 export function buildPostUrl(
@@ -31,17 +32,20 @@ export function buildLlmsIndex(
 
   lines.push("## Pages");
   lines.push("");
+  const dl = LOCALES[0];
   lines.push(
-    `- [关于](${new URL("zh/about/", base).href}): 了解作者和这个博客`,
+    `- [关于](${new URL(`${dl}/about/`, base).href}): 了解作者和这个博客`,
   );
   lines.push("");
 
   lines.push("## Optional");
   lines.push("");
   lines.push(
-    `- [许可证](${new URL("zh/license/", base).href}): 网站内容许可协议`,
+    `- [许可证](${new URL(`${dl}/license/`, base).href}): 网站内容许可协议`,
   );
-  lines.push(`- [RSS Feed](${new URL("zh/rss.xml", base).href}): 订阅博客更新`);
+  lines.push(
+    `- [RSS Feed](${new URL(`${dl}/rss.xml`, base).href}): 订阅博客更新`,
+  );
   lines.push(
     `- [Sitemap](${new URL("sitemap-index.xml", base).href}): 网站完整页面索引`,
   );

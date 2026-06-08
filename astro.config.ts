@@ -14,13 +14,15 @@ import remarkCollapse from "remark-collapse";
 import remarkGithubBlockquoteAlert from "remark-github-blockquote-alert";
 import remarkMath from "remark-math";
 import remarkToc from "remark-toc";
-import { SITE } from "./src/config";
+import { SITE, THEME_DEFS } from "./src/config";
 import { LOCALES } from "./src/i18n/config";
 import { rehypeA11y } from "./src/plugins/rehype-a11y";
 import { rehypeImgProxy } from "./src/plugins/rehypeImgProxy";
 import { remarkMermaid } from "./src/plugins/remarkMermaid";
 import { transformerCodeMeta } from "./src/utils/transformers/codeMeta";
 import { transformerLineNumbers } from "./src/utils/transformers/lineNumbers";
+
+const theme = THEME_DEFS[SITE.themeScheme];
 
 // https://astro.build/config
 export default defineConfig({
@@ -54,14 +56,7 @@ export default defineConfig({
     ],
     rehypePlugins: [rehypeRaw, rehypeImgProxy, rehypeKatex, rehypeA11y],
     shikiConfig: {
-      /*
-      Shiki 在构建时静态编译，不支持运行时跟随 data-scheme 切换。
-      换色板后需重新构建。备选主题对:
-        Default:  { light: "github-light",  dark: "github-dark" }
-        Nord:     { light: "github-light",  dark: "nord" }
-        Gruvbox:  { light: "gruvbox-light-hard", dark: "gruvbox-dark-hard" }  // ← 当前
-      */
-      themes: { light: "gruvbox-light-hard", dark: "gruvbox-dark-hard" },
+      themes: theme.shiki,
       defaultColor: false,
       wrap: true,
       transformers: [

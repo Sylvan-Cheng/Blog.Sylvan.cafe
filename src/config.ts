@@ -1,3 +1,50 @@
+export const THEME_DEFS = {
+  gruvbox: {
+    shiki: {
+      light: "gruvbox-light-hard" as const,
+      dark: "gruvbox-dark-hard" as const,
+    },
+    og: {
+      bg: "#fbf1c7",
+      border: "#ebdbb2",
+    },
+    giscus: {
+      light: "gruvbox_light" as const,
+      dark: "gruvbox_dark" as const,
+    },
+  },
+  nord: {
+    shiki: {
+      light: "github-light" as const,
+      dark: "nord" as const,
+    },
+    og: {
+      bg: "#eceff4",
+      border: "#88c0d0",
+    },
+    giscus: {
+      light: "nord" as const,
+      dark: "nord" as const,
+    },
+  },
+  default: {
+    shiki: {
+      light: "github-light" as const,
+      dark: "github-dark" as const,
+    },
+    og: {
+      bg: "#ffffff",
+      border: "#e5e7eb",
+    },
+    giscus: {
+      light: "light" as const,
+      dark: "dark" as const,
+    },
+  },
+} as const;
+
+export type ThemeScheme = keyof typeof THEME_DEFS;
+
 export const SITE = {
   website: "https://blog.sylvan.cafe/",
   author: "Sylvan",
@@ -26,8 +73,6 @@ export const SITE = {
     reactionsEnabled: "1",
     emitMetadata: false,
     inputPosition: "top",
-    lightTheme: "gruvbox_light",
-    darkTheme: "gruvbox_dark",
   },
   dynamicOgImage: true,
   dir: "ltr", // "rtl" | "auto"
@@ -38,9 +83,5 @@ export const SITE = {
       websiteId: "636e674b-026b-4730-b2dc-cd79336f463c",
     },
   },
-  themeScheme: "gruvbox", // "gruvbox" | "nord" | "default"
-  ogColors: {
-    bg: "#fbf1c7",
-    border: "#ebdbb2",
-  },
+  themeScheme: "gruvbox" as ThemeScheme,
 } as const;

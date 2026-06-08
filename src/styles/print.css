@@ -26,6 +26,8 @@
   html[data-theme="dark"] {
     --background: #fff !important;
     --foreground: #000 !important;
+    --text-secondary: #333 !important;
+    --text-muted: #666 !important;
     --accent: #333 !important;
     --muted: #eee !important;
     --border: #999 !important;

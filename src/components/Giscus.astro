@@ -1,5 +1,5 @@
 ---
-import { SITE } from "@/config";
+import { SITE, THEME_DEFS } from "@/config";
 import { resolveLocale } from "@/i18n/utils";
 
 const giscus = SITE.giscus;
@@ -7,6 +7,8 @@ const locale = resolveLocale(Astro.currentLocale);
 const giscusLang = { zh: "zh-CN", en: "en", ja: "ja", ru: "ru", eo: "eo" }[
   locale
 ];
+
+const giscusTheme = THEME_DEFS[SITE.themeScheme].giscus;
 
 // Strip locale prefix for cross-language comment sharing
 const localePrefix = Astro.currentLocale;
@@ -33,7 +35,7 @@ const giscusTerm = path.replace(/\/$/, "") || "/";
         data-reactions-enabled={giscus.reactionsEnabled}
         data-emit-metadata={giscus.emitMetadata.toString()}
         data-input-position={giscus.inputPosition}
-        data-theme={giscus.darkTheme}
+        data-theme={giscusTheme.dark}
         data-lang={giscusLang}
         data-loading="lazy"
         crossorigin="anonymous"
@@ -45,7 +47,7 @@ const giscusTerm = path.replace(/\/$/, "") || "/";
 
 {
   giscus.enabled && (
-    <script is:inline define:vars={{ darkTheme: giscus.darkTheme, lightTheme: giscus.lightTheme }}>
+    <script is:inline define:vars={{ darkTheme: giscusTheme.dark, lightTheme: giscusTheme.light }}>
       // 单例模式：避免 View Transitions 导致监听器重复累积
       if (window.__giscusInit) {
         window.__giscusSync?.();

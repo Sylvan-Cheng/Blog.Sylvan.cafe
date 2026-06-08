@@ -29,9 +29,9 @@ const svg = (svgMap[locale] ?? "")
   <a
     href="https://notbyai.fyi"
     target="_blank"
-    rel="noopener"
+    rel="noopener noreferrer"
     aria-label={t(UI.notByAI, locale)}
-    class="inline-flex items-center text-foreground hover:text-accent transition-colors duration-100 h-6"
+    class="inline-flex items-center text-foreground hover:text-accent transition-colors duration-200 h-6"
   >
     <span class="h-full w-auto" set:html={svg} />
   </a>

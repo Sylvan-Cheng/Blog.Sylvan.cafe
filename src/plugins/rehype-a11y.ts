@@ -17,6 +17,7 @@ function getTextContent(node: Element): string {
 export function rehypeA11y() {
   return (tree: Root) => {
     let headingIndex = 0;
+    const usedIds = new Set<string>();
 
     visit(tree, "element", (node: Element) => {
       // 1. Task list checkboxes — missing aria-label for screen readers
@@ -44,6 +45,14 @@ export function rehypeA11y() {
       if (!id) {
         const text = getTextContent(node);
         id = slugifyStr(text) || `heading-${headingIndex}`;
+
+        // ID 去重：重复标题追加 -2, -3 后缀
+        if (usedIds.has(id)) {
+          let n = 2;
+          while (usedIds.has(`${id}-${n}`)) n++;
+          id = `${id}-${n}`;
+        }
+        usedIds.add(id);
         node.properties.id = id;
       }
 

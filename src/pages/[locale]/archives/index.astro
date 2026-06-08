@@ -1,4 +1,5 @@
 ---
+import type { CollectionEntry } from "astro:content";
 import { getCollection } from "astro:content";
 import Card from "@/components/Card.astro";
 import Footer from "@/components/Footer.astro";
@@ -9,94 +10,35 @@ import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import Main from "@/layouts/Main.astro";
-import getPostsByGroupCondition from "@/utils/getPostsByGroupCondition";
+
+type GroupKey = string | number | symbol;
+
+function groupBy(
+  posts: CollectionEntry<"blog">[],
+  fn: (item: CollectionEntry<"blog">) => GroupKey,
+): Record<GroupKey, CollectionEntry<"blog">[]> {
+  const result: Record<GroupKey, CollectionEntry<"blog">[]> = {};
+  for (const post of posts) {
+    const key = fn(post);
+    if (!result[key]) result[key] = [];
+    result[key].push(post);
+  }
+  return result;
+}
 
 export function getStaticPaths() {
   return LOCALES.map((locale) => ({ params: { locale } }));
 }
 
-// Redirect to 404 page if `showArchives` config is false
 if (!SITE.showArchives) {
   return Astro.redirect("/404");
 }
 
 const locale = resolveLocale(Astro.currentLocale);
+const months = UI.months[locale] ?? UI.months.en;
 
 const allPosts = await getCollection("blog", ({ data }) => !data.draft);
 const posts = allPosts.filter((p) => p.data.locale === locale);
-
-const monthNames: Record<string, Record<number, string>> = {
-  zh: [
-    "一月",
-    "二月",
-    "三月",
-    "四月",
-    "五月",
-    "六月",
-    "七月",
-    "八月",
-    "九月",
-    "十月",
-    "十一月",
-    "十二月",
-  ],
-  ja: [
-    "1月",
-    "2月",
-    "3月",
-    "4月",
-    "5月",
-    "6月",
-    "7月",
-    "8月",
-    "9月",
-    "10月",
-    "11月",
-    "12月",
-  ],
-  ru: [
-    "Январь",
-    "Февраль",
-    "Март",
-    "Апрель",
-    "Май",
-    "Июнь",
-    "Июль",
-    "Август",
-    "Сентябрь",
-    "Октябрь",
-    "Ноябрь",
-    "Декабрь",
-  ],
-  en: [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ],
-  eo: [
-    "Januaro",
-    "Februaro",
-    "Marto",
-    "Aprilo",
-    "Majo",
-    "Junio",
-    "Julio",
-    "Aŭgusto",
-    "Septembro",
-    "Oktobro",
-    "Novembro",
-    "Decembro",
-  ],
-};
 ---
 
 <Layout title={`${t(UI.archives.title, locale)} | ${SITE.title}`}>
@@ -104,7 +46,7 @@ const monthNames: Record<string, Record<number, string>> = {
   <Main pageTitle={t(UI.archives.title, locale)} pageDesc={t(UI.archives.desc, locale)}>
     {
       Object.entries(
-        getPostsByGroupCondition(posts, post =>
+        groupBy(posts, post =>
           post.data.pubDatetime.getFullYear()
         )
       )
@@ -114,7 +56,7 @@ const monthNames: Record<string, Record<number, string>> = {
             <span class="text-2xl font-bold">{year}</span>
             <sup class="text-sm">{yearGroup.length}</sup>
             {Object.entries(
-              getPostsByGroupCondition(
+              groupBy(
                 yearGroup,
                 post => post.data.pubDatetime.getMonth() + 1
               )
@@ -123,7 +65,7 @@ const monthNames: Record<string, Record<number, string>> = {
               .map(([month, monthGroup]) => (
                 <div class="flex flex-col sm:flex-row">
                   <div class="mt-6 min-w-36 text-lg sm:my-6">
-                    <span class="font-bold">{monthNames[locale]?.[Number(month) - 1] ?? monthNames.en[Number(month) - 1]}</span>
+                    <span class="font-bold">{months[Number(month) - 1]}</span>
                     <sup class="text-xs">{monthGroup.length}</sup>
                   </div>
                   <ul>

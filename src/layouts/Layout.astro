@@ -3,7 +3,8 @@ import { PUBLIC_GOOGLE_SITE_VERIFICATION } from "astro:env/client";
 import { ClientRouter } from "astro:transitions";
 import { SITE } from "@/config";
 import { LOCALE_META, LOCALES } from "@/i18n/config";
-import { resolveLocale } from "@/i18n/utils";
+import { UI } from "@/i18n/ui";
+import { resolveLocale, t } from "@/i18n/utils";
 import "@/styles/global.css";
 import "@fontsource/noto-sans/latin-400.css";
 import "@fontsource/noto-sans/latin-700.css";
@@ -247,6 +248,12 @@ const structuredData = pubDatetime
         // Set theme immediately to prevent flash
         document.firstElementChild?.setAttribute("data-theme", themeValue);
 
+        // 同步设置浏览器地址栏颜色，避免 Android Chrome 暗色模式闪白
+        // 注意：色值与 theme.css 中 Gruvbox 的 --background 耦合
+        const themeColors = { light: "#fbf1c7", dark: "#282828" };
+        document.querySelector("meta[name='theme-color']")
+          ?.setAttribute("content", themeColors[themeValue] || "");
+
         // 合并现有 API（视图过渡时保留 theme.ts 扩展的方法）
         window.theme = {
           ...(window.theme || {}),
@@ -260,7 +267,7 @@ const structuredData = pubDatetime
     </script>
     <slot name="head" />
   </head>
-  <body>
+  <body data-reading-progress-label={t(UI.readingProgress, locale)}>
     <slot />
 
     <!-- Load full theme logic -->

@@ -11,6 +11,7 @@ export default {
     "media-feature-range-notation": null,
     "property-no-vendor-prefix": null,
     "property-no-deprecated": null,
+    "no-invalid-position-declaration": null,
     "at-rule-no-unknown": [
       true,
       {

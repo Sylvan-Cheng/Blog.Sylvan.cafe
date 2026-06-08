@@ -102,8 +102,8 @@ const kaTeXInlineCSS = post.data.math
     </h1>
     <div class="my-2 flex items-center gap-2" data-print-hide>
       <Datetime {pubDatetime} {modDatetime} {timezone} size="lg" />
-      <span aria-hidden="true" class="max-sm:hidden select-none opacity-40">&middot;</span>
-      <span class="text-sm text-foreground opacity-60 max-sm:hidden">
+      <span aria-hidden="true" class="max-sm:hidden select-none text-text-muted">&middot;</span>
+      <span class="text-sm text-text-muted max-sm:hidden">
         {tp(UI.post.wordsCount, locale, String(countWords(post.body ?? "")))}
       </span>
 
@@ -140,7 +140,7 @@ const kaTeXInlineCSS = post.data.math
             href={localizePostPath(prevPost.id, prevPost.filePath)}
             class="group justify-self-start"
           >
-            <div class="inline-flex items-center gap-1 group-hover:text-accent transition-colors duration-100">
+            <div class="inline-flex items-center gap-1 group-hover:text-accent/85 transition-colors duration-200">
               <Icon name="tabler:chevron-left" class="inline-block flex-none rtl:rotate-180" />
               <div>
                 <span>{t(UI.post.prev, locale)}</span>
@@ -156,7 +156,7 @@ const kaTeXInlineCSS = post.data.math
             href={localizePostPath(nextPost.id, nextPost.filePath)}
             class="group justify-self-end sm:col-start-2"
           >
-            <div class="inline-flex items-center gap-1 text-end group-hover:text-accent transition-colors duration-100">
+            <div class="inline-flex items-center gap-1 text-end group-hover:text-accent/85 transition-colors duration-200">
               <div>
                 <span>{t(UI.post.next, locale)}</span>
                 <div class="text-sm text-accent/85">{nextPost.title}</div>
