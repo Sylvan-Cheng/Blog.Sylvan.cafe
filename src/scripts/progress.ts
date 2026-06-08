@@ -25,7 +25,10 @@ function createProgressBar() {
   progressBar.setAttribute("aria-valuemin", "0");
   progressBar.setAttribute("aria-valuemax", "100");
   progressBar.setAttribute("aria-valuenow", "0");
-  progressBar.setAttribute("aria-label", "Reading progress");
+  progressBar.setAttribute(
+    "aria-label",
+    document.body.dataset.readingProgressLabel || "Reading progress",
+  );
   progressContainer.appendChild(progressBar);
   document.body.appendChild(progressContainer);
 }

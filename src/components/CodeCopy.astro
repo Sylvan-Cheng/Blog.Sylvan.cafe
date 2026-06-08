@@ -48,7 +48,7 @@ const labelCopied = t(UI.codeBlock.copied, locale);
       const copyButton = document.createElement("button");
       copyButton.className = `copy-btn ${topClass}`;
       copyButton.type = "button";
-      copyButton.innerHTML = labelCopy;
+      copyButton.innerText = labelCopy;
       codeBlock.setAttribute("tabindex", "0");
       codeBlock.appendChild(copyButton);
 

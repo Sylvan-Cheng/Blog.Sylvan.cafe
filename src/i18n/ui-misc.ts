@@ -214,6 +214,13 @@ export const miscSection = {
     eo: "Redakti paĝon",
   } satisfies Dict,
   pagination: {
+    ariaLabel: {
+      zh: "分页导航",
+      en: "Pagination Navigation",
+      ja: "ページネーション",
+      ru: "Навигация по страницам",
+      eo: "Navigado de paĝoj",
+    } satisfies Dict,
     prev: {
       zh: "上一页",
       en: "Prev",
@@ -235,6 +242,13 @@ export const miscSection = {
     ja: "AI ではなく人間による制作",
     ru: "Создано человеком, а не ИИ",
     eo: "Kreita de Homo, Ne de AI",
+  } satisfies Dict,
+  readingProgress: {
+    zh: "阅读进度",
+    en: "Reading progress",
+    ja: "読書進捗",
+    ru: "Прогресс чтения",
+    eo: "Lega progreso",
   } satisfies Dict,
   breadcrumb: {
     home: {
