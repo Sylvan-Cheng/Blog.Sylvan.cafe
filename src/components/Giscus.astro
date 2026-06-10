@@ -36,6 +36,8 @@ const giscusTerm = path.replace(/\/$/, "") || "/";
         data-emit-metadata={giscus.emitMetadata.toString()}
         data-input-position={giscus.inputPosition}
         data-theme={giscusTheme.dark}
+        data-dark-theme={giscusTheme.dark}
+        data-light-theme={giscusTheme.light}
         data-lang={giscusLang}
         data-loading="lazy"
         crossorigin="anonymous"
@@ -45,71 +47,4 @@ const giscusTerm = path.replace(/\/$/, "") || "/";
   )
 }
 
-{
-  giscus.enabled && (
-    <script is:inline define:vars={{ darkTheme: giscusTheme.dark, lightTheme: giscusTheme.light }}>
-      // 单例模式：避免 View Transitions 导致监听器重复累积
-      if (window.__giscusInit) {
-        window.__giscusSync?.();
-        return;
-      }
-      window.__giscusInit = true;
-
-      {
-        let observer;
-
-        const sync = () => {
-          const isDark = document.documentElement.dataset.theme === "dark";
-          const theme = isDark ? darkTheme : lightTheme;
-
-          const el = document.getElementById("giscus-script");
-          if (el) el.setAttribute("data-theme", theme);
-
-          const frame = document.querySelector("iframe.giscus-frame");
-          if (frame?.contentWindow) {
-            frame.contentWindow.postMessage(
-              { giscus: { setConfig: { theme } } },
-              "https://giscus.app"
-            );
-          }
-        };
-        window.__giscusSync = sync;
-
-        const setupObserver = () => {
-          if (observer) observer.disconnect();
-          observer = new MutationObserver(sync);
-          observer.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ["data-theme"]
-          });
-        };
-
-        const messageHandler = (event) => {
-          if (event.origin !== 'https://giscus.app') return;
-          if (!(typeof event.data === 'object' && event.data.giscus)) return;
-          sync();
-        };
-        window.addEventListener('message', messageHandler);
-
-        sync();
-        setupObserver();
-
-        document.addEventListener("astro:after-swap", () => {
-          // 销毁旧 iframe 并重建脚本元素，强制 Giscus 为新页面重新渲染
-          const oldFrame = document.querySelector("iframe.giscus-frame");
-          if (oldFrame) oldFrame.remove();
-          const script = document.getElementById("giscus-script");
-          if (script) {
-            const newScript = document.createElement("script");
-            for (const attr of script.attributes) {
-              if (attr.name !== "is:inline") newScript.setAttribute(attr.name, attr.value);
-            }
-            script.replaceWith(newScript);
-          }
-          sync();
-          setupObserver();
-        });
-      }
-    </script>
-  )
-}
+{giscus.enabled && <script src="../scripts/giscus.ts"></script>}

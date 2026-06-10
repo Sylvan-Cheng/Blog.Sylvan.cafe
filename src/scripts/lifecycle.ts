@@ -6,6 +6,31 @@ export function initScript(key: string): AbortSignal {
   return ac.signal;
 }
 
+export type InteractionContext = {
+  signal: AbortSignal;
+  onCleanup: (fn: () => void) => void;
+};
+
+export function initInteraction(key: string): InteractionContext {
+  const signal = initScript(key);
+  const cleanups: Array<() => void> = [];
+
+  signal.addEventListener(
+    "abort",
+    () => {
+      while (cleanups.length > 0) cleanups.pop()?.();
+    },
+    { once: true },
+  );
+
+  return {
+    signal,
+    onCleanup(fn) {
+      cleanups.push(fn);
+    },
+  };
+}
+
 export function onSwap(fn: () => void, signal?: AbortSignal): void {
   document.addEventListener("astro:after-swap", fn, { signal });
   fn();
