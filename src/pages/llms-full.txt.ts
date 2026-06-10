@@ -1,16 +1,11 @@
-import { getCollection } from "astro:content";
 import type { APIRoute } from "astro";
 import { SITE } from "@/config";
-import getSortedPosts from "@/utils/getSortedPosts";
+import { getSortedPublishedPosts } from "@/utils/blogRepository";
 import { buildLlmsIndex, buildPostUrl } from "@/utils/llms";
 
 export const GET: APIRoute = async ({ site }) => {
   const base = site?.href ?? SITE.website;
-  const allPosts = await getCollection(
-    "blog",
-    ({ data }) => !data.draft && data.locale === "zh",
-  );
-  const sorted = getSortedPosts(allPosts);
+  const sorted = await getSortedPublishedPosts("zh");
 
   const lines = buildLlmsIndex(sorted, base);
 

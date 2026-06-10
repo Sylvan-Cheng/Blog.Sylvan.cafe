@@ -1,14 +1,13 @@
 import type { CollectionEntry } from "astro:content";
 import { SITE } from "@/config";
 import { LOCALES } from "@/i18n/config";
-import { getPath } from "./getPath";
+import { getPostMarkdownUrl } from "./contentIdentity";
 
 export function buildPostUrl(
   post: CollectionEntry<"blog">,
   base: string,
 ): string {
-  const path = `/${post.data.locale}${getPath(post.id, post.filePath)}index.md`;
-  return new URL(path, base).href;
+  return getPostMarkdownUrl(post, base);
 }
 
 export function buildLlmsIndex(

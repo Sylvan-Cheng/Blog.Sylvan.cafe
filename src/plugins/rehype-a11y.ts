@@ -1,18 +1,7 @@
 import type { Element, Root } from "hast";
 import { visit } from "unist-util-visit";
-import { slugifyStr } from "../utils/slugify";
-
-function getTextContent(node: Element): string {
-  return node.children
-    .map((c) =>
-      c.type === "text"
-        ? c.value
-        : "children" in c
-          ? getTextContent(c as Element)
-          : "",
-    )
-    .join("");
-}
+import { getTextContent, toClassList } from "./hastUtils";
+import { buildHeadingId } from "./markdownTransforms";
 
 export function rehypeA11y() {
   return (tree: Root) => {
@@ -44,26 +33,13 @@ export function rehypeA11y() {
 
       if (!id) {
         const text = getTextContent(node);
-        id = slugifyStr(text) || `heading-${headingIndex}`;
-
-        // ID 去重：重复标题追加 -2, -3 后缀
-        if (usedIds.has(id)) {
-          let n = 2;
-          while (usedIds.has(`${id}-${n}`)) n++;
-          id = `${id}-${n}`;
-        }
-        usedIds.add(id);
+        id = buildHeadingId(text, usedIds, `heading-${headingIndex}`);
         node.properties.id = id;
       }
 
       headingIndex++;
 
-      const cls = node.properties.className;
-      const classList = Array.isArray(cls)
-        ? cls
-        : typeof cls === "string"
-          ? [cls]
-          : [];
+      const classList = toClassList(node.properties.className);
       node.properties.className = classList.concat("group").filter(Boolean);
 
       (node.children as Element[]).push({

@@ -1,5 +1,4 @@
 ---
-import { getCollection } from "astro:content";
 import Card from "@/components/Card.astro";
 import Footer from "@/components/Footer.astro";
 import Header from "@/components/Header.astro";
@@ -12,7 +11,7 @@ import { LOCALES } from "@/i18n/config";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
-import getSortedPosts from "@/utils/getSortedPosts";
+import { getSortedPublishedPosts } from "@/utils/blogRepository";
 
 export function getStaticPaths() {
   return LOCALES.map((locale) => ({ params: { locale } }));
@@ -20,10 +19,7 @@ export function getStaticPaths() {
 
 const locale = resolveLocale(Astro.currentLocale);
 
-const allPosts = await getCollection("blog");
-const posts = allPosts.filter((p) => p.data.locale === locale);
-
-const sortedPosts = getSortedPosts(posts);
+const sortedPosts = await getSortedPublishedPosts(locale);
 const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
 const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
 ---
@@ -85,10 +81,9 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
         <section id="recent-posts" class="pt-12 pb-6">
           <h2 class="text-2xl font-semibold tracking-wide">{t(UI.home.recent, locale)}</h2>
           <ul>
-            {recentPosts.map(
-              (data, index) =>
-                index < SITE.postPerIndex && <Card variant="h3" {...data} locale={locale} />
-            )}
+            {recentPosts.slice(0, SITE.postPerIndex).map(data => (
+              <Card variant="h3" {...data} locale={locale} />
+            ))}
           </ul>
         </section>
       )

@@ -1,20 +1,20 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import { getPath } from "@/utils/getPath";
+import type { Locale } from "@/i18n/config";
+import { getPostUrl } from "@/utils/contentIdentity";
 import { slugifyStr } from "@/utils/slugify";
 import Datetime from "./Datetime.astro";
 
 type Props = {
   variant?: "h2" | "h3";
-  locale?: string;
+  locale?: Locale;
 } & CollectionEntry<"blog">;
 
-const { variant: Heading = "h2", id, data, filePath, locale } = Astro.props;
+const { variant: Heading = "h2", data, locale } = Astro.props;
 
 const { title, description, ...props } = data;
-const href = locale
-  ? `/${locale}${getPath(id, filePath)}`
-  : getPath(id, filePath);
+const post = Astro.props as CollectionEntry<"blog">;
+const href = getPostUrl(post, locale);
 ---
 
 <li class="my-6">

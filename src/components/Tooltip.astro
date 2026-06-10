@@ -19,47 +19,4 @@ const { text, class: className = "" } = Astro.props;
   </span>
 </span>
 
-<script>
-  function positionTip(wrap: HTMLElement) {
-    const tip = wrap.querySelector<HTMLElement>("[data-tooltip-text]");
-    if (!tip) return;
-    const trigger = wrap.firstElementChild as HTMLElement;
-    if (!trigger) return;
-    const tr = trigger.getBoundingClientRect();
-    tip.style.visibility = "hidden";
-    tip.style.removeProperty("top");
-    tip.style.removeProperty("bottom");
-    tip.offsetHeight;
-    const tw = tip.offsetWidth || 200;
-    const th = tip.offsetHeight || 30;
-    const gap = 8;
-    let top = tr.bottom + gap;
-    if (top + th > window.innerHeight - gap) {
-      top = tr.top - th - gap;
-    }
-    let left = tr.left + tr.width / 2 - tw / 2;
-    left = Math.max(gap, Math.min(left, document.documentElement.clientWidth - tw - gap));
-    tip.style.top = `${top}px`;
-    tip.style.left = `${left}px`;
-    tip.style.visibility = "";
-  }
-
-  function initTooltips() {
-    document.querySelectorAll<HTMLElement>(".tooltip-wrap").forEach((wrap) => {
-      if ((wrap as any).__tipBound) return;
-      (wrap as any).__tipBound = true;
-
-      const trigger = wrap.firstElementChild as HTMLElement;
-      const tip = wrap.querySelector<HTMLElement>("[data-tooltip-text]");
-      if (trigger && tip) {
-        const tipId = `tooltip-${Math.random().toString(36).slice(2, 9)}`;
-        tip.id = tipId;
-        trigger.setAttribute("aria-describedby", tipId);
-      }
-
-      wrap.addEventListener("mouseenter", () => positionTip(wrap), { passive: true });
-    });
-  }
-  document.addEventListener("astro:after-swap", initTooltips);
-  initTooltips();
-</script>
+<script src="../scripts/tooltip.ts"></script>

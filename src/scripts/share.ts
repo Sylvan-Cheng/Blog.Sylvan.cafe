@@ -11,6 +11,12 @@ const expandDuration = 300;
 let timerWrap: ReturnType<typeof setTimeout> | undefined;
 let copyTimer: ReturnType<typeof setTimeout> | undefined;
 
+type ShareWrapper = HTMLElement & {
+  __shareExpandEnd?: (e: TransitionEvent) => void;
+};
+
+type ShareEls = NonNullable<ReturnType<typeof getEls>>;
+
 function getEls() {
   const container = document.querySelector<HTMLElement>(
     "[data-share-container]",
@@ -37,6 +43,65 @@ function getEls() {
   };
 }
 
+function clearWrapperTransitionEnd(wrapper: HTMLElement): void {
+  const shareWrapper = wrapper as ShareWrapper;
+  const prev = shareWrapper.__shareExpandEnd;
+  if (!prev) return;
+  shareWrapper.removeEventListener("transitionend", prev);
+  shareWrapper.__shareExpandEnd = undefined;
+}
+
+function setShareItemsVisible(
+  items: NodeListOf<HTMLElement>,
+  visible: boolean,
+): void {
+  items.forEach((item, i) => {
+    if (visible) {
+      const delay = i * expandStagger;
+      const base = `${expandDuration}ms ease-out ${delay}ms`;
+      item.style.transition = mobile
+        ? `opacity ${base}`
+        : `opacity ${base}, transform ${base}`;
+      item.offsetHeight;
+      item.style.transform = mobile ? "" : "translateX(0)";
+      item.setAttribute("tabindex", "0");
+      item.removeAttribute("aria-hidden");
+      item.classList.add("opacity-100", "pointer-events-auto");
+      item.classList.remove("opacity-0", "pointer-events-none");
+      return;
+    }
+
+    item.style.transition = mobile
+      ? "opacity 150ms ease-out 0ms"
+      : "opacity 150ms ease-out 0ms, transform 150ms ease-out 0ms";
+    item.offsetHeight;
+    item.style.transform = mobile ? "" : "translateX(-0.75rem)";
+    item.setAttribute("tabindex", "-1");
+    item.setAttribute("aria-hidden", "true");
+    item.classList.add("opacity-0", "pointer-events-none");
+    item.classList.remove("opacity-100", "pointer-events-auto");
+  });
+}
+
+function resetShareItems(items: NodeListOf<HTMLElement>): void {
+  items.forEach((item) => {
+    item.style.transition = "none";
+    item.offsetHeight;
+    item.style.transform = "";
+    item.setAttribute("tabindex", "-1");
+    item.setAttribute("aria-hidden", "true");
+    item.classList.add("opacity-0", "pointer-events-none");
+    item.classList.remove("opacity-100", "pointer-events-auto");
+  });
+}
+
+function setToggleExpanded(els: ShareEls, isExpanded: boolean): void {
+  els.toggleCollapsed?.classList.toggle("hidden", isExpanded);
+  els.toggleExpanded?.classList.toggle("hidden", !isExpanded);
+  els.toggle?.setAttribute("aria-expanded", String(isExpanded));
+  updateToggleTip(els, isExpanded);
+}
+
 function expand() {
   const els = getEls();
   if (!els?.wrapper || !els?.toggle) return;
@@ -52,18 +117,14 @@ function expand() {
     els.wrapper.offsetHeight;
     els.wrapper.style.transition = "max-height 350ms ease-out";
     els.wrapper.style.maxHeight = `${fullH}px`;
-    const wrapper = els.wrapper;
-    const prev = (wrapper as any).__shareExpandEnd as
-      | ((e: TransitionEvent) => void)
-      | undefined;
-    if (prev) wrapper.removeEventListener("transitionend", prev);
+    const wrapper = els.wrapper as ShareWrapper;
+    clearWrapperTransitionEnd(wrapper);
     const onEnd = (e: TransitionEvent) => {
       if (e.propertyName !== "max-height") return;
       wrapper.style.overflow = "";
-      wrapper.removeEventListener("transitionend", onEnd);
-      (wrapper as any).__shareExpandEnd = undefined;
+      clearWrapperTransitionEnd(wrapper);
     };
-    (wrapper as any).__shareExpandEnd = onEnd;
+    wrapper.__shareExpandEnd = onEnd;
     wrapper.addEventListener("transitionend", onEnd);
   } else {
     els.wrapper.style.maxHeight = "none";
@@ -71,24 +132,8 @@ function expand() {
     els.wrapper.offsetWidth;
     els.wrapper.style.maxWidth = "30rem";
   }
-  els.items.forEach((item, i) => {
-    const delay = i * expandStagger;
-    const dur = expandDuration;
-    const base = `${dur}ms ease-out ${delay}ms`;
-    item.style.transition = mobile
-      ? `opacity ${base}`
-      : `opacity ${base}, transform ${base}`;
-    item.offsetHeight;
-    item.style.transform = mobile ? "" : "translateX(0)";
-    item.setAttribute("tabindex", "0");
-    item.removeAttribute("aria-hidden");
-    item.classList.add("opacity-100", "pointer-events-auto");
-    item.classList.remove("opacity-0", "pointer-events-none");
-  });
-  els.toggleCollapsed?.classList.add("hidden");
-  els.toggleExpanded?.classList.remove("hidden");
-  els.toggle.setAttribute("aria-expanded", "true");
-  updateToggleTip(els, true);
+  setShareItemsVisible(els.items, true);
+  setToggleExpanded(els, true);
 }
 
 function updateToggleTip(
@@ -106,30 +151,12 @@ function collapse() {
   const els = getEls();
   if (!els?.wrapper || !els?.toggle) return;
   clearTimeout(timerWrap);
-  els.toggleExpanded?.classList.add("hidden");
-  els.toggleCollapsed?.classList.remove("hidden");
-  els.toggle.setAttribute("aria-expanded", "false");
-  updateToggleTip(els, false);
-  els.items.forEach((item) => {
-    item.style.transition = mobile
-      ? "opacity 150ms ease-out 0ms"
-      : "opacity 150ms ease-out 0ms, transform 150ms ease-out 0ms";
-    item.offsetHeight;
-    item.style.transform = mobile ? "" : "translateX(-0.75rem)";
-    item.setAttribute("tabindex", "-1");
-    item.setAttribute("aria-hidden", "true");
-    item.classList.add("opacity-0", "pointer-events-none");
-    item.classList.remove("opacity-100", "pointer-events-auto");
-  });
+  setToggleExpanded(els, false);
+  setShareItemsVisible(els.items, false);
   if (mobile) {
-    const prev = (els.wrapper as any).__shareExpandEnd as
-      | ((e: TransitionEvent) => void)
-      | undefined;
-    if (prev) {
-      els.wrapper.removeEventListener("transitionend", prev);
-      (els.wrapper as any).__shareExpandEnd = undefined;
-    }
-    els.wrapper.style.overflow = "hidden";
+    const wrapper = els.wrapper as ShareWrapper;
+    clearWrapperTransitionEnd(wrapper);
+    wrapper.style.overflow = "hidden";
   }
   timerWrap = setTimeout(() => {
     const els2 = getEls();
@@ -150,33 +177,14 @@ function reset() {
   expanded = false;
   clearTimeout(timerWrap);
   if (els.wrapper) {
-    const prev = (els.wrapper as any).__shareExpandEnd as
-      | ((e: TransitionEvent) => void)
-      | undefined;
-    if (prev) {
-      els.wrapper.removeEventListener("transitionend", prev);
-      (els.wrapper as any).__shareExpandEnd = undefined;
-    }
+    clearWrapperTransitionEnd(els.wrapper);
     els.wrapper.style.transition = "none";
     els.wrapper.style.maxWidth = "0";
     els.wrapper.style.maxHeight = "0";
     els.wrapper.style.overflow = "";
   }
-  els.items.forEach((item) => {
-    item.style.transition = "none";
-    item.offsetHeight;
-    item.style.transform = "";
-    item.setAttribute("tabindex", "-1");
-    item.setAttribute("aria-hidden", "true");
-    item.classList.add("opacity-0", "pointer-events-none");
-    item.classList.remove("opacity-100", "pointer-events-auto");
-  });
-  els.toggleCollapsed?.classList.remove("hidden");
-  els.toggleExpanded?.classList.add("hidden");
-  if (els.toggle) {
-    els.toggle.setAttribute("aria-expanded", "false");
-    updateToggleTip(els, false);
-  }
+  resetShareItems(els.items);
+  setToggleExpanded(els, false);
   if (els.copyDefault) els.copyDefault.classList.remove("hidden");
   if (els.copySuccess) els.copySuccess.classList.add("hidden");
 }

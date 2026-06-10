@@ -1,5 +1,4 @@
 ---
-import { getCollection } from "astro:content";
 import type { GetStaticPaths } from "astro";
 import Card from "@/components/Card.astro";
 import Footer from "@/components/Footer.astro";
@@ -11,17 +10,16 @@ import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import Main from "@/layouts/Main.astro";
-import getSortedPosts from "@/utils/getSortedPosts";
+import { getPublishedPostsByLocale, sortPosts } from "@/utils/blogRepository";
 
 const locale = resolveLocale(Astro.currentLocale);
 
 export const getStaticPaths = (async ({ paginate }) => {
   const locales = LOCALES;
-  const allPosts = await getCollection("blog", ({ data }) => !data.draft);
   const results = [];
   for (const loc of locales) {
-    const localePosts = allPosts.filter((p) => p.data.locale === loc);
-    const pages = paginate(getSortedPosts(localePosts), {
+    const localePosts = await getPublishedPostsByLocale(loc);
+    const pages = paginate(sortPosts(localePosts), {
       params: { locale: loc },
       pageSize: SITE.postPerPage,
     });

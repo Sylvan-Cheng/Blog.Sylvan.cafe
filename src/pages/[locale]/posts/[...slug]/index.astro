@@ -2,9 +2,13 @@
 import { type CollectionEntry, getCollection } from "astro:content";
 import { LOCALES } from "@/i18n/config";
 import PostDetails from "@/layouts/PostDetails.astro";
-import { getPath } from "@/utils/getPath";
+import { getPostSlugPath } from "@/utils/contentIdentity";
 import getSortedPosts from "@/utils/getSortedPosts";
 import { postFilter } from "@/utils/postFilter";
+import {
+  buildTranslationMap,
+  groupPostsByTranslationKey,
+} from "@/utils/postTranslations";
 
 type Props = {
   post: CollectionEntry<"blog">;
@@ -15,15 +19,7 @@ type Props = {
 export async function getStaticPaths() {
   const allPosts = (await getCollection("blog")).filter(postFilter);
 
-  // Group posts by translation key (derived from id: "hello-world/zh" → "hello-world")
-  const postsByKey: Record<string, CollectionEntry<"blog">[]> = {};
-  for (const p of allPosts) {
-    const key = p.id.split("/").slice(0, -1).join("/");
-    if (key) {
-      postsByKey[key] ??= [];
-      postsByKey[key].push(p);
-    }
-  }
+  const postsByKey = groupPostsByTranslationKey(allPosts);
 
   // Pre-compute sorted posts per locale
   const sortedByLocale = Object.fromEntries(
@@ -37,17 +33,13 @@ export async function getStaticPaths() {
     allPosts
       .filter((post) => post.data.locale === locale)
       .map((post) => {
-        const key = post.id.split("/").slice(0, -1).join("/");
-        const translationMap: Record<string, string> = {};
-        for (const p of postsByKey[key] ?? []) {
-          if (p.data.locale) {
-            translationMap[p.data.locale] =
-              `/${p.data.locale}${getPath(p.id, p.filePath)}`;
-          }
-        }
         return {
-          params: { locale, slug: getPath(post.id, post.filePath, false) },
-          props: { post, translationMap, posts: sortedByLocale[locale] },
+          params: { locale, slug: getPostSlugPath(post) },
+          props: {
+            post,
+            translationMap: buildTranslationMap(post, postsByKey),
+            posts: sortedByLocale[locale],
+          },
         };
       }),
   );

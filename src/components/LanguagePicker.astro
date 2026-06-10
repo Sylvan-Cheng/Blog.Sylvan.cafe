@@ -15,7 +15,7 @@ const locales = LOCALES.map((code) => ({
 function switchLocale(path: string, to: string): string {
   if (path === "/") return `/${to}/`;
   const replaced = path.replace(/^\/([a-z]{2})(\/|$)/, `/${to}$2`);
-  return replaced.endsWith("/") ? replaced : replaced + "/";
+  return replaced.endsWith("/") ? replaced : `${replaced}/`;
 }
 
 const items = locales.map(({ code, label }) => ({

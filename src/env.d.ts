@@ -1,6 +1,4 @@
 interface Window {
-  __giscusInit?: boolean;
-  __giscusSync?: () => void;
   theme?: {
     themeValue: string;
     setPreference: () => void;
@@ -13,6 +11,8 @@ interface Window {
   __bttAC?: AbortController;
   __langAC?: AbortController;
   __navAC?: AbortController;
+  __tipAC?: AbortController;
+  __giscusAC?: AbortController;
   __toc?: {
     observer?: IntersectionObserver;
     scrollHandler?: (() => void) | null;

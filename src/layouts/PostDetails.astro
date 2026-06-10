@@ -1,7 +1,7 @@
 ---
 import { type CollectionEntry, render } from "astro:content";
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import BackButton from "@/components/BackButton.astro";
 import BackToTopButton from "@/components/BackToTopButton.astro";
 import CodeCopy from "@/components/CodeCopy.astro";
@@ -20,9 +20,12 @@ import { SITE } from "@/config";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t, tp } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
-import { getOgImage } from "@/utils/getOgImage";
-import { getPath } from "@/utils/getPath";
-import { getPrevNextPosts } from "@/utils/getPrevNextPosts";
+import {
+  buildPostLayoutProps,
+  buildPostNavigation,
+  getLocalizedPostPath,
+  KATEX_PRELOAD_FONTS,
+} from "@/utils/postPageModel";
 import { slugifyStr } from "@/utils/slugify";
 import { countWords } from "@/utils/wordCount";
 
@@ -35,41 +38,17 @@ type Props = {
 const { post, posts, translationMap } = Astro.props;
 const locale = resolveLocale(Astro.currentLocale);
 
-const localizePostPath = (id: string, filePath?: string) =>
-  `/${locale}${getPath(id, filePath)}`;
-
-const {
-  title,
-  author,
-  description,
-  canonicalURL,
-  pubDatetime,
-  modDatetime,
-  timezone,
-  tags,
-  license,
-} = post.data;
+const { title, pubDatetime, modDatetime, timezone, tags, license } = post.data;
 
 const { Content, headings } = await render(post);
-const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const layoutProps = buildPostLayoutProps(
+  post,
+  locale,
+  Astro.url.origin,
+  translationMap,
+);
 
-const ogImageUrl = getOgImage(post, locale);
-const ogImage = ogImageUrl
-  ? new URL(ogImageUrl, Astro.url.origin).href
-  : undefined;
-
-const layoutProps = {
-  title: `${title} | ${SITE.title}`,
-  author,
-  description,
-  pubDatetime,
-  modDatetime,
-  canonicalURL,
-  ogImage,
-  hreflangs: translationMap,
-};
-
-const { prev: prevPost, next: nextPost } = getPrevNextPosts(posts, post.id);
+const { prev: prevPost, next: nextPost } = buildPostNavigation(posts, post);
 
 const kaTeXInlineCSS = post.data.math
   ? fs.readFileSync(path.resolve("public/assets/katex.min.css"), "utf-8")
@@ -80,10 +59,9 @@ const kaTeXInlineCSS = post.data.math
   {post.data.math && <style slot="head" set:html={kaTeXInlineCSS} />}
   {post.data.math && (
     <>
-      <link slot="head" rel="preload" href="/assets/fonts/katex/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin />
-      <link slot="head" rel="preload" href="/assets/fonts/katex/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin />
-      <link slot="head" rel="preload" href="/assets/fonts/katex/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin />
-      <link slot="head" rel="preload" href="/assets/fonts/katex/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin />
+      {KATEX_PRELOAD_FONTS.map(font => (
+        <link slot="head" rel="preload" href={`/assets/fonts/katex/${font}`} as="font" type="font/woff2" crossorigin />
+      ))}
     </>
   )}
   <Header />
@@ -115,7 +93,7 @@ const kaTeXInlineCSS = post.data.math
       <Content />
     </article>
 
-    <FloatingTOC headings={tocHeadings} />
+    <FloatingTOC {headings} />
 
     <hr class="my-8 border-dashed" />
 
@@ -137,7 +115,7 @@ const kaTeXInlineCSS = post.data.math
       {
         prevPost && (
           <a
-            href={localizePostPath(prevPost.id, prevPost.filePath)}
+            href={getLocalizedPostPath(prevPost, locale)}
             class="group justify-self-start"
           >
             <div class="inline-flex items-center gap-1 group-hover:text-accent/85 transition-colors duration-200">
@@ -153,7 +131,7 @@ const kaTeXInlineCSS = post.data.math
       {
         nextPost && (
           <a
-            href={localizePostPath(nextPost.id, nextPost.filePath)}
+            href={getLocalizedPostPath(nextPost, locale)}
             class="group justify-self-end sm:col-start-2"
           >
             <div class="inline-flex items-center gap-1 text-end group-hover:text-accent/85 transition-colors duration-200">

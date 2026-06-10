@@ -1,14 +1,9 @@
 import type { CollectionEntry } from "astro:content";
+import { sortPosts } from "./blogRepository";
 import { postFilter } from "./postFilter";
 
 const getSortedPosts = (posts: CollectionEntry<"blog">[]) => {
-  return posts
-    .filter(postFilter)
-    .sort(
-      (a, b) =>
-        (b.data.modDatetime ?? b.data.pubDatetime ?? new Date(0)).getTime() -
-        (a.data.modDatetime ?? a.data.pubDatetime ?? new Date(0)).getTime(),
-    );
+  return sortPosts(posts.filter(postFilter));
 };
 
 export default getSortedPosts;

@@ -1,5 +1,4 @@
 ---
-import { getCollection } from "astro:content";
 import Footer from "@/components/Footer.astro";
 import Header from "@/components/Header.astro";
 import Tag from "@/components/Tag.astro";
@@ -9,6 +8,7 @@ import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import Main from "@/layouts/Main.astro";
+import { getPublishedPostsByLocale } from "@/utils/blogRepository";
 import getUniqueTags from "@/utils/getUniqueTags";
 
 export function getStaticPaths() {
@@ -16,8 +16,7 @@ export function getStaticPaths() {
 }
 
 const locale = resolveLocale(Astro.currentLocale);
-const allPosts = await getCollection("blog");
-const posts = allPosts.filter((p) => p.data.locale === locale);
+const posts = await getPublishedPostsByLocale(locale);
 let tags = getUniqueTags(posts);
 ---
 

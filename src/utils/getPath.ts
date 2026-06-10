@@ -50,5 +50,5 @@ export function getPath(
       ? [basePath, ...slug].join("/")
       : [basePath, ...pathSegments, ...slug].join("/");
 
-  return includeBase ? raw + "/" : raw;
+  return includeBase ? `${raw}/` : raw;
 }

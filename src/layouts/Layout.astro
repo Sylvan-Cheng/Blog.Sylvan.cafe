@@ -5,6 +5,11 @@ import { SITE } from "@/config";
 import { LOCALE_META, LOCALES } from "@/i18n/config";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
+import {
+  buildHreflangPath,
+  buildStructuredData,
+  getDefaultOgImage,
+} from "@/utils/layoutSeo";
 import "@/styles/global.css";
 import "@fontsource/noto-sans/latin-400.css";
 import "@fontsource/noto-sans/latin-700.css";
@@ -47,7 +52,7 @@ const {
   author = SITE.author,
   profile = SITE.profile,
   description = SITE.desc,
-  ogImage = SITE.ogImage ? `/${SITE.ogImage}` : "/og.png",
+  ogImage = getDefaultOgImage(),
   canonicalURL = new URL(Astro.url.pathname, Astro.url),
   pubDatetime,
   modDatetime,
@@ -57,41 +62,22 @@ const {
 const locale = resolveLocale(Astro.currentLocale);
 const currentPath = Astro.url.pathname;
 
-function hreflangUrl(targetLocale: string): string {
-  if (hreflangs?.[targetLocale]) return hreflangs[targetLocale];
-  const segments = currentPath.replace(/^\//, "").split("/");
-  if ((LOCALES as readonly string[]).includes(segments[0])) {
-    segments[0] = targetLocale;
-  } else {
-    segments.unshift(targetLocale);
-  }
-  const path = "/" + segments.join("/");
-  return path.endsWith("/") ? path : path + "/";
-}
+const hreflangUrl = (targetLocale: string) =>
+  buildHreflangPath(currentPath, targetLocale, hreflangs);
 
 const socialImageURL = new URL(ogImage, Astro.url);
 
-const structuredData = pubDatetime
-  ? {
-      "@context": "https://schema.org",
-      "@type": "BlogPosting",
-      "@id": `${canonicalURL}#article`,
-      headline: `${title}`,
-      description: `${description}`,
-      image: `${socialImageURL}`,
-      inLanguage: locale,
-      datePublished: pubDatetime.toISOString(),
-      ...(modDatetime && { dateModified: modDatetime.toISOString() }),
-      mainEntityOfPage: { "@id": `${canonicalURL}` },
-      author: [
-        {
-          "@type": "Person",
-          name: `${author}`,
-          ...(profile && { url: profile }),
-        },
-      ],
-    }
-  : null;
+const structuredData = buildStructuredData({
+  title,
+  author,
+  profile,
+  description,
+  socialImageURL,
+  canonicalURL,
+  locale,
+  pubDatetime,
+  modDatetime,
+});
 ---
 
 <!--
