@@ -1,8 +1,6 @@
 import type { CollectionEntry } from "astro:content";
-import { SITE } from "@/config";
+import { isPostPublishable } from "./blogRepository";
 
 export const postFilter = ({ data }: CollectionEntry<"blog">) => {
-  const isPublishTimePassed =
-    Date.now() > data.pubDatetime.getTime() - SITE.scheduledPostMargin;
-  return !data.draft && (import.meta.env.DEV || isPublishTimePassed);
+  return isPostPublishable(data);
 };

@@ -1,5 +1,4 @@
 ---
-import { getCollection } from "astro:content";
 import type { GetStaticPathsOptions } from "astro";
 import Card from "@/components/Card.astro";
 import Footer from "@/components/Footer.astro";
@@ -12,22 +11,19 @@ import { UI } from "@/i18n/ui";
 import { resolveLocale, t, tp } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import Main from "@/layouts/Main.astro";
-import getSortedPosts from "@/utils/getSortedPosts";
+import { getPublishedPostsByLocale, sortPosts } from "@/utils/blogRepository";
+import { postHasTag } from "@/utils/contentIdentity";
 import getUniqueTags from "@/utils/getUniqueTags";
-import { slugifyStr } from "@/utils/slugify";
 
 export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
-  const allPosts = await getCollection("blog");
   const locales = LOCALES;
   const results = [];
   for (const loc of locales) {
-    const localePosts = allPosts.filter((p) => p.data.locale === loc);
+    const localePosts = await getPublishedPostsByLocale(loc);
     const tags = getUniqueTags(localePosts);
     for (const { tag, tagName } of tags) {
-      const tagPosts = getSortedPosts(
-        localePosts.filter((post) =>
-          post.data.tags.some((t) => slugifyStr(t) === tag),
-        ),
+      const tagPosts = sortPosts(
+        localePosts.filter((post) => postHasTag(post, tag)),
       );
       if (tagPosts.length === 0) continue;
       const pages = paginate(tagPosts, {

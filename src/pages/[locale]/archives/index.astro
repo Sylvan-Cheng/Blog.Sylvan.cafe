@@ -1,6 +1,5 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import { getCollection } from "astro:content";
 import Card from "@/components/Card.astro";
 import Footer from "@/components/Footer.astro";
 import Header from "@/components/Header.astro";
@@ -10,6 +9,7 @@ import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import Main from "@/layouts/Main.astro";
+import { getPublishedPostsByLocale } from "@/utils/blogRepository";
 
 type GroupKey = string | number | symbol;
 
@@ -37,8 +37,7 @@ if (!SITE.showArchives) {
 const locale = resolveLocale(Astro.currentLocale);
 const months = UI.months[locale] ?? UI.months.en;
 
-const allPosts = await getCollection("blog", ({ data }) => !data.draft);
-const posts = allPosts.filter((p) => p.data.locale === locale);
+const posts = await getPublishedPostsByLocale(locale);
 ---
 
 <Layout title={`${t(UI.archives.title, locale)} | ${SITE.title}`}>

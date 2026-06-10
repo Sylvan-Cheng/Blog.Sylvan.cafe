@@ -2,7 +2,11 @@
 import { type CollectionEntry, getCollection } from "astro:content";
 import { LOCALES } from "@/i18n/config";
 import PostDetails from "@/layouts/PostDetails.astro";
-import { getPath } from "@/utils/getPath";
+import {
+  getPostSlugPath,
+  getPostTranslationKey,
+  getPostUrl,
+} from "@/utils/contentIdentity";
 import getSortedPosts from "@/utils/getSortedPosts";
 import { postFilter } from "@/utils/postFilter";
 
@@ -18,7 +22,7 @@ export async function getStaticPaths() {
   // Group posts by translation key (derived from id: "hello-world/zh" → "hello-world")
   const postsByKey: Record<string, CollectionEntry<"blog">[]> = {};
   for (const p of allPosts) {
-    const key = p.id.split("/").slice(0, -1).join("/");
+    const key = getPostTranslationKey(p);
     if (key) {
       postsByKey[key] ??= [];
       postsByKey[key].push(p);
@@ -37,16 +41,15 @@ export async function getStaticPaths() {
     allPosts
       .filter((post) => post.data.locale === locale)
       .map((post) => {
-        const key = post.id.split("/").slice(0, -1).join("/");
+        const key = getPostTranslationKey(post);
         const translationMap: Record<string, string> = {};
         for (const p of postsByKey[key] ?? []) {
           if (p.data.locale) {
-            translationMap[p.data.locale] =
-              `/${p.data.locale}${getPath(p.id, p.filePath)}`;
+            translationMap[p.data.locale] = getPostUrl(p);
           }
         }
         return {
-          params: { locale, slug: getPath(post.id, post.filePath, false) },
+          params: { locale, slug: getPostSlugPath(post) },
           props: { post, translationMap, posts: sortedByLocale[locale] },
         };
       }),

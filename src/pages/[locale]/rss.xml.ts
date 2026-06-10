@@ -1,10 +1,9 @@
-import { getCollection } from "astro:content";
 import rss from "@astrojs/rss";
 import { SITE } from "@/config";
 import type { Locale } from "@/i18n/config";
 import { LOCALE_META, LOCALES } from "@/i18n/config";
-import { getPath } from "@/utils/getPath";
-import getSortedPosts from "@/utils/getSortedPosts";
+import { getSortedPublishedPosts } from "@/utils/blogRepository";
+import { getPostUrl } from "@/utils/contentIdentity";
 
 export async function getStaticPaths() {
   return LOCALES.map((locale) => ({ params: { locale } }));
@@ -14,21 +13,19 @@ export async function GET({ params }: { params: { locale: string } }) {
   const locale = params.locale as Locale;
   const meta = LOCALE_META[locale] ?? { lang: locale, label: locale };
 
-  const allPosts = await getCollection("blog", ({ data }) => !data.draft);
-  const posts = allPosts.filter((p) => p.data.locale === locale);
-  const sortedPosts = getSortedPosts(posts);
+  const sortedPosts = await getSortedPublishedPosts(locale);
 
   return rss({
     title: `${SITE.title} - ${meta.label}`,
     description: SITE.desc,
     site: SITE.website,
     customData: `<language>${meta.lang}</language>`,
-    items: sortedPosts.map(({ data, id, filePath }) => ({
-      link: `/${locale}${getPath(id, filePath)}`,
-      title: data.title,
-      description: data.description,
-      pubDate: data.modDatetime ?? data.pubDatetime,
-      guid: new URL(`/${locale}${getPath(id, filePath)}`, SITE.website).href,
+    items: sortedPosts.map((post) => ({
+      link: getPostUrl(post, locale),
+      title: post.data.title,
+      description: post.data.description,
+      pubDate: post.data.modDatetime ?? post.data.pubDatetime,
+      guid: new URL(getPostUrl(post, locale), SITE.website).href,
     })),
   });
 }

@@ -1,14 +1,14 @@
 import type { CollectionEntry } from "astro:content";
-import { getCollection } from "astro:content";
 import type { APIRoute, GetStaticPaths } from "astro";
-import { getPath } from "@/utils/getPath";
+import { getPublishedPosts } from "@/utils/blogRepository";
+import { getPostSlugPath } from "@/utils/contentIdentity";
 
 export const getStaticPaths = (async () => {
-  const allPosts = await getCollection("blog", ({ data }) => !data.draft);
+  const allPosts = await getPublishedPosts();
   return allPosts.map((post) => ({
     params: {
       locale: post.data.locale,
-      slug: getPath(post.id, post.filePath, false),
+      slug: getPostSlugPath(post),
     },
     props: { post },
   }));
