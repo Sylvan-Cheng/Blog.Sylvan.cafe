@@ -11,11 +11,9 @@
 
   window.__toc ??= {};
   const toc = window.__toc as TocState;
-  toc.buildTOC = () => {
-    const t = toc;
-    if (t.observer) {
-      t.observer.disconnect();
-    }
+
+  function cleanupTocState(t: TocState): AbortSignal {
+    t.observer?.disconnect();
     if (t.scrollHandler) {
       document.removeEventListener("scroll", t.scrollHandler);
       t.scrollHandler = null;
@@ -34,7 +32,65 @@
     }
     t._tocAbort?.abort();
     t._tocAbort = new AbortController();
-    const tocSignal = t._tocAbort.signal;
+    return t._tocAbort.signal;
+  }
+
+  function setupTocClickScroll(
+    list: HTMLElement,
+    offset: number,
+    behavior: ScrollBehavior,
+    signal: AbortSignal,
+  ) {
+    list.addEventListener(
+      "click",
+      (e) => {
+        const a = (e.target as Element).closest("a");
+        if (!a) return;
+        e.preventDefault();
+        const id = a.getAttribute("href")?.slice(1);
+        if (!id) return;
+        const target = document.getElementById(id);
+        if (target) {
+          const top =
+            target.getBoundingClientRect().top + window.scrollY - offset;
+          window.scrollTo({ top, behavior });
+          history.replaceState(null, "", `#${id}`);
+        }
+      },
+      { signal },
+    );
+  }
+
+  function setupFadeEdges(list: HTMLElement, signal: AbortSignal) {
+    const topFade = document.getElementById("toc-fade-top");
+    const bottomFade = document.getElementById("toc-fade-bottom");
+
+    function updateFadeEdges() {
+      if (!topFade || !bottomFade) return;
+      if (list.scrollHeight <= list.clientHeight) {
+        topFade.classList.add("hidden");
+        bottomFade.classList.add("hidden");
+        return;
+      }
+      topFade.classList.toggle("hidden", list.scrollTop <= 0);
+      const atBottom =
+        list.scrollTop + list.clientHeight >= list.scrollHeight - 2;
+      bottomFade.classList.toggle("hidden", atBottom);
+    }
+
+    if (topFade && bottomFade) {
+      list.addEventListener("scroll", updateFadeEdges, {
+        passive: true,
+        signal,
+      });
+    }
+
+    return updateFadeEdges;
+  }
+
+  toc.buildTOC = () => {
+    const t = toc;
+    const tocSignal = cleanupTocState(t);
 
     let tooltipRoot = document.getElementById("toc-tooltip-root");
     if (tooltipRoot) {
@@ -65,25 +121,11 @@
       ? ("instant" as ScrollBehavior)
       : ("smooth" as ScrollBehavior);
 
-    tocList.addEventListener(
-      "click",
-      (e) => {
-        const a = (e.target as Element).closest("a");
-        if (!a) return;
-        e.preventDefault();
-        const id = a.getAttribute("href")?.slice(1);
-        if (!id) return;
-        const target = document.getElementById(id);
-        if (target) {
-          const top =
-            target.getBoundingClientRect().top +
-            window.scrollY -
-            HEADING_SCROLL_OFFSET;
-          window.scrollTo({ top, behavior: scrollBehavior });
-          history.replaceState(null, "", `#${id}`);
-        }
-      },
-      { signal: tocSignal },
+    setupTocClickScroll(
+      tocList,
+      HEADING_SCROLL_OFFSET,
+      scrollBehavior,
+      tocSignal,
     );
 
     const tocItems = tocList.querySelectorAll("li a");
@@ -226,28 +268,7 @@
       );
     }
 
-    const topFade = document.getElementById("toc-fade-top");
-    const bottomFade = document.getElementById("toc-fade-bottom");
-
-    function updateFadeEdges() {
-      if (!topFade || !bottomFade) return;
-      if (list.scrollHeight <= list.clientHeight) {
-        topFade.classList.add("hidden");
-        bottomFade.classList.add("hidden");
-        return;
-      }
-      topFade.classList.toggle("hidden", list.scrollTop <= 0);
-      const atBottom =
-        list.scrollTop + list.clientHeight >= list.scrollHeight - 2;
-      bottomFade.classList.toggle("hidden", atBottom);
-    }
-
-    if (topFade && bottomFade) {
-      tocList.addEventListener("scroll", updateFadeEdges, {
-        passive: true,
-        signal: tocSignal,
-      });
-    }
+    const updateFadeEdges = setupFadeEdges(list, tocSignal);
 
     const tocLinks = Array.from(tocItems);
 
