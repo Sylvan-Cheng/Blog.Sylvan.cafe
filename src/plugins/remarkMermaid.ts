@@ -1,5 +1,6 @@
 import { renderMermaidSVG } from "beautiful-mermaid";
 import type { Root, RootContent } from "mdast";
+import { wrapMermaidSvg } from "./markdownTransforms";
 
 const STYLE_INJECTION = `<style>
   svg {
@@ -45,7 +46,7 @@ function walk(node: Root | RootContent): void {
 
         node.children.splice(i, 1, {
           type: "html",
-          value: `<figure class="mermaid-diagram">${svg}</figure>`,
+          value: wrapMermaidSvg(svg),
         });
       } catch {
         // Keep the original code block — Shiki will syntax-highlight it as plain text

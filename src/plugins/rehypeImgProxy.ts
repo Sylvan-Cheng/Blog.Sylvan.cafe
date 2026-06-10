@@ -12,9 +12,8 @@
  */
 import type { Element, Root } from "hast";
 import { visit } from "unist-util-visit";
-
-const S3_BASE = "https://s3.sylvan.cafe/";
-const PROXY_BASE = "https://img.sylvan.cafe/unsafe/";
+import { toClassList } from "./hastUtils";
+import { buildImgProxyUrls } from "./markdownTransforms";
 
 export function rehypeImgProxy() {
   return (tree: Root) => {
@@ -22,37 +21,19 @@ export function rehypeImgProxy() {
       if (node.tagName !== "img") return;
 
       const src = node.properties?.src;
-      if (typeof src !== "string" || !src.startsWith(S3_BASE)) return;
-
-      const path = src.slice(S3_BASE.length);
-      const fullUrl = `${PROXY_BASE}plain/${path}`;
+      if (typeof src !== "string") return;
 
       const w = node.properties?.width;
       const h = node.properties?.height;
-
-      let thumbUrl: string;
-      if (
-        w !== undefined &&
-        h !== undefined &&
-        Number(w) > 0 &&
-        Number(h) > 0
-      ) {
-        thumbUrl = `${PROXY_BASE}rs:fit:${Number(w)}:${Number(h)}/plain/${path}`;
-      } else {
-        thumbUrl = `${PROXY_BASE}w:800/plain/${path}`;
-      }
+      const urls = buildImgProxyUrls(src, w, h);
+      if (!urls) return;
 
       const props = node.properties ?? {};
       node.properties = props;
-      props.src = thumbUrl;
-      props["data-zoom-src"] = fullUrl;
+      props.src = urls.thumbUrl;
+      props["data-zoom-src"] = urls.fullUrl;
 
-      const cls = props.className;
-      const classList = Array.isArray(cls)
-        ? cls
-        : typeof cls === "string"
-          ? [cls]
-          : [];
+      const classList = toClassList(props.className);
       props.className = [...classList, "img-zoomable"].filter(Boolean);
     });
   };
