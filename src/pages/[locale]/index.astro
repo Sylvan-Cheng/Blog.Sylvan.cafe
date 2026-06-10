@@ -85,10 +85,9 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
         <section id="recent-posts" class="pt-12 pb-6">
           <h2 class="text-2xl font-semibold tracking-wide">{t(UI.home.recent, locale)}</h2>
           <ul>
-            {recentPosts.map(
-              (data, index) =>
-                index < SITE.postPerIndex && <Card variant="h3" {...data} locale={locale} />
-            )}
+            {recentPosts.slice(0, SITE.postPerIndex).map(data => (
+              <Card variant="h3" {...data} locale={locale} />
+            ))}
           </ul>
         </section>
       )

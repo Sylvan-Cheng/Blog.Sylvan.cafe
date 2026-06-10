@@ -65,8 +65,8 @@ function hreflangUrl(targetLocale: string): string {
   } else {
     segments.unshift(targetLocale);
   }
-  const path = "/" + segments.join("/");
-  return path.endsWith("/") ? path : path + "/";
+  const path = `/${segments.join("/")}`;
+  return path.endsWith("/") ? path : `${path}/`;
 }
 
 const socialImageURL = new URL(ogImage, Astro.url);

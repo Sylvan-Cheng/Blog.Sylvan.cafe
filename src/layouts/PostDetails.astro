@@ -1,7 +1,7 @@
 ---
 import { type CollectionEntry, render } from "astro:content";
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import BackButton from "@/components/BackButton.astro";
 import BackToTopButton from "@/components/BackToTopButton.astro";
 import CodeCopy from "@/components/CodeCopy.astro";
@@ -32,6 +32,13 @@ type Props = {
   translationMap: Record<string, string>;
 };
 
+const KATEX_PRELOAD_FONTS = [
+  "KaTeX_Main-Regular.woff2",
+  "KaTeX_Main-Bold.woff2",
+  "KaTeX_Math-Italic.woff2",
+  "KaTeX_Size1-Regular.woff2",
+];
+
 const { post, posts, translationMap } = Astro.props;
 const locale = resolveLocale(Astro.currentLocale);
 
@@ -51,7 +58,6 @@ const {
 } = post.data;
 
 const { Content, headings } = await render(post);
-const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
 
 const ogImageUrl = getOgImage(post, locale);
 const ogImage = ogImageUrl
@@ -80,10 +86,9 @@ const kaTeXInlineCSS = post.data.math
   {post.data.math && <style slot="head" set:html={kaTeXInlineCSS} />}
   {post.data.math && (
     <>
-      <link slot="head" rel="preload" href="/assets/fonts/katex/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin />
-      <link slot="head" rel="preload" href="/assets/fonts/katex/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin />
-      <link slot="head" rel="preload" href="/assets/fonts/katex/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin />
-      <link slot="head" rel="preload" href="/assets/fonts/katex/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin />
+      {KATEX_PRELOAD_FONTS.map(font => (
+        <link slot="head" rel="preload" href={`/assets/fonts/katex/${font}`} as="font" type="font/woff2" crossorigin />
+      ))}
     </>
   )}
   <Header />
@@ -115,7 +120,7 @@ const kaTeXInlineCSS = post.data.math
       <Content />
     </article>
 
-    <FloatingTOC headings={tocHeadings} />
+    <FloatingTOC {headings} />
 
     <hr class="my-8 border-dashed" />
 

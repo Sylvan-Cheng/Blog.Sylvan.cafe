@@ -43,6 +43,7 @@ export function rehypeImgProxy() {
       }
 
       const props = node.properties ?? {};
+      node.properties = props;
       props.src = thumbUrl;
       props["data-zoom-src"] = fullUrl;
 

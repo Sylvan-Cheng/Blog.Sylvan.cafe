@@ -11,6 +11,10 @@ const expandDuration = 300;
 let timerWrap: ReturnType<typeof setTimeout> | undefined;
 let copyTimer: ReturnType<typeof setTimeout> | undefined;
 
+type ShareWrapper = HTMLElement & {
+  __shareExpandEnd?: (e: TransitionEvent) => void;
+};
+
 function getEls() {
   const container = document.querySelector<HTMLElement>(
     "[data-share-container]",
@@ -52,18 +56,16 @@ function expand() {
     els.wrapper.offsetHeight;
     els.wrapper.style.transition = "max-height 350ms ease-out";
     els.wrapper.style.maxHeight = `${fullH}px`;
-    const wrapper = els.wrapper;
-    const prev = (wrapper as any).__shareExpandEnd as
-      | ((e: TransitionEvent) => void)
-      | undefined;
+    const wrapper = els.wrapper as ShareWrapper;
+    const prev = wrapper.__shareExpandEnd;
     if (prev) wrapper.removeEventListener("transitionend", prev);
     const onEnd = (e: TransitionEvent) => {
       if (e.propertyName !== "max-height") return;
       wrapper.style.overflow = "";
       wrapper.removeEventListener("transitionend", onEnd);
-      (wrapper as any).__shareExpandEnd = undefined;
+      wrapper.__shareExpandEnd = undefined;
     };
-    (wrapper as any).__shareExpandEnd = onEnd;
+    wrapper.__shareExpandEnd = onEnd;
     wrapper.addEventListener("transitionend", onEnd);
   } else {
     els.wrapper.style.maxHeight = "none";
@@ -122,14 +124,13 @@ function collapse() {
     item.classList.remove("opacity-100", "pointer-events-auto");
   });
   if (mobile) {
-    const prev = (els.wrapper as any).__shareExpandEnd as
-      | ((e: TransitionEvent) => void)
-      | undefined;
+    const wrapper = els.wrapper as ShareWrapper;
+    const prev = wrapper.__shareExpandEnd;
     if (prev) {
-      els.wrapper.removeEventListener("transitionend", prev);
-      (els.wrapper as any).__shareExpandEnd = undefined;
+      wrapper.removeEventListener("transitionend", prev);
+      wrapper.__shareExpandEnd = undefined;
     }
-    els.wrapper.style.overflow = "hidden";
+    wrapper.style.overflow = "hidden";
   }
   timerWrap = setTimeout(() => {
     const els2 = getEls();
@@ -150,12 +151,11 @@ function reset() {
   expanded = false;
   clearTimeout(timerWrap);
   if (els.wrapper) {
-    const prev = (els.wrapper as any).__shareExpandEnd as
-      | ((e: TransitionEvent) => void)
-      | undefined;
+    const wrapper = els.wrapper as ShareWrapper;
+    const prev = wrapper.__shareExpandEnd;
     if (prev) {
-      els.wrapper.removeEventListener("transitionend", prev);
-      (els.wrapper as any).__shareExpandEnd = undefined;
+      wrapper.removeEventListener("transitionend", prev);
+      wrapper.__shareExpandEnd = undefined;
     }
     els.wrapper.style.transition = "none";
     els.wrapper.style.maxWidth = "0";

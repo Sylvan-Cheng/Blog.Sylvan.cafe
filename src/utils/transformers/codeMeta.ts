@@ -53,10 +53,9 @@ export const transformerCodeMeta = ({
 
     const fileNameOffset = style === "v1" ? "0.75rem" : "-0.75rem";
     const existingStyle = Array.isArray(node.properties.style)
-      ? node.properties.style.join(";") + ";"
+      ? `${node.properties.style.join(";")};`
       : (node.properties.style as string) || "";
-    node.properties.style =
-      existingStyle + `--file-name-offset: ${fileNameOffset};`;
+    node.properties.style = `${existingStyle}--file-name-offset: ${fileNameOffset};`;
 
     // 标记 copy 按钮需偏移（避免运行时 getComputedStyle 强制重排）
     node.properties["data-filename"] = "true";

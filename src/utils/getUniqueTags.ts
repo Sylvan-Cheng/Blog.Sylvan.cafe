@@ -9,21 +9,21 @@ interface Tag {
 
 const getUniqueTags = (posts: CollectionEntry<"blog">[]) => {
   const seen = new Set<string>();
-  const tags: Tag[] = posts
-    .filter(postFilter)
-    .flatMap((post) => post.data.tags)
-    .reduce<Tag[]>((acc, tag) => {
+  const tags: Tag[] = [];
+
+  for (const post of posts.filter(postFilter)) {
+    for (const tag of post.data.tags) {
       const slug = slugifyStr(tag);
       if (!seen.has(slug)) {
         seen.add(slug);
-        acc.push({ tag: slug, tagName: tag });
+        tags.push({ tag: slug, tagName: tag });
       }
-      return acc;
-    }, [])
-    .sort((tagA, tagB) =>
-      tagA.tag.localeCompare(tagB.tag, "en", { sensitivity: "base" }),
-    );
-  return tags;
+    }
+  }
+
+  return tags.sort((tagA, tagB) =>
+    tagA.tag.localeCompare(tagB.tag, "en", { sensitivity: "base" }),
+  );
 };
 
 export default getUniqueTags;

@@ -6,7 +6,7 @@ const BAR_ID = "reading-progress-bar";
 const CONTAINER_CLASS = "progress-container";
 
 function createProgressBar() {
-  const existing = document.querySelector("." + CONTAINER_CLASS);
+  const existing = document.querySelector(`.${CONTAINER_CLASS}`);
   if (existing) {
     const bar = existing.querySelector<HTMLElement>(".progress-bar");
     if (bar) {
@@ -16,8 +16,7 @@ function createProgressBar() {
     return;
   }
   const progressContainer = document.createElement("div");
-  progressContainer.className =
-    CONTAINER_CLASS + " fixed top-0 z-10 h-1 w-full bg-background";
+  progressContainer.className = `${CONTAINER_CLASS} fixed top-0 z-10 h-1 w-full bg-background`;
   const progressBar = document.createElement("div");
   progressBar.className = "progress-bar h-1 w-0 bg-accent";
   progressBar.id = BAR_ID;
@@ -46,7 +45,7 @@ function updateScrollProgress() {
     return;
   }
   const pct = Math.round((winScroll / height) * 100);
-  bar.style.width = pct + "%";
+  bar.style.width = `${pct}%`;
   bar.setAttribute("aria-valuenow", String(pct));
 }
 
