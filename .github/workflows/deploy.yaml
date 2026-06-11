@@ -45,5 +45,6 @@ jobs:
           ARGS: "-avz --delete"
           SOURCE: "dist/"
           REMOTE_HOST: ${{ secrets.SERVER_IP }}
+          REMOTE_PORT: "2222"
           REMOTE_USER: "github"
           TARGET: "/blog/sylvan.cafe/"
