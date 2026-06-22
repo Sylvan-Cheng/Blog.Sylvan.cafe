@@ -1,3 +1,4 @@
+import { unified } from "@astrojs/markdown-remark";
 import partytown from "@astrojs/partytown";
 import sitemap from "@astrojs/sitemap";
 import {
@@ -47,14 +48,16 @@ export default defineConfig({
     icon(),
   ],
   markdown: {
-    remarkPlugins: [
-      remarkToc,
-      remarkMath,
-      remarkMermaid,
-      remarkGithubBlockquoteAlert,
-      [remarkCollapse, { test: "Table of contents" }],
-    ],
-    rehypePlugins: [rehypeRaw, rehypeImgProxy, rehypeKatex, rehypeA11y],
+    processor: unified({
+      remarkPlugins: [
+        remarkToc,
+        remarkMath,
+        remarkMermaid,
+        remarkGithubBlockquoteAlert,
+        [remarkCollapse, { test: "Table of contents" }],
+      ],
+      rehypePlugins: [rehypeRaw, rehypeImgProxy, rehypeKatex, rehypeA11y],
+    }),
     shikiConfig: {
       themes: theme.shiki,
       defaultColor: false,

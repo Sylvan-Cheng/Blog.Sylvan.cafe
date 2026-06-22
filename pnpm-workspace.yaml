@@ -1,0 +1,10 @@
+allowBuilds:
+  esbuild: true
+  sharp: true
+
+# Temporary security overrides for transitive dependencies.
+# Remove when astro-icon/@astrojs/check resolve these through upstream releases.
+overrides:
+  tar: 7.5.16
+  undici: 7.28.0
+  yaml: 2.9.0
