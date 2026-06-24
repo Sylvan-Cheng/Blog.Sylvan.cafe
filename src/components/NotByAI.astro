@@ -1,6 +1,5 @@
 ---
 import { UI } from "@/i18n/ui";
-// import Tooltip from "@/components/Tooltip.astro";
 import { resolveLocale, t } from "@/i18n/utils";
 import enSvg from "../assets/badges/not-by-ai/en.svg?raw";
 import eoSvg from "../assets/badges/not-by-ai/eo.svg?raw";
@@ -25,14 +24,12 @@ const svg = (svgMap[locale] ?? "")
   .replace(/stroke="currentColor"/, 'stroke="currentColor" stroke-width="2"');
 ---
 
-<!-- <Tooltip text={t(UI.notByAI, locale)}> -->
-  <a
-    href="https://notbyai.fyi"
-    target="_blank"
-    rel="noopener noreferrer"
-    aria-label={t(UI.notByAI, locale)}
-    class="inline-flex items-center text-foreground hover:text-accent transition-colors duration-200 h-6"
-  >
-    <span class="h-full w-auto" set:html={svg} />
-  </a>
-<!-- </Tooltip> -->
+<a
+  href="https://notbyai.fyi"
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label={t(UI.notByAI, locale)}
+  class="inline-flex items-center text-foreground hover:text-accent transition-colors duration-200 h-6"
+>
+  <span class="h-full w-auto" set:html={svg} />
+</a>
