@@ -73,9 +73,6 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
-    optimizeDeps: {
-      exclude: ["@resvg/resvg-js"],
-    },
   },
   image: {
     responsiveStyles: true,

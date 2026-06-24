@@ -41,12 +41,7 @@ const locale = resolveLocale(Astro.currentLocale);
 const { title, pubDatetime, modDatetime, timezone, tags, license } = post.data;
 
 const { Content, headings } = await render(post);
-const layoutProps = buildPostLayoutProps(
-  post,
-  locale,
-  Astro.url.origin,
-  translationMap,
-);
+const layoutProps = buildPostLayoutProps(post, translationMap);
 
 const { prev: prevPost, next: nextPost } = buildPostNavigation(posts, post);
 

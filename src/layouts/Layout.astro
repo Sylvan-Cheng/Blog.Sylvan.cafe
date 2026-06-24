@@ -40,7 +40,6 @@ type Props = {
   author?: string;
   profile?: string;
   description?: string;
-  ogImage?: string;
   canonicalURL?: string;
   pubDatetime?: Date;
   modDatetime?: Date | null;
@@ -52,7 +51,6 @@ const {
   author = SITE.author,
   profile = SITE.profile,
   description = SITE.desc,
-  ogImage = getDefaultOgImage(),
   canonicalURL = new URL(Astro.url.pathname, Astro.url),
   pubDatetime,
   modDatetime,
@@ -65,7 +63,7 @@ const currentPath = Astro.url.pathname;
 const hreflangUrl = (targetLocale: string) =>
   buildHreflangPath(currentPath, targetLocale, hreflangs);
 
-const socialImageURL = new URL(ogImage, Astro.url);
+const socialImageURL = new URL(getDefaultOgImage(), Astro.url);
 
 const structuredData = buildStructuredData({
   title,
@@ -171,7 +169,7 @@ const structuredData = buildStructuredData({
     }
 
     <!-- Twitter -->
-    <meta property="twitter:card" content={ogImage && ogImage !== "/og.png" ? "summary_large_image" : "summary"} />
+    <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={canonicalURL} />
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />

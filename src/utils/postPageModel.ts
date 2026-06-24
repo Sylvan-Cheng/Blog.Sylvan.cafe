@@ -1,7 +1,6 @@
 import type { CollectionEntry } from "astro:content";
 import { SITE } from "@/config";
 import type { Locale } from "@/i18n/config";
-import { getOgImage } from "./getOgImage";
 import { getPath } from "./getPath";
 import { getPrevNextPosts } from "./getPrevNextPosts";
 
@@ -17,13 +16,8 @@ export const KATEX_PRELOAD_FONTS = [
 
 export function buildPostLayoutProps(
   post: BlogPost,
-  locale: Locale,
-  origin: string,
   translationMap: Record<string, string>,
 ) {
-  const ogImageUrl = getOgImage(post, locale);
-  const ogImage = ogImageUrl ? new URL(ogImageUrl, origin).href : undefined;
-
   return {
     title: `${post.data.title} | ${SITE.title}`,
     author: post.data.author,
@@ -31,7 +25,6 @@ export function buildPostLayoutProps(
     pubDatetime: post.data.pubDatetime,
     modDatetime: post.data.modDatetime,
     canonicalURL: post.data.canonicalURL,
-    ogImage,
     hreflangs: translationMap,
   };
 }

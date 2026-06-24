@@ -1,4 +1,3 @@
-import { SITE } from "@/config";
 import { LOCALES } from "@/i18n/config";
 
 type Hreflangs = Record<string, string> | undefined;
@@ -68,5 +67,5 @@ export function buildStructuredData({
 }
 
 export function getDefaultOgImage(): string {
-  return SITE.ogImage ? `/${SITE.ogImage}` : "/og.png";
+  return "/og.png";
 }
