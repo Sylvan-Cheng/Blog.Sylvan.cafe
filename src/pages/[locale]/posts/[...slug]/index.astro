@@ -20,12 +20,12 @@ export async function getStaticPaths() {
       .filter((post) => post.data.locale === locale)
       .map((post) => {
         return {
-            params: { locale, slug: getPostSlugPath(post) },
-            props: {
-              post,
-              translationMap: buildTranslationMap(post, postIndex.postsByKey),
-              posts: postIndex.sortedPostsByLocale[locale],
-            },
+          params: { locale, slug: getPostSlugPath(post) },
+          props: {
+            post,
+            translationMap: buildTranslationMap(post, postIndex.postsByKey),
+            posts: postIndex.sortedPostsByLocale[locale],
+          },
         };
       }),
   );
