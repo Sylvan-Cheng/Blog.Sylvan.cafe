@@ -17,13 +17,6 @@ export const homeSection = {
       ru: "Личный блог Sylvan. Мысли о технологиях, коде и жизни.",
       eo: "Persona blogo de Sylvan. Pensoj pri teknologio, kodo kaj vivo.",
     } satisfies Dict,
-    featured: {
-      zh: "精选文章",
-      en: "Featured",
-      ja: "注目記事",
-      ru: "Избранное",
-      eo: "Elstaraj",
-    } satisfies Dict,
     recent: {
       zh: "最近文章",
       en: "Recent Posts",

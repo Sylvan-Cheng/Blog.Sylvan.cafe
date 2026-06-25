@@ -3,7 +3,6 @@ locale: zh
 author: 测试作者
 pubDatetime: 2026-05-01T00:00:00Z
 title: 你好，世界！
-featured: true
 math: true
 license: cc-by-nc-sa-4.0
 tags:

@@ -3,7 +3,6 @@ locale: ja
 author: テスト著者
 pubDatetime: 2026-05-01T00:00:00Z
 title: こんにちは、世界！
-featured: true
 math: true
 license: cc-by-nc-sa-4.0
 tags:

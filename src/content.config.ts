@@ -8,29 +8,24 @@ export const BLOG_PATH = "src/data/blog";
 
 const blog = defineCollection({
   loader: glob({ pattern: "**/[^_]*.md", base: `./${BLOG_PATH}` }),
-  schema: ({ image }) =>
-    z.object({
-      // === Required ===
-      locale: z.enum(LOCALES).default("zh"),
-      title: z.string().min(1, "Title is required"),
-      pubDatetime: z.coerce.date(),
-      description: z
-        .string()
-        .min(10, "Description must be at least 10 characters")
-        .max(320, "Description too long for SEO"),
+  schema: z.object({
+    // === Required ===
+    locale: z.enum(LOCALES).default("zh"),
+    title: z.string().min(1, "Title is required"),
+    pubDatetime: z.coerce.date(),
+    description: z
+      .string()
+      .min(10, "Description must be at least 10 characters")
+      .max(320, "Description too long for SEO"),
 
-      // === Optional ===
-      author: z.string().default(SITE.author),
-      modDatetime: z.coerce.date().optional(),
-      image: image().or(z.string()).optional(),
-      canonicalURL: z.url().optional(),
-      tags: z.array(z.string()).default(["others"]),
-      keywords: z.array(z.string()).optional(),
-      featured: z.boolean().optional().default(false),
-      math: z.boolean().optional().default(false),
-      timezone: z.string().optional(),
-      license: z.enum(["cc-by-nc-sa-4.0", "copyright"]).optional(),
-    }),
+    // === Optional ===
+    author: z.string().default(SITE.author),
+    modDatetime: z.coerce.date().optional(),
+    tags: z.array(z.string()).default(["others"]),
+    math: z.boolean().optional().default(false),
+    timezone: z.string().optional(),
+    license: z.enum(["cc-by-nc-sa-4.0", "copyright"]).optional(),
+  }),
 });
 
 const pages = defineCollection({

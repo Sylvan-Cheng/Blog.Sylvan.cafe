@@ -6,11 +6,6 @@ description: 2026 年の技術と生活の成長と変化を振り返り、新�
 tags:
   - test
   - life
-keywords:
-  - 年振り返り
-  - "2026"
-  - 技術まとめ
-featured: true
 ---
 
 ## 技術の成長

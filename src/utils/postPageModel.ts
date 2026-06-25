@@ -24,7 +24,6 @@ export function buildPostLayoutProps(
     description: post.data.description,
     pubDatetime: post.data.pubDatetime,
     modDatetime: post.data.modDatetime,
-    canonicalURL: post.data.canonicalURL,
     hreflangs: translationMap,
   };
 }

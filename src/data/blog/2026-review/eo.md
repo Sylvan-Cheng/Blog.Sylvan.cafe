@@ -6,11 +6,6 @@ description: Retrorigardo al la kresko kaj ŝanĝoj en teknologio kaj vivo dum 2
 tags:
   - test
   - life
-keywords:
-  - jara revizio
-  - "2026"
-  - teknika resumo
-featured: true
 ---
 
 ## Teknologia Kresko
