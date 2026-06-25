@@ -1,11 +1,11 @@
 import type { APIRoute } from "astro";
 import { SITE } from "@/config";
-import { getSortedPublishedPosts } from "@/utils/blogRepository";
+import { getSortedPosts } from "@/utils/blogRepository";
 import { buildLlmsIndex, buildPostUrl } from "@/utils/llms";
 
 export const GET: APIRoute = async ({ site }) => {
   const base = site?.href ?? SITE.website;
-  const sorted = await getSortedPublishedPosts("zh");
+  const sorted = await getSortedPosts("zh");
 
   const lines = buildLlmsIndex(sorted, base);
 

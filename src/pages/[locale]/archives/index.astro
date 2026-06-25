@@ -9,7 +9,7 @@ import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import Main from "@/layouts/Main.astro";
-import { getPublishedPostsByLocale } from "@/utils/blogRepository";
+import { getPostsByLocale } from "@/utils/blogRepository";
 
 type GroupKey = string | number | symbol;
 
@@ -37,7 +37,7 @@ if (!SITE.showArchives) {
 const locale = resolveLocale(Astro.currentLocale);
 const months = UI.months[locale] ?? UI.months.en;
 
-const posts = await getPublishedPostsByLocale(locale);
+const posts = await getPostsByLocale(locale);
 ---
 
 <Layout title={`${t(UI.archives.title, locale)} | ${SITE.title}`}>

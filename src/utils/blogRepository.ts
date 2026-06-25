@@ -1,46 +1,24 @@
 import type { CollectionEntry } from "astro:content";
 import { getCollection } from "astro:content";
-import { SITE } from "@/config";
-import type { Locale } from "@/i18n/config";
+import { LOCALES, type Locale } from "@/i18n/config";
+import { groupPostsByTranslationKey } from "./postTranslations";
 
 type BlogPost = CollectionEntry<"blog">;
 
-export type PublishOptions = {
-  now?: number;
-  dev?: boolean;
-  scheduledPostMargin?: number;
+export type PostIndex = {
+  posts: BlogPost[];
+  postsByKey: ReturnType<typeof groupPostsByTranslationKey>;
+  sortedPostsByLocale: Record<Locale, BlogPost[]>;
 };
 
-export function isPostPublishable(
-  data: BlogPost["data"],
-  options: PublishOptions = {},
-): boolean {
-  const now = options.now ?? Date.now();
-  const dev = options.dev ?? import.meta.env.DEV;
-  const scheduledPostMargin =
-    options.scheduledPostMargin ?? SITE.scheduledPostMargin;
-  const isPublishTimePassed =
-    now > data.pubDatetime.getTime() - scheduledPostMargin;
-
-  return !data.draft && (dev || isPublishTimePassed);
-}
-
-export async function getBlogPosts(): Promise<BlogPost[]> {
+export async function getPosts(): Promise<BlogPost[]> {
   return getCollection("blog");
 }
 
-export async function getPublishedPosts(
-  options?: PublishOptions,
-): Promise<BlogPost[]> {
-  const posts = await getBlogPosts();
-  return posts.filter(({ data }) => isPostPublishable(data, options));
-}
-
-export async function getPublishedPostsByLocale(
+export async function getPostsByLocale(
   locale: Locale | string,
-  options?: PublishOptions,
 ): Promise<BlogPost[]> {
-  const posts = await getPublishedPosts(options);
+  const posts = await getPosts();
   return posts.filter((post) => post.data.locale === locale);
 }
 
@@ -52,12 +30,25 @@ export function sortPosts(posts: BlogPost[]): BlogPost[] {
   );
 }
 
-export async function getSortedPublishedPosts(
+export async function getSortedPosts(
   locale?: Locale | string,
-  options?: PublishOptions,
 ): Promise<BlogPost[]> {
-  const posts = locale
-    ? await getPublishedPostsByLocale(locale, options)
-    : await getPublishedPosts(options);
+  const posts = locale ? await getPostsByLocale(locale) : await getPosts();
   return sortPosts(posts);
+}
+
+export async function getPostIndex(): Promise<PostIndex> {
+  const posts = await getPosts();
+  const sortedPostsByLocale = Object.fromEntries(
+    LOCALES.map((locale) => [
+      locale,
+      sortPosts(posts.filter((post) => post.data.locale === locale)),
+    ]),
+  ) as Record<Locale, BlogPost[]>;
+
+  return {
+    posts,
+    postsByKey: groupPostsByTranslationKey(posts),
+    sortedPostsByLocale,
+  };
 }

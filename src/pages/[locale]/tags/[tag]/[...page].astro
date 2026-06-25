@@ -11,7 +11,7 @@ import { UI } from "@/i18n/ui";
 import { resolveLocale, t, tp } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import Main from "@/layouts/Main.astro";
-import { getPublishedPostsByLocale, sortPosts } from "@/utils/blogRepository";
+import { getPostsByLocale, sortPosts } from "@/utils/blogRepository";
 import { postHasTag } from "@/utils/contentIdentity";
 import getUniqueTags from "@/utils/getUniqueTags";
 
@@ -19,7 +19,7 @@ export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
   const locales = LOCALES;
   const results = [];
   for (const loc of locales) {
-    const localePosts = await getPublishedPostsByLocale(loc);
+    const localePosts = await getPostsByLocale(loc);
     const tags = getUniqueTags(localePosts);
     for (const { tag, tagName } of tags) {
       const tagPosts = sortPosts(

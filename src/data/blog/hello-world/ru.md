@@ -4,7 +4,6 @@ author: Тестовый автор
 pubDatetime: 2026-05-01T00:00:00Z
 title: Привет, мир!
 featured: true
-draft: false
 math: true
 license: cc-by-nc-sa-4.0
 tags:
