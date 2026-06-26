@@ -4,21 +4,20 @@ import BackButton from "@/components/BackButton.astro";
 import BackToTopButton from "@/components/BackToTopButton.astro";
 import CodeCopy from "@/components/CodeCopy.astro";
 import CodeFolding from "@/components/CodeFolding.astro";
-import Datetime from "@/components/Datetime.astro";
+import ContinueReading from "@/components/ContinueReading.astro";
 import FloatingTOC from "@/components/FloatingTOC.astro";
 import Footer from "@/components/Footer.astro";
 import Giscus from "@/components/Giscus.astro";
 import Header from "@/components/Header.astro";
-import Icon from "@/components/Icon.astro";
 import ImageZoom from "@/components/ImageZoom.astro";
 import LicenseInfo from "@/components/LicenseInfo.astro";
+import PostMeta from "@/components/PostMeta.astro";
+import PostNavigation from "@/components/PostNavigation.astro";
 import ShareLinks from "@/components/ShareLinks.astro";
 import Tag from "@/components/Tag.astro";
 import { SITE } from "@/config";
-import { UI } from "@/i18n/ui";
-import { resolveLocale, t, tp } from "@/i18n/utils";
+import { resolveLocale } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
-import { getPostUrl } from "@/utils/contentIdentity";
 import { buildPostDetailsModel } from "@/utils/postDetailsModel";
 import { slugifyStr } from "@/utils/slugify";
 
@@ -72,11 +71,7 @@ const {
       >
         {title}
       </h1>
-      <div class="type-meta mt-4 flex flex-wrap items-center gap-x-3 gap-y-2" data-print-hide>
-        <Datetime {pubDatetime} {modDatetime} {timezone} size="lg" />
-        <span aria-hidden="true">·</span>
-        <span>{tp(UI.post.wordsCount, locale, String(wordCount))}</span>
-      </div>
+      <PostMeta {locale} {pubDatetime} {modDatetime} {timezone} {wordCount} />
     </header>
     <article
       id="article"
@@ -94,23 +89,7 @@ const {
 
     <hr class="line-section my-8" />
 
-    <section class="grid gap-8 xl:grid-cols-2" data-pagefind-ignore data-print-hide>
-      {
-        continuePosts.length > 0 && (
-          <div>
-            <h2 class="pane-title">{t(UI.post.continueReading, locale)}</h2>
-            <ul class="line-frame mt-4 border-b">
-              {continuePosts.map(relatedPost => (
-                <li class="line-frame border-t py-3">
-                  <a class="tone-link-strong" href={getPostUrl(relatedPost, locale)}>{relatedPost.data.title}</a>
-                  <p class="type-meta mt-1">{relatedPost.data.description}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )
-      }
-    </section>
+    <ContinueReading {locale} posts={continuePosts} />
 
 
     <ul data-print-hide class="mt-4 mb-8 flex flex-wrap gap-4 sm:my-8">
@@ -125,41 +104,7 @@ const {
 
     <LicenseInfo {license} />
 
-    <!-- Previous/Next Post Buttons -->
-    <div data-pagefind-ignore data-print-hide class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-      {
-        prevPost && (
-          <a
-            href={prevPost.url}
-            class="group justify-self-start"
-          >
-            <div class="hover-title inline-flex items-center gap-1">
-              <Icon name="tabler:chevron-left" class="inline-block flex-none rtl:rotate-180" />
-              <div>
-                <span>{t(UI.post.prev, locale)}</span>
-                <div class="type-meta text-accent">{prevPost.title}</div>
-              </div>
-            </div>
-          </a>
-        )
-      }
-      {
-        nextPost && (
-          <a
-            href={nextPost.url}
-            class="group justify-self-end sm:col-start-2"
-          >
-            <div class="hover-title inline-flex items-center gap-1 text-end">
-              <div>
-                <span>{t(UI.post.next, locale)}</span>
-                <div class="type-meta text-accent">{nextPost.title}</div>
-              </div>
-              <Icon name="tabler:chevron-right" class="inline-block flex-none rtl:rotate-180" />
-            </div>
-          </a>
-        )
-      }
-    </div>
+    <PostNavigation {locale} {prevPost} {nextPost} />
 
     <Giscus />
   </main>

@@ -1,0 +1,22 @@
+---
+import type { Locale } from "@/i18n/config";
+import { UI } from "@/i18n/ui";
+import { tp } from "@/i18n/utils";
+import Datetime from "./Datetime.astro";
+
+type Props = {
+  locale: Locale;
+  modDatetime?: Date | null;
+  pubDatetime: Date;
+  timezone?: string;
+  wordCount: number;
+};
+
+const { locale, modDatetime, pubDatetime, timezone, wordCount } = Astro.props;
+---
+
+<div class="type-meta mt-4 flex flex-wrap items-center gap-x-3 gap-y-2" data-print-hide>
+  <Datetime {pubDatetime} {modDatetime} {timezone} size="lg" />
+  <span aria-hidden="true">·</span>
+  <span>{tp(UI.post.wordsCount, locale, String(wordCount))}</span>
+</div>

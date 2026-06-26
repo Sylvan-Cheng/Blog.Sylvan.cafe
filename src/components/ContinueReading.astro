@@ -1,0 +1,32 @@
+---
+import type { CollectionEntry } from "astro:content";
+import type { Locale } from "@/i18n/config";
+import { UI } from "@/i18n/ui";
+import { t } from "@/i18n/utils";
+import { getPostUrl } from "@/utils/contentIdentity";
+
+type Props = {
+  locale: Locale;
+  posts: CollectionEntry<"blog">[];
+};
+
+const { locale, posts } = Astro.props;
+---
+
+{
+  posts.length > 0 && (
+    <section class="grid gap-8 xl:grid-cols-2" data-pagefind-ignore data-print-hide>
+      <div>
+        <h2 class="pane-title">{t(UI.post.continueReading, locale)}</h2>
+        <ul class="line-frame mt-4 border-b">
+          {posts.map(post => (
+            <li class="line-frame border-t py-3">
+              <a class="tone-link-strong" href={getPostUrl(post, locale)}>{post.data.title}</a>
+              <p class="type-meta mt-1">{post.data.description}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}

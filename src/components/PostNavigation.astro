@@ -1,0 +1,48 @@
+---
+import type { Locale } from "@/i18n/config";
+import { UI } from "@/i18n/ui";
+import { t } from "@/i18n/utils";
+import Icon from "./Icon.astro";
+
+type PostLink = {
+  title: string;
+  url: string;
+};
+
+type Props = {
+  locale: Locale;
+  nextPost: PostLink | null;
+  prevPost: PostLink | null;
+};
+
+const { locale, nextPost, prevPost } = Astro.props;
+---
+
+<div data-pagefind-ignore data-print-hide class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+  {
+    prevPost && (
+      <a href={prevPost.url} class="group justify-self-start">
+        <div class="hover-title inline-flex items-center gap-1">
+          <Icon name="tabler:chevron-left" class="inline-block flex-none rtl:rotate-180" />
+          <div>
+            <span>{t(UI.post.prev, locale)}</span>
+            <div class="type-meta text-accent">{prevPost.title}</div>
+          </div>
+        </div>
+      </a>
+    )
+  }
+  {
+    nextPost && (
+      <a href={nextPost.url} class="group justify-self-end sm:col-start-2">
+        <div class="hover-title inline-flex items-center gap-1 text-end">
+          <div>
+            <span>{t(UI.post.next, locale)}</span>
+            <div class="type-meta text-accent">{nextPost.title}</div>
+          </div>
+          <Icon name="tabler:chevron-right" class="inline-block flex-none rtl:rotate-180" />
+        </div>
+      </a>
+    )
+  }
+</div>
