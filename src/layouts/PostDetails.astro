@@ -1,7 +1,5 @@
 ---
 import { type CollectionEntry, render } from "astro:content";
-import fs from "node:fs";
-import path from "node:path";
 import BackButton from "@/components/BackButton.astro";
 import BackToTopButton from "@/components/BackToTopButton.astro";
 import CodeCopy from "@/components/CodeCopy.astro";
@@ -20,12 +18,14 @@ import { SITE } from "@/config";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t, tp } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
+import { getPostUrl } from "@/utils/contentIdentity";
+import { KATEX_PRELOAD_FONTS, loadKatexCss } from "@/utils/katexAssets";
 import {
-  buildPostLayoutProps,
   buildPostNavigation,
   getLocalizedPostPath,
-  KATEX_PRELOAD_FONTS,
-} from "@/utils/postPageModel";
+} from "@/utils/postNavigation";
+import { buildPostReadingModel } from "@/utils/postReading";
+import { buildPostLayoutProps } from "@/utils/postSeo";
 import { slugifyStr } from "@/utils/slugify";
 import { countWords } from "@/utils/wordCount";
 
@@ -44,10 +44,9 @@ const { Content, headings } = await render(post);
 const layoutProps = buildPostLayoutProps(post, translationMap);
 
 const { prev: prevPost, next: nextPost } = buildPostNavigation(posts, post);
+const { continuePosts } = buildPostReadingModel(posts, post);
 
-const kaTeXInlineCSS = post.data.math
-  ? fs.readFileSync(path.resolve("public/assets/katex.min.css"), "utf-8")
-  : "";
+const kaTeXInlineCSS = loadKatexCss(post.data.math);
 ---
 
 <Layout {...layoutProps}>
@@ -67,20 +66,21 @@ const kaTeXInlineCSS = post.data.math
     data-pagefind-body
     data-backurl={`/${locale}/`}
   >
-    <h1
-      transition:name={`p-${slugifyStr(title)}`}
-      class="inline-block text-2xl font-bold text-accent sm:text-3xl"
-    >
-      {title}
-    </h1>
-    <div class="my-2 flex items-center gap-2" data-print-hide>
-      <Datetime {pubDatetime} {modDatetime} {timezone} size="lg" />
-      <span aria-hidden="true" class="max-sm:hidden select-none text-text-muted">&middot;</span>
-      <span class="text-sm text-text-muted max-sm:hidden">
-        {tp(UI.post.wordsCount, locale, String(countWords(post.body ?? "")))}
-      </span>
-
-    </div>
+    <div class="post-grid">
+      <div class="min-w-0">
+    <header class="pane-head">
+      <h1
+        transition:name={`p-${slugifyStr(title)}`}
+        class="type-post-title mt-5 max-w-4xl"
+      >
+        {title}
+      </h1>
+      <div class="type-meta mt-4 flex flex-wrap items-center gap-x-3 gap-y-2" data-print-hide>
+        <Datetime {pubDatetime} {modDatetime} {timezone} size="lg" />
+        <span aria-hidden="true">·</span>
+        <span>{tp(UI.post.wordsCount, locale, String(countWords(post.body ?? "")))}</span>
+      </div>
+    </header>
     <article
       id="article"
       class="app-prose mt-8 w-full"
@@ -88,9 +88,32 @@ const kaTeXInlineCSS = post.data.math
       <Content />
     </article>
 
-    <FloatingTOC {headings} />
+      </div>
 
-    <hr class="my-8 border-dashed" />
+      <aside class="post-side hidden xl:block" data-pagefind-ignore data-print-hide>
+        <FloatingTOC {headings} />
+      </aside>
+    </div>
+
+    <hr class="line-section my-8" />
+
+    <section class="grid gap-8 xl:grid-cols-2" data-pagefind-ignore data-print-hide>
+      {
+        continuePosts.length > 0 && (
+          <div>
+            <h2 class="pane-title">{t(UI.post.continueReading, locale)}</h2>
+            <ul class="line-frame mt-4 border-b">
+              {continuePosts.map(relatedPost => (
+                <li class="line-frame border-t py-3">
+                  <a class="tone-link-strong" href={getPostUrl(relatedPost, locale)}>{relatedPost.data.title}</a>
+                  <p class="type-meta mt-1">{relatedPost.data.description}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+    </section>
 
 
     <ul data-print-hide class="mt-4 mb-8 flex flex-wrap gap-4 sm:my-8">
@@ -101,7 +124,7 @@ const kaTeXInlineCSS = post.data.math
 
     <ShareLinks />
 
-    <hr class="my-6 border-dashed" />
+    <hr class="line-section my-6" />
 
     <LicenseInfo {license} />
 
@@ -113,11 +136,11 @@ const kaTeXInlineCSS = post.data.math
             href={getLocalizedPostPath(prevPost, locale)}
             class="group justify-self-start"
           >
-            <div class="inline-flex items-center gap-1 group-hover:text-accent/85 transition-colors duration-200">
+            <div class="hover-title inline-flex items-center gap-1">
               <Icon name="tabler:chevron-left" class="inline-block flex-none rtl:rotate-180" />
               <div>
                 <span>{t(UI.post.prev, locale)}</span>
-                <div class="text-sm text-accent/85">{prevPost.title}</div>
+                <div class="type-meta text-accent">{prevPost.title}</div>
               </div>
             </div>
           </a>
@@ -129,10 +152,10 @@ const kaTeXInlineCSS = post.data.math
             href={getLocalizedPostPath(nextPost, locale)}
             class="group justify-self-end sm:col-start-2"
           >
-            <div class="inline-flex items-center gap-1 text-end group-hover:text-accent/85 transition-colors duration-200">
+            <div class="hover-title inline-flex items-center gap-1 text-end">
               <div>
                 <span>{t(UI.post.next, locale)}</span>
-                <div class="text-sm text-accent/85">{nextPost.title}</div>
+                <div class="type-meta text-accent">{nextPost.title}</div>
               </div>
               <Icon name="tabler:chevron-right" class="inline-block flex-none rtl:rotate-180" />
             </div>
@@ -152,9 +175,6 @@ const kaTeXInlineCSS = post.data.math
 <script src="../scripts/progress.ts"></script>
 
 <style is:inline>
-  .progress-container {
-    z-index: 10;
-  }
   .progress-bar {
     transition: width 150ms linear;
   }
