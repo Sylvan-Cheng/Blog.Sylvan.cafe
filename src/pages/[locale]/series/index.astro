@@ -8,17 +8,15 @@ import { UI } from "@/i18n/ui";
 import { resolveLocale, t, tp } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import Main from "@/layouts/Main.astro";
-import { getPostsByLocale } from "@/utils/blogRepository";
 import { getPostUrl } from "@/utils/contentIdentity";
-import { buildSeriesGroups } from "@/utils/seriesModel";
+import { buildSeriesPageModel } from "@/utils/seriesPageModel";
 
 export function getStaticPaths() {
   return LOCALES.map((locale) => ({ params: { locale } }));
 }
 
 const locale = resolveLocale(Astro.currentLocale);
-const posts = await getPostsByLocale(locale);
-const seriesGroups = buildSeriesGroups(posts);
+const { seriesGroups } = await buildSeriesPageModel(locale);
 ---
 
 <Layout title={`${t(UI.series.title, locale)} | ${SITE.title}`} description={t(UI.series.desc, locale)}>
