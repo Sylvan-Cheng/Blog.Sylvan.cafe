@@ -1,10 +1,7 @@
 import { type CollectionEntry, render } from "astro:content";
 import type { Locale } from "@/i18n/config";
 import { KATEX_PRELOAD_FONTS, loadKatexCss } from "./katexAssets";
-import {
-  buildPostNavigation,
-  getLocalizedPostPath,
-} from "./postNavigation";
+import { buildPostNavigation, getLocalizedPostPath } from "./postNavigation";
 import { buildPostReadingModel } from "./postReading";
 import { buildPostLayoutProps } from "./postSeo";
 import { countWords } from "./wordCount";

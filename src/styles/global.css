@@ -193,6 +193,14 @@ html[lang="ja"] {
   @apply text-text-muted text-xs;
 }
 
+@utility type-index {
+  @apply font-mono text-accent text-sm;
+}
+
+@utility type-card-desc {
+  @apply max-w-2xl text-text-secondary leading-relaxed;
+}
+
 @utility tone-link {
   @apply text-accent decoration-dotted underline-offset-4 transition-colors duration-200 hover:underline;
 }
@@ -239,6 +247,10 @@ html[lang="ja"] {
 
 @utility shadow-popover {
   @apply shadow-lg;
+}
+
+@utility tooltip-popover {
+  @apply pointer-events-none fixed z-50 w-max max-w-[200px] whitespace-normal shape-control bg-foreground px-2 py-1 text-xs text-background opacity-0 shadow-popover transition-opacity duration-200 group-hover:opacity-100 group-hover:delay-400;
 }
 
 .site-header {

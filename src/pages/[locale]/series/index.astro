@@ -35,7 +35,7 @@ const seriesGroups = buildSeriesGroups(posts);
             <ol class="divide-y divide-soft">
               {series.posts.map((post, index) => (
                 <li class="grid gap-3 py-4 sm:grid-cols-[4rem_minmax(0,1fr)]">
-                  <span class="font-mono text-accent text-sm">{String(index + 1).padStart(2, "0")}</span>
+                  <span class="type-index">{String(index + 1).padStart(2, "0")}</span>
                   <div>
                     <a class="tone-link-strong text-lg" href={getPostUrl(post, locale)}>{post.data.title}</a>
                     <p class="type-meta mt-1">{post.data.description}</p>
