@@ -25,8 +25,8 @@ const sortedPosts = await getSortedPosts(locale);
 <Layout title={t(UI.home.greeting, locale)} description={t(UI.home.desc, locale)}>
   <Header />
   <main id="main-content" data-layout="index" data-backurl={`/${locale}/`} class="app-layout overflow-x-clip">
-    <section id="hero" class="pt-10 pb-8">
-      <h1 class="type-hero-title my-4 max-w-3xl sm:my-8">
+    <section id="hero" class="pt-10 pb-6">
+      <h1 class="type-hero-title mt-4 mb-5 max-w-3xl sm:mt-8 sm:mb-6">
         {t(UI.home.greeting, locale)}
       </h1>
       <p class="type-body-lead max-w-2xl">{t(UI.home.desc, locale)}</p>
@@ -43,18 +43,18 @@ const sortedPosts = await getSortedPosts(locale);
 
     {
       sortedPosts.length > 0 && (
-        <section id="recent-posts" class="pt-12 pb-6">
+        <section id="recent-posts" class="line-section border-t pt-6 pb-4">
           <h2 class="pane-title">{t(UI.home.recent, locale)}</h2>
-          <ul class="mt-6 divide-y divide-soft">
+          <ul class="mt-4 divide-y divide-soft">
             {sortedPosts.slice(0, SITE.postPerIndex).map(data => (
-              <Card variant="h3" {...data} locale={locale} />
+              <Card variant="h3" density="home" {...data} locale={locale} />
             ))}
           </ul>
         </section>
       )
     }
 
-    <div class="my-8 flex flex-wrap justify-center gap-4 text-center">
+    <div class="mt-6 mb-8 flex flex-wrap justify-start gap-4">
       <LinkButton href={`/${locale}/series/`}>
         {t(UI.home.seriesCta, locale)}
         <Icon name="tabler:arrow-right" class="inline-block rtl:-rotate-180" />
