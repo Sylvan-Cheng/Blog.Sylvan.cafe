@@ -39,6 +39,10 @@ function loadTsModule(filePath) {
   moduleCache.set(filePath, module);
 
   const localRequire = (request) => {
+    if (request === "@/content.config") {
+      return { BLOG_PATH: "src/data/blog" };
+    }
+
     const resolved = resolveModule(request, filePath);
     return resolved.endsWith(".ts") ? loadTsModule(resolved) : nodeRequire(resolved);
   };
@@ -55,6 +59,7 @@ function loadTsModule(filePath) {
 const { buildHeadingId } = loadTsModule(resolve(rootDir, "src/plugins/headingIds.ts"));
 const { buildImgProxyUrls } = loadTsModule(resolve(rootDir, "src/plugins/imgProxyUrls.ts"));
 const { injectMermaidStyle } = loadTsModule(resolve(rootDir, "src/plugins/mermaidMarkup.ts"));
+const { getPath } = loadTsModule(resolve(rootDir, "src/utils/getPath.ts"));
 const { parseCodeMeta } = loadTsModule(resolve(rootDir, "src/utils/transformers/codeMetaParser.ts"));
 
 const fullMeta = parseCodeMeta('file="demo.ts" collapse nolines');
@@ -70,6 +75,9 @@ assert.equal(emptyMeta.nolines, false);
 const usedIds = new Set();
 assert.equal(buildHeadingId("Hello World", usedIds, "fallback"), "hello-world");
 assert.equal(buildHeadingId("Hello World", usedIds, "fallback"), "hello-world-2");
+
+assert.equal(getPath("hello-world/zh", "src/data/blog/hello-world/zh.md"), "/posts/hello-world/");
+assert.equal(getPath("hello-world/zh", "src/data/blog/hello-world/zh.md", false), "hello-world");
 
 assert.equal(buildImgProxyUrls("https://example.com/image.png"), null);
 const imgProxyUrls = buildImgProxyUrls("https://s3.sylvan.cafe/a/b.png", 320, 180);

@@ -45,10 +45,11 @@ export function getPath(
     pathSegments.pop();
   }
 
-  const raw =
+  const parts =
     !pathSegments || pathSegments.length < 1
-      ? [basePath, ...slug].join("/")
-      : [basePath, ...pathSegments, ...slug].join("/");
+      ? [...slug]
+      : [...pathSegments, ...slug];
+  const raw = includeBase ? [basePath, ...parts].join("/") : parts.join("/");
 
   return includeBase ? `${raw}/` : raw;
 }
