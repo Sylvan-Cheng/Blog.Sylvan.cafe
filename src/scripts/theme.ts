@@ -121,7 +121,7 @@ window.matchMedia("(prefers-color-scheme: dark)").addEventListener(
     if (localStorage.getItem(THEME)) return; // respect explicit user choice
     themeValue = isDark ? DARK : LIGHT;
     window.theme?.setTheme(themeValue);
-    setPreference();
+    reflectPreference();
   },
   { signal },
 );
