@@ -7,6 +7,7 @@ math: true
 license: cc-by-nc-sa-4.0
 tags:
   - test
+series: astro-blog-rendering
 description: Полная проверка синтаксиса Markdown на русском языке, охватывающая все возможности рендеринга и многоязычную функциональность блога.
 ---
 

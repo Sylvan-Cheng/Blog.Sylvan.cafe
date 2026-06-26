@@ -6,6 +6,7 @@ description: Retrorigardo al la kresko kaj ŝanĝoj en teknologio kaj vivo dum 2
 tags:
   - test
   - life
+series: annual-review
 ---
 
 ## Teknologia Kresko

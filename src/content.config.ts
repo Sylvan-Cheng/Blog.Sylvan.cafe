@@ -22,6 +22,7 @@ const blog = defineCollection({
     author: z.string().default(SITE.author),
     modDatetime: z.coerce.date().optional(),
     tags: z.array(z.string()).default(["others"]),
+    series: z.string().optional(),
     math: z.boolean().optional().default(false),
     timezone: z.string().optional(),
     license: z.enum(["cc-by-nc-sa-4.0", "copyright"]).optional(),

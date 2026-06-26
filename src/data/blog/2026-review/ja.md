@@ -6,6 +6,7 @@ description: 2026 年の技術と生活の成長と変化を振り返り、新�
 tags:
   - test
   - life
+series: annual-review
 ---
 
 ## 技術の成長

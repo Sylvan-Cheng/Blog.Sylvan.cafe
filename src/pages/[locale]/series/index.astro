@@ -1,0 +1,54 @@
+---
+import Footer from "@/components/Footer.astro";
+import Header from "@/components/Header.astro";
+import { SITE } from "@/config";
+import { LOCALES } from "@/i18n/config";
+import { getSeriesLabel } from "@/i18n/seriesLabels";
+import { UI } from "@/i18n/ui";
+import { resolveLocale, t, tp } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+import Main from "@/layouts/Main.astro";
+import { getPostsByLocale } from "@/utils/blogRepository";
+import { getPostUrl } from "@/utils/contentIdentity";
+import { buildSeriesGroups } from "@/utils/seriesModel";
+
+export function getStaticPaths() {
+  return LOCALES.map((locale) => ({ params: { locale } }));
+}
+
+const locale = resolveLocale(Astro.currentLocale);
+const posts = await getPostsByLocale(locale);
+const seriesGroups = buildSeriesGroups(posts);
+---
+
+<Layout title={`${t(UI.series.title, locale)} | ${SITE.title}`} description={t(UI.series.desc, locale)}>
+  <Header />
+  <Main pageTitle={t(UI.series.title, locale)} pageDesc={t(UI.series.desc, locale)}>
+    <section class="space-y-12">
+      {seriesGroups.length > 0 ? (
+        seriesGroups.map(series => (
+          <article>
+            <header class="mb-4 pb-1">
+              <h2 class="pane-title">{getSeriesLabel(series.key, locale)}</h2>
+              <p class="pane-sub">{tp(UI.series.postCount, locale, String(series.count))} · {t(UI.series.updated, locale)} {series.updatedAt.toISOString().slice(0, 10)}</p>
+            </header>
+            <ol class="divide-y divide-soft">
+              {series.posts.map((post, index) => (
+                <li class="grid gap-3 py-4 sm:grid-cols-[4rem_minmax(0,1fr)]">
+                  <span class="font-mono text-accent text-sm">{String(index + 1).padStart(2, "0")}</span>
+                  <div>
+                    <a class="tone-link-strong text-lg" href={getPostUrl(post, locale)}>{post.data.title}</a>
+                    <p class="type-meta mt-1">{post.data.description}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </article>
+        ))
+      ) : (
+        <p class="text-text-muted">{t(UI.series.empty, locale)}</p>
+      )}
+    </section>
+  </Main>
+  <Footer />
+</Layout>

@@ -46,6 +46,13 @@ export const postSection = {
       },
       eo: (count: string) => `${count} vortoj`,
     } satisfies TemplateDict,
+    continueReading: {
+      zh: "继续阅读",
+      en: "Continue Reading",
+      ja: "続きを読む",
+      ru: "Продолжить чтение",
+      eo: "Daŭrigi legadon",
+    } satisfies Dict,
   },
 
   codeBlock: {
