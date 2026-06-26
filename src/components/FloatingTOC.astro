@@ -20,11 +20,10 @@ const tocHeadings = (headings ?? []).filter(
     <nav
       id="floating-toc"
       aria-label={t(UI.toc, locale)}
-      class="fixed top-24 hidden w-48 xl:block"
-      style="right: max(1rem, calc((100vw - 1152px) / 2));"
+      class="hidden xl:block"
     >
-      <div class="border-s-2 border-accent/30 ps-3">
-        <div class="mb-2 flex items-center gap-1.5 text-xs font-semibold text-text-secondary">
+      <div class="line-guide border-s ps-5">
+        <div class="type-section-label mb-3 flex items-center gap-1.5 uppercase">
           <Icon name="tabler:list-tree" class="inline-block size-3.5" />
           <span>{t(UI.toc, locale)}</span>
         </div>
@@ -53,7 +52,7 @@ const tocHeadings = (headings ?? []).filter(
                 <li>
                   <a
                     href={`#${h.slug}`}
-                    class={`block border-s-2 py-1 pe-2 transition duration-200 origin-left hover:text-accent hover:border-accent/40 hover:scale-[1.02] ${isH3 ? "ps-6" : "ps-3"} ${isFirst ? "text-accent font-semibold border-accent/60" : "text-text-muted border-transparent"}`}
+                    class={`hover-guide block border-s-2 py-1 pe-2 ${isH3 ? "ps-6" : "ps-3"} ${isFirst ? "text-accent font-semibold border-accent/60" : "text-text-muted border-transparent"}`}
                   >
                     <span class={`block truncate${isH3 ? " text-xs" : ""}`}>
                       {label}
@@ -74,7 +73,7 @@ const tocHeadings = (headings ?? []).filter(
     scrollbar-width: none;
     scroll-padding-top: 6rem;
     scroll-padding-bottom: 6rem;
-    overscroll-behavior: contain;
+    overscroll-behavior: auto;
   }
 
   #toc-list::-webkit-scrollbar {

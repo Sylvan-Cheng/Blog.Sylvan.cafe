@@ -106,7 +106,7 @@ function getLabel(icon: string): string {
 
 const LINK =
   "scale-90 p-2 hover:-translate-y-[0.05rem] transition-transform duration-200 sm:p-1 " +
-  "focus-visible:ring-2 focus-visible:ring-accent focus-visible:rounded";
+  "focus-ring";
 
 const ICON =
   "inline-block size-6 scale-125 stroke-current " +
@@ -181,7 +181,7 @@ const ICON =
       data-tip-expanded={t(UI.share.less, locale)}
       aria-label={t(UI.share.more, locale)}
       aria-expanded="false"
-      class="group inline-flex items-center gap-1 scale-90 p-2 sm:p-1 hover:text-accent border-0 bg-transparent cursor-pointer max-md:order-1 text-text-secondary hover:text-foreground transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-accent focus-visible:rounded"
+      class="focus-ring hover-quiet group inline-flex items-center gap-1 scale-90 border-0 bg-transparent p-2 text-text-secondary sm:p-1 cursor-pointer max-md:order-1"
     >
       <span class="share-toggle-collapsed"><Icon name="tabler:plus" class={ICON} /></span>
       <span class="share-toggle-expanded hidden"><Icon name="tabler:minus" class={ICON} /></span>

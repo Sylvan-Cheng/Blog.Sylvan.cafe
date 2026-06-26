@@ -51,7 +51,7 @@ const displayTag = translateTag(tag, "en", locale) ?? tagName;
     pageDesc={tp(UI.tags.descFiltered, locale, displayTag)}
   >
     <h1 slot="title" transition:name={`p-${tag}`}>{`${t(UI.tags.label, locale)}:${displayTag}`}</h1>
-    <ul>
+    <ul class="line-frame border-b">
       {page.data.map(data => <Card {...data} locale={locale} />)}
     </ul>
   </Main>

@@ -34,7 +34,7 @@ const { page } = Astro.props;
 <Layout title={`${t(UI.posts.title, locale)} | ${SITE.title}`}>
   <Header />
   <Main pageTitle={t(UI.posts.title, locale)} pageDesc={t(UI.posts.desc, locale)}>
-    <ul>
+    <ul class="line-frame border-b">
       {page.data.map(data => <Card {...data} locale={locale} />)}
     </ul>
   </Main>

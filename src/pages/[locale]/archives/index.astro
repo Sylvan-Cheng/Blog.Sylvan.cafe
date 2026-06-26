@@ -67,7 +67,7 @@ const posts = await getPostsByLocale(locale);
                     <span class="font-bold">{months[Number(month) - 1]}</span>
                     <sup class="text-xs">{monthGroup.length}</sup>
                   </div>
-                  <ul>
+                  <ul class="line-frame border-b">
                     {monthGroup
                       .sort(
                         (a, b) =>

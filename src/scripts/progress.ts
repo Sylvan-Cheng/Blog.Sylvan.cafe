@@ -5,7 +5,16 @@ const signal = initScript("__progressAC");
 const BAR_ID = "reading-progress-bar";
 const CONTAINER_CLASS = "progress-container";
 
-function createProgressBar() {
+function removeProgressBar() {
+  document.querySelector(`.${CONTAINER_CLASS}`)?.remove();
+}
+
+function syncProgressBar() {
+  if (!document.getElementById("article")) {
+    removeProgressBar();
+    return;
+  }
+
   const existing = document.querySelector(`.${CONTAINER_CLASS}`);
   if (existing) {
     const bar = existing.querySelector<HTMLElement>(".progress-bar");
@@ -16,7 +25,8 @@ function createProgressBar() {
     return;
   }
   const progressContainer = document.createElement("div");
-  progressContainer.className = `${CONTAINER_CLASS} fixed top-0 z-10 h-1 w-full bg-background`;
+  progressContainer.className = `${CONTAINER_CLASS} fixed z-20 h-1 w-full bg-background`;
+  progressContainer.style.top = "var(--header-h)";
   const progressBar = document.createElement("div");
   progressBar.className = "progress-bar h-1 w-0 bg-accent";
   progressBar.id = BAR_ID;
@@ -33,6 +43,11 @@ function createProgressBar() {
 }
 
 function updateScrollProgress() {
+  if (!document.getElementById("article")) {
+    removeProgressBar();
+    return;
+  }
+
   const bar = document.getElementById(BAR_ID);
   if (!bar) return;
   const winScroll = document.documentElement.scrollTop;
@@ -54,11 +69,9 @@ throttleRAF(updateScrollProgress, signal);
 document.addEventListener(
   "astro:after-swap",
   () => {
-    if (!document.getElementById("main-content")) return;
-    window.scrollTo({ left: 0, top: 0, behavior: "instant" as ScrollBehavior });
-    requestAnimationFrame(createProgressBar);
+    requestAnimationFrame(syncProgressBar);
   },
   { signal },
 );
 
-createProgressBar();
+syncProgressBar();

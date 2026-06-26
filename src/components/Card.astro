@@ -15,23 +15,37 @@ const { variant: Heading = "h2", data, locale } = Astro.props;
 const { title, description, ...props } = data;
 const post = Astro.props as CollectionEntry<"blog">;
 const href = getPostUrl(post, locale);
+const tags = data.tags.slice(0, 3);
 ---
 
-<li class="my-6">
-  <a
-    href={href}
-    class:list={[
-      "inline-block text-lg font-medium text-accent",
-      "decoration-dashed underline-offset-4 hover:underline",
-      "focus-visible:no-underline focus-visible:underline-offset-0",
-    ]}
-  >
-    <Heading
-      transition:name={`p-${slugifyStr(title)}`}
-    >
-      {title}
-    </Heading>
-  </a>
-  <Datetime {...props} />
-  <p>{description}</p>
+<li class="line-frame group border-t py-5 first:border-t-0">
+  <article class="grid gap-3 sm:grid-cols-[9.5rem_minmax(0,1fr)]">
+    <div class="text-text-muted">
+      <Datetime {...props} class="font-mono text-xs uppercase tracking-wide" />
+    </div>
+    <div>
+      <a
+        href={href}
+        class:list={[
+          "tone-link-strong inline-block",
+          "focus-visible:no-underline focus-visible:underline-offset-0",
+        ]}
+      >
+        <Heading
+          class="type-card-title hover-title"
+          transition:name={`p-${slugifyStr(title)}`}
+        >
+          {title}
+        </Heading>
+      </a>
+      <p class="mt-2 max-w-2xl text-text-secondary leading-relaxed">{description}</p>
+      {
+        tags.length > 0 && (
+          <p class="type-micro mt-3 flex flex-wrap gap-x-3 gap-y-1">
+            {tags.map(tag => <span>#{tag}</span>)}
+          </p>
+        )
+      }
+    </div>
+  </article>
 </li>

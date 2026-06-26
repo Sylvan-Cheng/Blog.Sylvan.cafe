@@ -24,7 +24,7 @@
     }
 
     a {
-      @apply wrap-break-word text-foreground decoration-dashed underline-offset-4 hover:text-accent focus-visible:no-underline transition-colors duration-200;
+      @apply hover-accent wrap-break-word text-foreground decoration-dashed underline-offset-4 focus-visible:no-underline;
     }
 
     ul {
@@ -49,6 +49,10 @@
 
     table {
       @apply w-full border-separate border-spacing-0 border border-border/50 rounded-lg text-left;
+
+      display: block;
+      max-width: 100%;
+      overflow-x: auto;
 
       thead {
         th {

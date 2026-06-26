@@ -1,4 +1,6 @@
-(() => {
+import { initInteraction, onSwap } from "./lifecycle";
+
+{
   type TocState = {
     observer?: IntersectionObserver;
     scrollHandler?: (() => void) | null;
@@ -9,10 +11,12 @@
     _scrollTocTimer?: number;
   };
 
+  const { signal: scriptSignal, onCleanup } = initInteraction("__tocAC");
+
   window.__toc ??= {};
   const toc = window.__toc as TocState;
 
-  function cleanupTocState(t: TocState): AbortSignal {
+  function disposeTocState(t: TocState): void {
     t.observer?.disconnect();
     if (t.scrollHandler) {
       document.removeEventListener("scroll", t.scrollHandler);
@@ -31,9 +35,15 @@
       t._scrollTocTimer = undefined;
     }
     t._tocAbort?.abort();
+  }
+
+  function cleanupTocState(t: TocState): AbortSignal {
+    disposeTocState(t);
     t._tocAbort = new AbortController();
     return t._tocAbort.signal;
   }
+
+  onCleanup(() => disposeTocState(toc));
 
   function setupTocClickScroll(
     list: HTMLElement,
@@ -354,9 +364,5 @@
     });
   };
 
-  document.addEventListener("astro:page-load", () =>
-    requestAnimationFrame(toc.buildTOC),
-  );
-})();
-
-export {};
+  onSwap(() => requestAnimationFrame(toc.buildTOC), scriptSignal);
+}

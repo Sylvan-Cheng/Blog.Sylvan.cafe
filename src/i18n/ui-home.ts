@@ -4,14 +4,14 @@ export const homeSection = {
   /** Home page */
   home: {
     greeting: {
-      zh: "你好，欢迎来访 👋",
+      zh: "Sylvan 的札记",
       en: "Hello, welcome! 👋",
       ja: "こんにちは、ようこそ！👋",
       ru: "Привет, добро пожаловать! 👋",
       eo: "Saluton, bonvenon! 👋",
     } satisfies Dict,
     desc: {
-      zh: "这是 Sylvan 的个人博客。这里记录关于技术、代码和生活的思考。",
+      zh: "记录一些关于技术、代码和生活的思考。",
       en: "Sylvan's personal blog. Thoughts on technology, code, and life.",
       ja: "Sylvan の個人ブログです。技術、コード、そして生活についての考えを綴っています。",
       ru: "Личный блог Sylvan. Мысли о технологиях, коде и жизни.",
@@ -30,6 +30,13 @@ export const homeSection = {
       ja: "全ての記事",
       ru: "Все записи",
       eo: "Ĉiuj afiŝoj",
+    } satisfies Dict,
+    seriesCta: {
+      zh: "查看系列",
+      en: "Browse Series",
+      ja: "シリーズを見る",
+      ru: "Смотреть серии",
+      eo: "Foliumi seriojn",
     } satisfies Dict,
     socialLinks: {
       zh: "社交链接：",

@@ -11,6 +11,17 @@ const currentUrlPath = Astro.url.pathname.replace(/\/+$/, "");
 // eg: /zh/tags/tailwindcss => ['zh', 'tags', 'tailwindcss']
 const breadcrumbList = currentUrlPath.split("/").slice(2);
 
+const routeLabels: Record<string, string> = {
+  posts: t(UI.nav.posts, locale),
+  tags: t(UI.nav.tags, locale),
+  archives: t(UI.nav.archives, locale),
+  about: t(UI.nav.about, locale),
+  series: t(UI.nav.series, locale),
+};
+
+const labelFor = (segment: string) =>
+  routeLabels[segment] ?? decodeURIComponent(segment);
+
 // if breadcrumb is Home > Posts > 1 <etc>
 if (breadcrumbList[0] === "posts") {
   const pageLabel = t(UI.posts.title, locale);
@@ -29,10 +40,10 @@ if (breadcrumbList[0] === "tags" && !Number.isNaN(Number(breadcrumbList[2]))) {
 
 <nav class="app-layout mt-8 mb-1" aria-label="breadcrumb">
   <ul
-    class="font-light [&>li]:inline [&>li:not(:last-child)>a]:hover:text-foreground"
+    class="font-light [&>li]:inline"
   >
     <li>
-      <a href={`/${locale}/`} class="text-text-secondary transition-colors duration-200">{t(UI.breadcrumb.home, locale)}</a>
+      <a href={`/${locale}/`} class="hover-quiet text-text-secondary">{t(UI.breadcrumb.home, locale)}</a>
       <span aria-hidden="true" class="text-text-secondary">&raquo;</span>
     </li>
     {
@@ -43,13 +54,13 @@ if (breadcrumbList[0] === "tags" && !Number.isNaN(Number(breadcrumbList[2]))) {
               class:list={["capitalize text-text-muted", { lowercase: index > 0 }]}
               aria-current="page"
             >
-              {decodeURIComponent(breadcrumb)}
+              {labelFor(breadcrumb)}
             </span>
           </li>
         ) : (
           <li>
-            <a href={`/${locale}/${breadcrumb}/`} class="capitalize text-text-secondary transition-colors duration-200">
-              {breadcrumb}
+            <a href={`/${locale}/${breadcrumb}/`} class="hover-quiet text-text-secondary capitalize">
+              {labelFor(breadcrumb)}
             </a>
             <span aria-hidden="true">&raquo;</span>
           </li>

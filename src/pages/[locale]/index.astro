@@ -25,25 +25,11 @@ const sortedPosts = await getSortedPosts(locale);
 <Layout title={t(UI.home.greeting, locale)} description={t(UI.home.desc, locale)}>
   <Header />
   <main id="main-content" data-layout="index" data-backurl={`/${locale}/`} class="app-layout overflow-x-clip">
-    <section id="hero" class:list={["pt-8 pb-6", "border-b border-border"]}>
-      <h1 class="my-4 inline-block text-4xl font-bold sm:my-8 sm:text-5xl">
+    <section id="hero" class="pt-10 pb-8">
+      <h1 class="type-hero-title my-4 max-w-3xl sm:my-8">
         {t(UI.home.greeting, locale)}
       </h1>
-      <LinkButton
-        href={`/${locale}/rss.xml`}
-        class="flex p-3 sm:p-1"
-        title="RSS Feed"
-        aria-label="rss feed"
-        target="_blank"
-      >
-        <Icon name="tabler:rss" />
-        <span class="sr-only">RSS Feed</span>
-      </LinkButton>
-
-      <p>{t(UI.home.desc, locale)}</p>
-      <p class="mt-2">
-        {t(UI.rss.subscribe, locale)}
-      </p>
+      <p class="type-body-lead max-w-2xl">{t(UI.home.desc, locale)}</p>
       {
         // only display if at least one social link is enabled
         SOCIALS.length > 0 && (
@@ -58,8 +44,8 @@ const sortedPosts = await getSortedPosts(locale);
     {
       sortedPosts.length > 0 && (
         <section id="recent-posts" class="pt-12 pb-6">
-          <h2 class="text-2xl font-semibold tracking-wide">{t(UI.home.recent, locale)}</h2>
-          <ul>
+          <h2 class="pane-title">{t(UI.home.recent, locale)}</h2>
+          <ul class="mt-6 divide-y divide-soft">
             {sortedPosts.slice(0, SITE.postPerIndex).map(data => (
               <Card variant="h3" {...data} locale={locale} />
             ))}
@@ -68,7 +54,11 @@ const sortedPosts = await getSortedPosts(locale);
       )
     }
 
-    <div class="my-8 text-center">
+    <div class="my-8 flex flex-wrap justify-center gap-4 text-center">
+      <LinkButton href={`/${locale}/series/`}>
+        {t(UI.home.seriesCta, locale)}
+        <Icon name="tabler:arrow-right" class="inline-block rtl:-rotate-180" />
+      </LinkButton>
       <LinkButton href={`/${locale}/posts/`}>
         {t(UI.home.allPosts, locale)}
         <Icon name="tabler:arrow-right" class="inline-block rtl:-rotate-180" />
