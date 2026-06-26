@@ -1,24 +1,6 @@
 import { renderMermaidSVG } from "beautiful-mermaid";
 import type { Root, RootContent } from "mdast";
-import { wrapMermaidSvg } from "./mermaidMarkup";
-
-const STYLE_INJECTION = `<style>
-  svg {
-    --_text:         var(--mermaid-fg);
-    --_text-sec:     var(--mermaid-fg);
-    --_text-muted:   var(--mermaid-fg);
-    --_text-faint:   var(--mermaid-fg);
-    --_line:         var(--mermaid-line);
-    --_arrow:        var(--mermaid-line);
-    --_node-fill:    var(--mermaid-node-fill);
-    --_node-stroke:  var(--mermaid-node-stroke);
-    --_group-fill:   var(--mermaid-group-fill);
-    --_group-hdr:    var(--mermaid-group-hdr);
-    --_inner-stroke: var(--mermaid-inner-stroke);
-    --_key-badge:    var(--mermaid-inner-stroke);
-  }
-  text { font-family: var(--font-body), system-ui, sans-serif; }
-</style>`;
+import { injectMermaidStyle, wrapMermaidSvg } from "./mermaidMarkup";
 
 export function remarkMermaid() {
   return (tree: Root) => {
@@ -42,7 +24,7 @@ function walk(node: Root | RootContent): void {
           transparent: true,
         });
 
-        svg = svg.replace(/<style\b[^>]*>[\s\S]*?<\/style>/, STYLE_INJECTION);
+        svg = injectMermaidStyle(svg);
 
         node.children.splice(i, 1, {
           type: "html",

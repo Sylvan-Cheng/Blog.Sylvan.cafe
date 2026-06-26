@@ -1,4 +1,5 @@
 import type { Element } from "hast";
+import { parseCodeMeta } from "./codeMetaParser";
 
 interface TransformerCtx {
   options: { meta?: { __raw?: string } };
@@ -23,31 +24,19 @@ export const transformerCodeMeta = ({
   hideDot = false,
 }: CodeMetaOptions = {}) => ({
   pre(node: Element) {
-    const raw = (this as unknown as TransformerCtx).options.meta?.__raw?.split(
-      " ",
+    const meta = parseCodeMeta(
+      (this as unknown as TransformerCtx).options.meta?.__raw,
     );
-    if (!raw) return;
 
-    const metaMap = new Map<string, string>();
-
-    for (const item of raw) {
-      const eqIdx = item.indexOf("=");
-      const key = eqIdx === -1 ? item : item.slice(0, eqIdx);
-      const value =
-        eqIdx === -1 ? undefined : item.slice(eqIdx + 1).replace(/["'`]/g, "");
-      if (!key) continue;
-      metaMap.set(key, value !== undefined ? value : "true");
-    }
-
-    if (metaMap.get("collapse") === "true") {
+    if (meta.collapse) {
       node.properties["data-collapse"] = "true";
     }
 
-    if (metaMap.get("nolines") === "true") {
+    if (meta.nolines) {
       node.properties["data-nolines"] = "true";
     }
 
-    const file = metaMap.get("file");
+    const file = meta.file;
 
     if (!file) return;
 
