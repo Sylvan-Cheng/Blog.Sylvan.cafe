@@ -1,5 +1,5 @@
 ---
-import { type CollectionEntry, render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
 import BackButton from "@/components/BackButton.astro";
 import BackToTopButton from "@/components/BackToTopButton.astro";
 import CodeCopy from "@/components/CodeCopy.astro";
@@ -19,15 +19,8 @@ import { UI } from "@/i18n/ui";
 import { resolveLocale, t, tp } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import { getPostUrl } from "@/utils/contentIdentity";
-import { KATEX_PRELOAD_FONTS, loadKatexCss } from "@/utils/katexAssets";
-import {
-  buildPostNavigation,
-  getLocalizedPostPath,
-} from "@/utils/postNavigation";
-import { buildPostReadingModel } from "@/utils/postReading";
-import { buildPostLayoutProps } from "@/utils/postSeo";
+import { buildPostDetailsModel } from "@/utils/postDetailsModel";
 import { slugifyStr } from "@/utils/slugify";
-import { countWords } from "@/utils/wordCount";
 
 type Props = {
   post: CollectionEntry<"blog">;
@@ -40,20 +33,24 @@ const locale = resolveLocale(Astro.currentLocale);
 
 const { title, pubDatetime, modDatetime, timezone, tags, license } = post.data;
 
-const { Content, headings } = await render(post);
-const layoutProps = buildPostLayoutProps(post, translationMap);
-
-const { prev: prevPost, next: nextPost } = buildPostNavigation(posts, post);
-const { continuePosts } = buildPostReadingModel(posts, post);
-
-const kaTeXInlineCSS = loadKatexCss(post.data.math);
+const {
+  Content,
+  continuePosts,
+  headings,
+  kaTeXInlineCSS,
+  katexPreloadFonts,
+  layoutProps,
+  nextPost,
+  prevPost,
+  wordCount,
+} = await buildPostDetailsModel({ post, posts, translationMap, locale });
 ---
 
 <Layout {...layoutProps}>
   {post.data.math && <style slot="head" set:html={kaTeXInlineCSS} />}
   {post.data.math && (
     <>
-      {KATEX_PRELOAD_FONTS.map(font => (
+      {katexPreloadFonts.map(font => (
         <link slot="head" rel="preload" href={`/assets/fonts/katex/${font}`} as="font" type="font/woff2" crossorigin />
       ))}
     </>
@@ -78,7 +75,7 @@ const kaTeXInlineCSS = loadKatexCss(post.data.math);
       <div class="type-meta mt-4 flex flex-wrap items-center gap-x-3 gap-y-2" data-print-hide>
         <Datetime {pubDatetime} {modDatetime} {timezone} size="lg" />
         <span aria-hidden="true">·</span>
-        <span>{tp(UI.post.wordsCount, locale, String(countWords(post.body ?? "")))}</span>
+        <span>{tp(UI.post.wordsCount, locale, String(wordCount))}</span>
       </div>
     </header>
     <article
@@ -133,7 +130,7 @@ const kaTeXInlineCSS = loadKatexCss(post.data.math);
       {
         prevPost && (
           <a
-            href={getLocalizedPostPath(prevPost, locale)}
+            href={prevPost.url}
             class="group justify-self-start"
           >
             <div class="hover-title inline-flex items-center gap-1">
@@ -149,7 +146,7 @@ const kaTeXInlineCSS = loadKatexCss(post.data.math);
       {
         nextPost && (
           <a
-            href={getLocalizedPostPath(nextPost, locale)}
+            href={nextPost.url}
             class="group justify-self-end sm:col-start-2"
           >
             <div class="hover-title inline-flex items-center gap-1 text-end">
