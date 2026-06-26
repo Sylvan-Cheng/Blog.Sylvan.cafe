@@ -7,6 +7,12 @@ interface Window {
     setTheme: (val: string) => void;
   };
   __shareAC?: AbortController;
+  __themeAC?: AbortController;
+  __backBtnAC?: AbortController;
+  __codeCopyAC?: AbortController;
+  __codeFoldingAC?: AbortController;
+  __imgZoomAC?: AbortController;
+  __tocAC?: AbortController;
   __progressAC?: AbortController;
   __bttAC?: AbortController;
   __langAC?: AbortController;

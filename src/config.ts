@@ -4,6 +4,10 @@ export const THEME_DEFS = {
       light: "gruvbox-light-hard" as const,
       dark: "gruvbox-dark-hard" as const,
     },
+    themeColor: {
+      light: "#fbf1c7",
+      dark: "#282828",
+    },
     giscus: {
       light: "gruvbox_light" as const,
       dark: "gruvbox_dark" as const,
@@ -14,15 +18,51 @@ export const THEME_DEFS = {
       light: "github-light" as const,
       dark: "nord" as const,
     },
+    themeColor: {
+      light: "#eceff4",
+      dark: "#2e3440",
+    },
     giscus: {
       light: "nord" as const,
       dark: "nord" as const,
+    },
+  },
+  dracula: {
+    shiki: {
+      light: "github-light" as const,
+      dark: "dracula" as const,
+    },
+    themeColor: {
+      light: "#f8f8f2",
+      dark: "#282a36",
+    },
+    giscus: {
+      light: "light" as const,
+      dark: "dark_dimmed" as const,
+    },
+  },
+  atom: {
+    shiki: {
+      light: "github-light" as const,
+      dark: "one-dark-pro" as const,
+    },
+    themeColor: {
+      light: "#fafafa",
+      dark: "#282c34",
+    },
+    giscus: {
+      light: "light" as const,
+      dark: "dark_dimmed" as const,
     },
   },
   default: {
     shiki: {
       light: "github-light" as const,
       dark: "github-dark" as const,
+    },
+    themeColor: {
+      light: "#fdfdfd",
+      dark: "#212737",
     },
     giscus: {
       light: "light" as const,

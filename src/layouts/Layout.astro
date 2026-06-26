@@ -1,7 +1,7 @@
 ---
 import { PUBLIC_GOOGLE_SITE_VERIFICATION } from "astro:env/client";
 import { ClientRouter } from "astro:transitions";
-import { SITE } from "@/config";
+import { SITE, THEME_DEFS } from "@/config";
 import { LOCALE_META, LOCALES } from "@/i18n/config";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
@@ -75,6 +75,8 @@ const structuredData = buildStructuredData({
   pubDatetime,
   modDatetime,
 });
+
+const themeColors = THEME_DEFS[SITE.themeScheme].themeColor;
 ---
 
 <!--
@@ -213,7 +215,7 @@ const structuredData = buildStructuredData({
     <script is:inline type="text/partytown" src={`${SITE.analytics.umami.url}/script.js`} data-website-id={SITE.analytics.umami.websiteId}></script>
 
     <!-- Minimal inline script to prevent FOUC - sets theme immediately -->
-    <script is:inline>
+    <script is:inline define:vars={{ themeColors }}>
       (function () {
         const initialColorScheme = ""; // "light" | "dark"
         const currentTheme = localStorage.getItem("theme");
@@ -230,10 +232,9 @@ const structuredData = buildStructuredData({
 
         // Set theme immediately to prevent flash
         document.firstElementChild?.setAttribute("data-theme", themeValue);
+        localStorage.removeItem("theme-scheme");
 
         // 同步设置浏览器地址栏颜色，避免 Android Chrome 暗色模式闪白
-        // 注意：色值与 theme.css 中 Gruvbox 的 --background 耦合
-        const themeColors = { light: "#fbf1c7", dark: "#282828" };
         document.querySelector("meta[name='theme-color']")
           ?.setAttribute("content", themeColors[themeValue] || "");
 

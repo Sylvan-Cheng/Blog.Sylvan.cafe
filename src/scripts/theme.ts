@@ -1,3 +1,7 @@
+import { initScript, onSwap } from "./lifecycle";
+
+const signal = initScript("__themeAC");
+
 // Constants
 const THEME = "theme";
 const LIGHT = "light";
@@ -51,6 +55,15 @@ function reflectPreference(): void {
     ?.setAttribute("content", getBgColor());
 }
 
+function handleThemeClick(event: MouseEvent): void {
+  const target = event.target as HTMLElement;
+  if (target.closest("#theme-btn")) {
+    themeValue = themeValue === LIGHT ? DARK : LIGHT;
+    window.theme?.setTheme(themeValue);
+    setPreference();
+  }
+}
+
 // Update the global theme API
 if (window.theme) {
   window.theme.setPreference = setPreference;
@@ -73,42 +86,42 @@ reflectPreference();
 function setThemeFeature(): void {
   // set on load so screen readers can get the latest value on the button
   reflectPreference();
-
-  // 视图过渡后 DOM 被替换，重新绑定到新的 #theme-btn 元素
-  document.querySelector("#theme-btn")?.addEventListener("click", () => {
-    themeValue = themeValue === LIGHT ? DARK : LIGHT;
-    window.theme?.setTheme(themeValue);
-    setPreference();
-  });
 }
 
 // Set up theme features after page load
+document.addEventListener("click", handleThemeClick, { signal });
 setThemeFeature();
 
 // Runs on view transitions navigation
-document.addEventListener("astro:after-swap", setThemeFeature);
+onSwap(setThemeFeature, signal);
 
 // Set theme-color value before page transition
 // to avoid navigation bar color flickering in Android dark mode
-document.addEventListener("astro:before-swap", (event) => {
-  const astroEvent = event;
-  const bgColor = document
-    .querySelector("meta[name='theme-color']")
-    ?.getAttribute("content");
-
-  if (bgColor) {
-    astroEvent.newDocument
+document.addEventListener(
+  "astro:before-swap",
+  (event) => {
+    const astroEvent = event;
+    const bgColor = document
       .querySelector("meta[name='theme-color']")
-      ?.setAttribute("content", bgColor);
-  }
-});
+      ?.getAttribute("content");
+
+    if (bgColor) {
+      astroEvent.newDocument
+        .querySelector("meta[name='theme-color']")
+        ?.setAttribute("content", bgColor);
+    }
+  },
+  { signal },
+);
 
 // sync with system changes (only when user has no explicit preference saved)
-window
-  .matchMedia("(prefers-color-scheme: dark)")
-  .addEventListener("change", ({ matches: isDark }) => {
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener(
+  "change",
+  ({ matches: isDark }) => {
     if (localStorage.getItem(THEME)) return; // respect explicit user choice
     themeValue = isDark ? DARK : LIGHT;
     window.theme?.setTheme(themeValue);
     setPreference();
-  });
+  },
+  { signal },
+);
