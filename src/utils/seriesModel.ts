@@ -1,5 +1,10 @@
 import type { CollectionEntry } from "astro:content";
 import { getPostTranslationKey } from "./contentIdentity";
+import {
+  comparePostsByDateDesc,
+  comparePostsByPubDateAsc,
+  getPostDate,
+} from "./postDates";
 import { slugifyStr } from "./slugify";
 
 type BlogPost = CollectionEntry<"blog">;
@@ -12,14 +17,8 @@ export type SeriesGroup = {
   updatedAt: Date;
 };
 
-function updatedAt(post: BlogPost): Date {
-  return post.data.modDatetime ?? post.data.pubDatetime;
-}
-
 export function sortByUpdated(posts: BlogPost[]): BlogPost[] {
-  return [...posts].sort(
-    (a, b) => updatedAt(b).getTime() - updatedAt(a).getTime(),
-  );
+  return [...posts].sort(comparePostsByDateDesc);
 }
 
 export function buildSeriesGroups(posts: BlogPost[]): SeriesGroup[] {
@@ -34,15 +33,13 @@ export function buildSeriesGroups(posts: BlogPost[]): SeriesGroup[] {
 
   return [...groups.entries()]
     .map(([key, groupPosts]) => {
-      const sortedPosts = [...groupPosts].sort(
-        (a, b) => a.data.pubDatetime.getTime() - b.data.pubDatetime.getTime(),
-      );
+      const sortedPosts = [...groupPosts].sort(comparePostsByPubDateAsc);
       return {
         key,
         sourceLabel: sortedPosts[0].data.series ?? key,
         posts: sortedPosts,
         count: sortedPosts.length,
-        updatedAt: updatedAt(sortByUpdated(sortedPosts)[0]),
+        updatedAt: getPostDate(sortByUpdated(sortedPosts)[0]),
       };
     })
     .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
@@ -67,6 +64,6 @@ export function getSameSeriesPosts(
   return posts
     .filter((post) => post.data.series === series)
     .filter((post) => getPostTranslationKey(post) !== translationKey)
-    .sort((a, b) => a.data.pubDatetime.getTime() - b.data.pubDatetime.getTime())
+    .sort(comparePostsByPubDateAsc)
     .slice(0, limit);
 }
