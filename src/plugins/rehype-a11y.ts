@@ -1,7 +1,7 @@
 import type { Element, Root } from "hast";
 import { visit } from "unist-util-visit";
 import { getTextContent, toClassList } from "./hastUtils";
-import { buildHeadingId } from "./markdownTransforms";
+import { buildHeadingId } from "./headingIds";
 
 export function rehypeA11y() {
   return (tree: Root) => {

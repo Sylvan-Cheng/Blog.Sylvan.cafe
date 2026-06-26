@@ -1,6 +1,6 @@
 import { renderMermaidSVG } from "beautiful-mermaid";
 import type { Root, RootContent } from "mdast";
-import { wrapMermaidSvg } from "./markdownTransforms";
+import { wrapMermaidSvg } from "./mermaidMarkup";
 
 const STYLE_INJECTION = `<style>
   svg {

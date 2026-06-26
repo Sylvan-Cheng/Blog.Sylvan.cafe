@@ -13,7 +13,7 @@
 import type { Element, Root } from "hast";
 import { visit } from "unist-util-visit";
 import { toClassList } from "./hastUtils";
-import { buildImgProxyUrls } from "./markdownTransforms";
+import { buildImgProxyUrls } from "./imgProxyUrls";
 
 export function rehypeImgProxy() {
   return (tree: Root) => {
