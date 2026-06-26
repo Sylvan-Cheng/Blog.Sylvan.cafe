@@ -8,7 +8,7 @@ import Main from "@/layouts/Main.astro";
 const { Content, notFoundText, pageDesc, pageTitle } = Astro.props;
 ---
 
-<Layout title={`${pageTitle} | ${SITE.title}`}>
+<Layout title={`${pageTitle} | ${SITE.title}`} description={pageDesc}>
   <Header />
   <Main {pageTitle} {pageDesc}>
     {
