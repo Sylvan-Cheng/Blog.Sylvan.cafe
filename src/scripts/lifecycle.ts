@@ -50,3 +50,17 @@ export function throttleRAF(fn: () => void, signal: AbortSignal): void {
   handler();
   window.addEventListener("scroll", handler, { passive: true, signal });
 }
+
+export function setCleanupTimeout(
+  fn: () => void,
+  delay: number,
+  signal: AbortSignal,
+): number {
+  const timeoutId = window.setTimeout(() => {
+    if (!signal.aborted) fn();
+  }, delay);
+  signal.addEventListener("abort", () => clearTimeout(timeoutId), {
+    once: true,
+  });
+  return timeoutId;
+}

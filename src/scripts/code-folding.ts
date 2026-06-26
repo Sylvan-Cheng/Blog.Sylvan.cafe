@@ -1,4 +1,4 @@
-import { initScript, onSwap } from "./lifecycle";
+import { initScript, onSwap, setCleanupTimeout } from "./lifecycle";
 
 const signal = initScript("__codeFoldingAC");
 
@@ -144,11 +144,18 @@ function initCodeFolding() {
             Number.parseFloat(
               getComputedStyle(code).getPropertyValue("--cf-duration"),
             ) || 400;
-          const safetyTimer = window.setTimeout(() => {
-            if (!animating) return;
-            resetCollapsedStyles(code, pre.classList.contains("cf-collapsed"));
-            animating = false;
-          }, computedDuration + 300);
+          const safetyTimer = setCleanupTimeout(
+            () => {
+              if (!animating) return;
+              resetCollapsedStyles(
+                code,
+                pre.classList.contains("cf-collapsed"),
+              );
+              animating = false;
+            },
+            computedDuration + 300,
+            signal,
+          );
 
           code.addEventListener(
             "transitionend",

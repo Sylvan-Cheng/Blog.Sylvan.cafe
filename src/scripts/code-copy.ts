@@ -1,4 +1,4 @@
-import { initScript, onSwap } from "./lifecycle";
+import { initScript, onSwap, setCleanupTimeout } from "./lifecycle";
 
 const signal = initScript("__codeCopyAC");
 
@@ -27,9 +27,13 @@ async function copyCode(block: HTMLElement, button: HTMLButtonElement) {
   }
 
   button.innerText = copied;
-  window.setTimeout(() => {
-    if (!signal.aborted) button.innerText = copy;
-  }, 700);
+  setCleanupTimeout(
+    () => {
+      button.innerText = copy;
+    },
+    700,
+    signal,
+  );
 }
 
 function attachCopyButtons() {
