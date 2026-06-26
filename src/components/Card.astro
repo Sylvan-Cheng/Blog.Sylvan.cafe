@@ -7,19 +7,33 @@ import Datetime from "./Datetime.astro";
 
 type Props = {
   variant?: "h2" | "h3";
+  density?: "default" | "home";
   locale?: Locale;
 } & CollectionEntry<"blog">;
 
-const { variant: Heading = "h2", data, locale } = Astro.props;
+const { variant: Heading = "h2", density = "default", data, locale } = Astro.props;
 
 const { title, description, ...props } = data;
 const post = Astro.props as CollectionEntry<"blog">;
 const href = getPostUrl(post, locale);
-const tags = data.tags.slice(0, 3);
+const isHomeDensity = density === "home";
+const tags = data.tags.slice(0, isHomeDensity ? 2 : 3);
 ---
 
-<li class="line-frame group border-t py-5 first:border-t-0">
-  <article class="grid gap-3 sm:grid-cols-[9.5rem_minmax(0,1fr)]">
+<li
+  class:list={[
+    "line-frame group border-t first:border-t-0",
+    isHomeDensity ? "py-4" : "py-5",
+  ]}
+>
+  <article
+    class:list={[
+      "grid gap-3",
+      isHomeDensity
+        ? "sm:grid-cols-[8.75rem_minmax(0,1fr)]"
+        : "sm:grid-cols-[9.5rem_minmax(0,1fr)]",
+    ]}
+  >
     <div class="text-text-muted">
       <Datetime {...props} class="font-mono text-xs uppercase tracking-wide" />
     </div>
@@ -38,10 +52,17 @@ const tags = data.tags.slice(0, 3);
           {title}
         </Heading>
       </a>
-      <p class="type-card-desc mt-2">{description}</p>
+      <p class:list={["type-card-desc", isHomeDensity ? "mt-1.5" : "mt-2"]}>
+        {description}
+      </p>
       {
         tags.length > 0 && (
-          <p class="type-micro mt-3 flex flex-wrap gap-x-3 gap-y-1">
+          <p
+            class:list={[
+              "type-micro flex flex-wrap gap-x-3 gap-y-1",
+              isHomeDensity ? "mt-2.5" : "mt-3",
+            ]}
+          >
             {tags.map(tag => <span>#{tag}</span>)}
           </p>
         )
