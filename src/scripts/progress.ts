@@ -1,4 +1,4 @@
-import { initScript, throttleRAF } from "./lifecycle";
+import { initScript, onSwap, throttleRAF } from "./lifecycle";
 
 const signal = initScript("__progressAC");
 
@@ -66,12 +66,4 @@ function updateScrollProgress() {
 
 throttleRAF(updateScrollProgress, signal);
 
-document.addEventListener(
-  "astro:after-swap",
-  () => {
-    requestAnimationFrame(syncProgressBar);
-  },
-  { signal },
-);
-
-syncProgressBar();
+onSwap(() => requestAnimationFrame(syncProgressBar), signal);
