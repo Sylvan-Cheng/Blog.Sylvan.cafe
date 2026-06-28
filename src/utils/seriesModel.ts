@@ -1,5 +1,4 @@
 import type { CollectionEntry } from "astro:content";
-import { getPostTranslationKey } from "./contentIdentity";
 import {
   comparePostsByDateDesc,
   comparePostsByPubDateAsc,
@@ -43,27 +42,4 @@ export function buildSeriesGroups(posts: BlogPost[]): SeriesGroup[] {
       };
     })
     .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
-}
-
-export function getRecentlyUpdatedPosts(
-  posts: BlogPost[],
-  limit = 5,
-): BlogPost[] {
-  return sortByUpdated(posts).slice(0, limit);
-}
-
-export function getSameSeriesPosts(
-  posts: BlogPost[],
-  currentPost: BlogPost,
-  limit = 3,
-): BlogPost[] {
-  const series = currentPost.data.series;
-  const translationKey = getPostTranslationKey(currentPost);
-  if (!series) return [];
-
-  return posts
-    .filter((post) => post.data.series === series)
-    .filter((post) => getPostTranslationKey(post) !== translationKey)
-    .sort(comparePostsByPubDateAsc)
-    .slice(0, limit);
 }
