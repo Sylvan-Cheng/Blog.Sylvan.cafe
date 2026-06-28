@@ -1,0 +1,43 @@
+---
+import { UI } from "@/i18n/ui";
+import { resolveLocale, t } from "@/i18n/utils";
+import assistedByAiSvg from "../assets/badges/ai-label/assisted-by-ai.svg?raw";
+import madeWithAiSvg from "../assets/badges/ai-label/made-with-ai.svg?raw";
+import noAiUsedSvg from "../assets/badges/ai-label/no-ai-used.svg?raw";
+
+export type AILabelType = "assisted-by-ai" | "made-with-ai" | "no-ai-used";
+
+type Props = {
+  label: AILabelType;
+};
+
+const { label } = Astro.props;
+const locale = resolveLocale(Astro.currentLocale);
+
+const labels: Record<AILabelType, { ariaLabel: string; svg: string }> = {
+  "assisted-by-ai": {
+    ariaLabel: t(UI.aiLabel.assistedByAI, locale),
+    svg: assistedByAiSvg,
+  },
+  "made-with-ai": {
+    ariaLabel: t(UI.aiLabel.madeWithAI, locale),
+    svg: madeWithAiSvg,
+  },
+  "no-ai-used": {
+    ariaLabel: t(UI.aiLabel.noAIUsed, locale),
+    svg: noAiUsedSvg,
+  },
+};
+
+const badge = labels[label];
+---
+
+<a
+  href="https://ai-label.org/"
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label={badge.ariaLabel}
+  class="hover-accent inline-flex h-6 items-center text-text-secondary"
+>
+  <span class="h-full w-auto" set:html={badge.svg} />
+</a>
