@@ -26,7 +26,7 @@ const sortedPosts = await getSortedPosts(locale);
   <Header />
   <main id="main-content" data-layout="index" data-backurl={`/${locale}/`} class="app-layout overflow-x-clip">
     <section id="hero" class="pt-10 pb-6">
-      <h1 class="type-hero-title mt-4 mb-5 max-w-3xl sm:mt-8 sm:mb-6">
+      <h1 class="type-hero-title home-hero-title mt-4 mb-5 max-w-3xl sm:mt-8 sm:mb-6">
         {t(UI.home.greeting, locale)}
       </h1>
       <p class="type-body-lead max-w-2xl">{t(UI.home.desc, locale)}</p>
@@ -43,7 +43,7 @@ const sortedPosts = await getSortedPosts(locale);
 
     {
       sortedPosts.length > 0 && (
-        <section id="recent-posts" class="line-section border-t pt-6 pb-4">
+        <section id="recent-posts" class="line-frame border-t pt-6 pb-4">
           <h2 class="pane-title">{t(UI.home.recent, locale)}</h2>
           <ul class="mt-4 divide-y divide-soft">
             {sortedPosts.slice(0, SITE.postPerIndex).map(data => (

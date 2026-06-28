@@ -23,11 +23,15 @@ const post = Astro.props as CollectionEntry<"blog">;
 const href = getPostUrl(post, locale);
 const isHomeDensity = density === "home";
 const tags = data.tags.slice(0, isHomeDensity ? 2 : 3);
+const titleClass = isHomeDensity
+  ? "text-lg font-semibold leading-snug tracking-tight sm:text-xl"
+  : "type-card-title";
 ---
 
 <li
   class:list={[
-    "line-frame group border-t first:border-t-0",
+    "group",
+    isHomeDensity ? "" : "line-frame border-t first:border-t-0",
     isHomeDensity ? "py-4" : "py-5",
   ]}
 >
@@ -51,13 +55,18 @@ const tags = data.tags.slice(0, isHomeDensity ? 2 : 3);
         ]}
       >
         <Heading
-          class="type-card-title hover-title"
+          class:list={[titleClass, "hover-title"]}
           transition:name={`p-${slugifyStr(title)}`}
         >
           {title}
         </Heading>
       </a>
-      <p class:list={["type-card-desc", isHomeDensity ? "mt-1.5" : "mt-2"]}>
+      <p
+        class:list={[
+          "type-card-desc",
+          isHomeDensity ? "mt-1.5 text-sm sm:text-base" : "mt-2",
+        ]}
+      >
         {description}
       </p>
       {

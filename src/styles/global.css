@@ -201,6 +201,10 @@ html[lang="ja"] {
   @apply max-w-2xl text-text-secondary leading-relaxed;
 }
 
+.home-hero-title {
+  @apply sm:text-[2.75rem];
+}
+
 @utility tone-link {
   @apply text-accent decoration-dotted underline-offset-4 transition-colors duration-200 hover:underline;
 }
@@ -283,7 +287,7 @@ html[lang="ja"] {
 }
 
 .desktop-nav-menu a {
-  @apply hover-accent relative py-2 ps-4 text-text-secondary text-sm;
+  @apply hover-accent relative py-2 ps-4 text-base text-text-secondary;
 }
 
 .desktop-nav-menu a::before {
@@ -307,7 +311,7 @@ html[lang="ja"] {
 }
 
 .site-kicker {
-  @apply type-micro font-semibold text-accent uppercase tracking-[0.08em];
+  @apply type-section-label uppercase;
 }
 
 .site-rss {
