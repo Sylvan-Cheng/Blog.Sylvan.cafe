@@ -2,7 +2,6 @@ import { type CollectionEntry, render } from "astro:content";
 import type { Locale } from "@/i18n/config";
 import { KATEX_PRELOAD_FONTS, loadKatexCss } from "./katexAssets";
 import { buildPostNavigation, getLocalizedPostPath } from "./postNavigation";
-import { buildPostReadingModel } from "./postReading";
 import { buildPostLayoutProps } from "./postSeo";
 import { countWords } from "./wordCount";
 
@@ -34,11 +33,9 @@ export async function buildPostDetailsModel({
 }: PostDetailsModelInput) {
   const { Content, headings } = await render(post);
   const { prev, next } = buildPostNavigation(posts, post);
-  const { continuePosts } = buildPostReadingModel(posts, post);
 
   return {
     Content,
-    continuePosts,
     headings,
     kaTeXInlineCSS: loadKatexCss(post.data.math),
     katexPreloadFonts: KATEX_PRELOAD_FONTS,
