@@ -1,7 +1,7 @@
 ---
 import { PUBLIC_GOOGLE_SITE_VERIFICATION } from "astro:env/client";
 import { ClientRouter } from "astro:transitions";
-import { SITE } from "@/config";
+import { SITE, THEME_DEFS } from "@/config";
 import { LOCALE_META, LOCALES } from "@/i18n/config";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
@@ -9,6 +9,7 @@ import {
   buildHreflangPath,
   buildStructuredData,
   getDefaultOgImage,
+  serializeJsonLd,
 } from "@/utils/layoutSeo";
 import "@/styles/global.css";
 import "@fontsource/noto-sans/latin-400.css";
@@ -40,8 +41,6 @@ type Props = {
   author?: string;
   profile?: string;
   description?: string;
-  ogImage?: string;
-  canonicalURL?: string;
   pubDatetime?: Date;
   modDatetime?: Date | null;
   hreflangs?: Record<string, string>;
@@ -52,8 +51,6 @@ const {
   author = SITE.author,
   profile = SITE.profile,
   description = SITE.desc,
-  ogImage = getDefaultOgImage(),
-  canonicalURL = new URL(Astro.url.pathname, Astro.url),
   pubDatetime,
   modDatetime,
   hreflangs,
@@ -61,11 +58,12 @@ const {
 
 const locale = resolveLocale(Astro.currentLocale);
 const currentPath = Astro.url.pathname;
+const canonicalURL = new URL(currentPath, Astro.url);
 
 const hreflangUrl = (targetLocale: string) =>
   buildHreflangPath(currentPath, targetLocale, hreflangs);
 
-const socialImageURL = new URL(ogImage, Astro.url);
+const socialImageURL = new URL(getDefaultOgImage(), Astro.url);
 
 const structuredData = buildStructuredData({
   title,
@@ -78,6 +76,8 @@ const structuredData = buildStructuredData({
   pubDatetime,
   modDatetime,
 });
+
+const themeColors = THEME_DEFS[SITE.themeScheme].themeColor;
 ---
 
 <!--
@@ -171,7 +171,7 @@ const structuredData = buildStructuredData({
     }
 
     <!-- Twitter -->
-    <meta property="twitter:card" content={ogImage && ogImage !== "/og.png" ? "summary_large_image" : "summary"} />
+    <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={canonicalURL} />
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />
@@ -183,7 +183,7 @@ const structuredData = buildStructuredData({
         <script
           type="application/ld+json"
           is:inline
-          set:html={JSON.stringify(structuredData)}
+          set:html={serializeJsonLd(structuredData)}
         />
       )
     }
@@ -216,7 +216,7 @@ const structuredData = buildStructuredData({
     <script is:inline type="text/partytown" src={`${SITE.analytics.umami.url}/script.js`} data-website-id={SITE.analytics.umami.websiteId}></script>
 
     <!-- Minimal inline script to prevent FOUC - sets theme immediately -->
-    <script is:inline>
+    <script is:inline define:vars={{ themeColors }}>
       (function () {
         const initialColorScheme = ""; // "light" | "dark"
         const currentTheme = localStorage.getItem("theme");
@@ -233,10 +233,9 @@ const structuredData = buildStructuredData({
 
         // Set theme immediately to prevent flash
         document.firstElementChild?.setAttribute("data-theme", themeValue);
+        localStorage.removeItem("theme-scheme");
 
         // 同步设置浏览器地址栏颜色，避免 Android Chrome 暗色模式闪白
-        // 注意：色值与 theme.css 中 Gruvbox 的 --background 耦合
-        const themeColors = { light: "#fbf1c7", dark: "#282828" };
         document.querySelector("meta[name='theme-color']")
           ?.setAttribute("content", themeColors[themeValue] || "");
 

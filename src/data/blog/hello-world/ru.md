@@ -3,12 +3,11 @@ locale: ru
 author: Тестовый автор
 pubDatetime: 2026-05-01T00:00:00Z
 title: Привет, мир!
-featured: true
-draft: false
 math: true
 license: cc-by-nc-sa-4.0
 tags:
   - test
+series: astro-blog-rendering
 description: Полная проверка синтаксиса Markdown на русском языке, охватывающая все возможности рендеринга и многоязычную функциональность блога.
 ---
 

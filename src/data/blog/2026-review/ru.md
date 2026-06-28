@@ -6,11 +6,7 @@ description: Оглядываясь на рост и изменения в те�
 tags:
   - test
   - life
-keywords:
-  - итоги года
-  - "2026"
-  - технический дайджест
-featured: true
+series: annual-review
 ---
 
 ## Технический рост

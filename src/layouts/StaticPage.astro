@@ -1,0 +1,27 @@
+---
+import Footer from "@/components/Footer.astro";
+import Header from "@/components/Header.astro";
+import { SITE } from "@/config";
+import Layout from "@/layouts/Layout.astro";
+import Main from "@/layouts/Main.astro";
+
+const { Content, notFoundText, pageDesc, pageTitle } = Astro.props;
+---
+
+<Layout title={`${pageTitle} | ${SITE.title}`} description={pageDesc}>
+  <Header />
+  <Main {pageTitle} {pageDesc}>
+    {
+      Content ? (
+        <article class="app-prose prose-img:border-0">
+          <Content />
+        </article>
+      ) : (
+        <section class="app-prose prose-img:border-0">
+          <p>{notFoundText}</p>
+        </section>
+      )
+    }
+  </Main>
+  <Footer />
+</Layout>

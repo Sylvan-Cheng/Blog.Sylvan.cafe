@@ -24,6 +24,13 @@ export const navSection = {
       ru: "Теги",
       eo: "Etikedoj",
     } satisfies Dict,
+    series: {
+      zh: "系列",
+      en: "Series",
+      ja: "シリーズ",
+      ru: "Серии",
+      eo: "Serioj",
+    } satisfies Dict,
     about: {
       zh: "关于",
       en: "About",
@@ -45,6 +52,20 @@ export const navSection = {
       ru: "Поиск",
       eo: "Serĉi",
     } satisfies Dict,
+    primary: {
+      zh: "主导航",
+      en: "Primary navigation",
+      ja: "メインナビゲーション",
+      ru: "Основная навигация",
+      eo: "Ĉefa navigado",
+    } satisfies Dict,
+    social: {
+      zh: "社交链接",
+      en: "Social links",
+      ja: "ソーシャルリンク",
+      ru: "Социальные ссылки",
+      eo: "Sociaj ligiloj",
+    } satisfies Dict,
   },
 
   /** Theme toggle */
@@ -54,6 +75,22 @@ export const navSection = {
     ja: "ライト/ダークモード切替",
     ru: "Переключить светлую/тёмную тему",
     eo: "Ŝalti helan/malhelan reĝimon",
+  } satisfies Dict,
+
+  siteNote: {
+    zh: "札记",
+    en: "Notes",
+    ja: "ノート",
+    ru: "Заметки",
+    eo: "Notoj",
+  } satisfies Dict,
+
+  rssFeed: {
+    zh: "RSS 订阅",
+    en: "RSS Feed",
+    ja: "RSS フィード",
+    ru: "RSS-лента",
+    eo: "RSS-fluo",
   } satisfies Dict,
 
   openMenu: {

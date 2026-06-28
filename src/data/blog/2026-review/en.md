@@ -6,11 +6,7 @@ description: A look back at the growth and changes in technology and life during
 tags:
   - test
   - life
-keywords:
-  - year in review
-  - "2026"
-  - tech summary
-featured: true
+series: annual-review
 ---
 
 ## Tech Growth

@@ -4,7 +4,7 @@ const signal = initScript("__navAC");
 
 function initNav(): void {
   const menuBtn = document.querySelector<HTMLButtonElement>("#menu-btn");
-  const navMenu = document.querySelector("#nav-menu");
+  const navMenu = document.querySelector<HTMLElement>("#nav-menu");
   const menuIcon = document.querySelector("#menu-icon");
   const closeIcon = document.querySelector("#close-icon");
 

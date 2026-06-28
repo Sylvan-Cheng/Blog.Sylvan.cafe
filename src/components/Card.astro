@@ -7,31 +7,80 @@ import Datetime from "./Datetime.astro";
 
 type Props = {
   variant?: "h2" | "h3";
+  density?: "default" | "home";
   locale?: Locale;
 } & CollectionEntry<"blog">;
 
-const { variant: Heading = "h2", data, locale } = Astro.props;
+const {
+  variant: Heading = "h2",
+  density = "default",
+  data,
+  locale,
+} = Astro.props;
 
 const { title, description, ...props } = data;
 const post = Astro.props as CollectionEntry<"blog">;
 const href = getPostUrl(post, locale);
+const isHomeDensity = density === "home";
+const tags = data.tags.slice(0, isHomeDensity ? 2 : 3);
+const titleClass = isHomeDensity
+  ? "text-lg font-semibold leading-snug tracking-tight sm:text-xl"
+  : "type-card-title";
 ---
 
-<li class="my-6">
-  <a
-    href={href}
+<li
+  class:list={[
+    "group",
+    isHomeDensity ? "" : "line-frame border-t first:border-t-0",
+    isHomeDensity ? "py-4" : "py-5",
+  ]}
+>
+  <article
     class:list={[
-      "inline-block text-lg font-medium text-accent",
-      "decoration-dashed underline-offset-4 hover:underline",
-      "focus-visible:no-underline focus-visible:underline-offset-0",
+      "grid gap-3",
+      isHomeDensity
+        ? "sm:grid-cols-[8.75rem_minmax(0,1fr)]"
+        : "sm:grid-cols-[9.5rem_minmax(0,1fr)]",
     ]}
   >
-    <Heading
-      transition:name={`p-${slugifyStr(title)}`}
-    >
-      {title}
-    </Heading>
-  </a>
-  <Datetime {...props} />
-  <p>{description}</p>
+    <div class="text-text-muted">
+      <Datetime {...props} class="font-mono text-xs uppercase tracking-wide" />
+    </div>
+    <div>
+      <a
+        href={href}
+        class:list={[
+          "tone-link-strong inline-block",
+          "focus-visible:no-underline focus-visible:underline-offset-0",
+        ]}
+      >
+        <Heading
+          class:list={[titleClass, "hover-title"]}
+          transition:name={`p-${slugifyStr(title)}`}
+        >
+          {title}
+        </Heading>
+      </a>
+      <p
+        class:list={[
+          "type-card-desc",
+          isHomeDensity ? "mt-1.5 text-sm sm:text-base" : "mt-2",
+        ]}
+      >
+        {description}
+      </p>
+      {
+        tags.length > 0 && (
+          <p
+            class:list={[
+              "type-micro flex flex-wrap gap-x-3 gap-y-1",
+              isHomeDensity ? "mt-2.5" : "mt-3",
+            ]}
+          >
+            {tags.map(tag => <span>#{tag}</span>)}
+          </p>
+        )
+      }
+    </div>
+  </article>
 </li>

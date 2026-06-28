@@ -3,12 +3,11 @@ locale: ja
 author: テスト著者
 pubDatetime: 2026-05-01T00:00:00Z
 title: こんにちは、世界！
-featured: true
-draft: false
 math: true
 license: cc-by-nc-sa-4.0
 tags:
   - test
+series: astro-blog-rendering
 description: すべての Markdown 構文を網羅した日本語テスト記事。レンダリング機能の検証と多言語ブログの動作確認を行います。
 ---
 

@@ -3,11 +3,29 @@ import Footer from "@/components/Footer.astro";
 import Header from "@/components/Header.astro";
 import LinkButton from "@/components/LinkButton.astro";
 import { SITE } from "@/config";
+import { LOCALE_META, LOCALES } from "@/i18n/config";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 
 const locale = resolveLocale(Astro.currentLocale);
+const defaultLocale = LOCALES[0];
+const notFoundText = Object.fromEntries(
+  LOCALES.map((loc) => [loc, t(UI.notFound, loc)]),
+);
+const goHomeText = Object.fromEntries(
+  LOCALES.map((loc) => [loc, t(UI.goHome, loc)]),
+);
+const langMap = Object.fromEntries(
+  LOCALES.map((loc) => [loc, LOCALE_META[loc].lang]),
+);
+const notFoundI18n = JSON.stringify({
+  defaultLocale,
+  goHomeText,
+  langMap,
+  locales: LOCALES,
+  notFoundText,
+});
 ---
 
 <Layout title={`404 Not Found | ${SITE.title}`}>
@@ -24,7 +42,7 @@ const locale = resolveLocale(Astro.currentLocale);
       <LinkButton
         id="go-home-link"
         href={`/${locale}/`}
-        class="my-6 text-lg underline decoration-dashed underline-offset-8"
+        class="tone-link-strong my-6 text-lg"
       >
         {t(UI.goHome, locale)}
       </LinkButton>
@@ -34,27 +52,24 @@ const locale = resolveLocale(Astro.currentLocale);
   <Footer />
 </Layout>
 
+<script is:inline id="not-found-i18n" type="application/json" set:html={notFoundI18n}></script>
 <script is:inline>
   (function () {
+    var rawData = document.getElementById("not-found-i18n");
+    var i18n = JSON.parse(rawData ? rawData.textContent || "{}" : "{}");
     var path = window.location.pathname;
-    var m = path.match(/^\/(zh|en|ja|ru|eo)\b/);
-    var locale = m ? m[1] : "zh";
-
-    var text = {
-      notFound: { zh:"页面未找到。", en:"Page not found.", ja:"ページが見つかりません。", ru:"Страница не найдена.", eo:"Paĝo ne trovita." },
-      goHome: { zh:"返回首页", en:"Go back home", ja:"ホームに戻る", ru:"На главную", eo:"Reiri al la ĉefpaĝo" },
-    };
-
-    var langMap = { zh:"zh-CN", en:"en-US", ja:"ja", ru:"ru", eo:"eo" };
+    var locale = i18n.locales.find(function (loc) {
+      return path === "/" + loc || path.indexOf("/" + loc + "/") === 0;
+    }) || i18n.defaultLocale;
 
     var notFoundEl = document.getElementById("not-found-text");
     var goHomeEl = document.getElementById("go-home-link");
 
-    if (notFoundEl) notFoundEl.textContent = text.notFound[locale] || text.notFound.zh;
+    if (notFoundEl) notFoundEl.textContent = i18n.notFoundText[locale] || i18n.notFoundText[i18n.defaultLocale];
     if (goHomeEl) {
-      goHomeEl.textContent = text.goHome[locale] || text.goHome.zh;
+      goHomeEl.textContent = i18n.goHomeText[locale] || i18n.goHomeText[i18n.defaultLocale];
       goHomeEl.href = "/" + locale + "/";
     }
-    document.documentElement.lang = langMap[locale] || "zh-CN";
+    document.documentElement.lang = i18n.langMap[locale] || i18n.langMap[i18n.defaultLocale];
   })();
 </script>

@@ -11,7 +11,7 @@ import { LOCALES } from "@/i18n/config";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
-import { getSortedPublishedPosts } from "@/utils/blogRepository";
+import { getSortedPosts } from "@/utils/blogRepository";
 
 export function getStaticPaths() {
   return LOCALES.map((locale) => ({ params: { locale } }));
@@ -19,33 +19,17 @@ export function getStaticPaths() {
 
 const locale = resolveLocale(Astro.currentLocale);
 
-const sortedPosts = await getSortedPublishedPosts(locale);
-const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
-const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
+const sortedPosts = await getSortedPosts(locale);
 ---
 
 <Layout title={t(UI.home.greeting, locale)} description={t(UI.home.desc, locale)}>
   <Header />
   <main id="main-content" data-layout="index" data-backurl={`/${locale}/`} class="app-layout overflow-x-clip">
-    <section id="hero" class:list={["pt-8 pb-6", "border-b border-border"]}>
-      <h1 class="my-4 inline-block text-4xl font-bold sm:my-8 sm:text-5xl">
+    <section id="hero" class="pt-10 pb-6">
+      <h1 class="type-hero-title home-hero-title mt-4 mb-5 max-w-3xl sm:mt-8 sm:mb-6">
         {t(UI.home.greeting, locale)}
       </h1>
-      <LinkButton
-        href={`/${locale}/rss.xml`}
-        class="flex p-3 sm:p-1"
-        title="RSS Feed"
-        aria-label="rss feed"
-        target="_blank"
-      >
-        <Icon name="tabler:rss" />
-        <span class="sr-only">RSS Feed</span>
-      </LinkButton>
-
-      <p>{t(UI.home.desc, locale)}</p>
-      <p class="mt-2">
-        {t(UI.rss.subscribe, locale)}
-      </p>
+      <p class="type-body-lead max-w-2xl">{t(UI.home.desc, locale)}</p>
       {
         // only display if at least one social link is enabled
         SOCIALS.length > 0 && (
@@ -58,38 +42,23 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
     </section>
 
     {
-      featuredPosts.length > 0 && (
-        <section
-          id="featured"
-          class:list={[
-            "pt-12 pb-6",
-            { "border-b border-border": recentPosts.length > 0 },
-          ]}
-        >
-          <h2 class="text-2xl font-semibold tracking-wide">{t(UI.home.featured, locale)}</h2>
-          <ul>
-            {featuredPosts.map(data => (
-              <Card variant="h3" {...data} locale={locale} />
+      sortedPosts.length > 0 && (
+        <section id="recent-posts" class="line-frame border-t pt-6 pb-4">
+          <h2 class="pane-title">{t(UI.home.recent, locale)}</h2>
+          <ul class="mt-4 divide-y divide-soft">
+            {sortedPosts.slice(0, SITE.postPerIndex).map(data => (
+              <Card variant="h3" density="home" {...data} locale={locale} />
             ))}
           </ul>
         </section>
       )
     }
 
-    {
-      recentPosts.length > 0 && (
-        <section id="recent-posts" class="pt-12 pb-6">
-          <h2 class="text-2xl font-semibold tracking-wide">{t(UI.home.recent, locale)}</h2>
-          <ul>
-            {recentPosts.slice(0, SITE.postPerIndex).map(data => (
-              <Card variant="h3" {...data} locale={locale} />
-            ))}
-          </ul>
-        </section>
-      )
-    }
-
-    <div class="my-8 text-center">
+    <div class="mt-6 mb-8 flex flex-wrap justify-start gap-4">
+      <LinkButton href={`/${locale}/series/`}>
+        {t(UI.home.seriesCta, locale)}
+        <Icon name="tabler:arrow-right" class="inline-block rtl:-rotate-180" />
+      </LinkButton>
       <LinkButton href={`/${locale}/posts/`}>
         {t(UI.home.allPosts, locale)}
         <Icon name="tabler:arrow-right" class="inline-block rtl:-rotate-180" />

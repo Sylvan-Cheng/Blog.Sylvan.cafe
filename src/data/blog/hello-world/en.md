@@ -3,12 +3,11 @@ locale: en
 author: Test Author
 pubDatetime: 2026-05-01T00:00:00Z
 title: Hello, World!
-featured: true
-draft: false
 math: true
 license: cc-by-nc-sa-4.0
 tags:
   - test
+series: astro-blog-rendering
 description: A comprehensive Markdown syntax test in English, covering all rendering features and verifying multilingual blog functionality.
 ---
 

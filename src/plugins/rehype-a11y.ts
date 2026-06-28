@@ -1,7 +1,7 @@
 import type { Element, Root } from "hast";
 import { visit } from "unist-util-visit";
 import { getTextContent, toClassList } from "./hastUtils";
-import { buildHeadingId } from "./markdownTransforms";
+import { buildHeadingId } from "./headingIds";
 
 export function rehypeA11y() {
   return (tree: Root) => {
@@ -31,7 +31,14 @@ export function rehypeA11y() {
       let id: string | undefined =
         typeof existingId === "string" ? existingId : undefined;
 
-      if (!id) {
+      if (id) {
+        if (usedIds.has(id)) {
+          id = buildHeadingId(id, usedIds, `heading-${headingIndex}`);
+          node.properties.id = id;
+        } else {
+          usedIds.add(id);
+        }
+      } else {
         const text = getTextContent(node);
         id = buildHeadingId(text, usedIds, `heading-${headingIndex}`);
         node.properties.id = id;

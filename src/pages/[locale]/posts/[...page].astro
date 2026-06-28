@@ -5,27 +5,16 @@ import Footer from "@/components/Footer.astro";
 import Header from "@/components/Header.astro";
 import Pagination from "@/components/Pagination.astro";
 import { SITE } from "@/config";
-import { LOCALES } from "@/i18n/config";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import Main from "@/layouts/Main.astro";
-import { getPublishedPostsByLocale, sortPosts } from "@/utils/blogRepository";
+import { buildPostListStaticPaths } from "@/utils/postListPageModel";
 
 const locale = resolveLocale(Astro.currentLocale);
 
 export const getStaticPaths = (async ({ paginate }) => {
-  const locales = LOCALES;
-  const results = [];
-  for (const loc of locales) {
-    const localePosts = await getPublishedPostsByLocale(loc);
-    const pages = paginate(sortPosts(localePosts), {
-      params: { locale: loc },
-      pageSize: SITE.postPerPage,
-    });
-    results.push(...pages);
-  }
-  return results;
+  return buildPostListStaticPaths(paginate);
 }) satisfies GetStaticPaths;
 
 const { page } = Astro.props;
@@ -34,7 +23,7 @@ const { page } = Astro.props;
 <Layout title={`${t(UI.posts.title, locale)} | ${SITE.title}`}>
   <Header />
   <Main pageTitle={t(UI.posts.title, locale)} pageDesc={t(UI.posts.desc, locale)}>
-    <ul>
+    <ul class="line-frame border-b">
       {page.data.map(data => <Card {...data} locale={locale} />)}
     </ul>
   </Main>

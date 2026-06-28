@@ -1,7 +1,7 @@
 ---
 import type { HTMLAttributes } from "astro/types";
 import { resolveLocale } from "@/i18n/utils";
-import NotByAI from "./NotByAI.astro";
+import AILabel, { type AILabelType } from "./AILabel.astro";
 import Socials from "./Socials.astro";
 
 const currentYear = new Date().getFullYear();
@@ -9,9 +9,15 @@ const locale = resolveLocale(Astro.currentLocale);
 
 type Props = {
   noMarginTop?: boolean;
+  aiLabel?: AILabelType;
 } & HTMLAttributes<"footer">;
 
-const { noMarginTop = false, class: className, ...attrs } = Astro.props;
+const {
+  noMarginTop = false,
+  aiLabel = "assisted-by-ai",
+  class: className,
+  ...attrs
+} = Astro.props;
 ---
 
 <footer
@@ -21,7 +27,7 @@ const { noMarginTop = false, class: className, ...attrs } = Astro.props;
   <div
     class:list={[
       "py-6 sm:py-4",
-      "border-t border-border",
+      "line-frame border-t",
       "flex flex-col items-center gap-4 sm:flex-row sm:justify-between",
     ]}
   >
@@ -32,11 +38,11 @@ const { noMarginTop = false, class: className, ...attrs } = Astro.props;
       <span class="hidden sm:inline">&nbsp;|&nbsp;</span>
       <span>Some rights reserved.</span>
       <span class="hidden sm:inline">&nbsp;|&nbsp;</span>
-      <a href={`/${locale}/license`} class="hover:text-accent transition-colors duration-200">License</a>
+      <a href={`/${locale}/license`} class="hover-accent">License</a>
     </div>
-    <NotByAI />
-    <div class="order-first sm:order-none">
-    <Socials />
+    <AILabel label={aiLabel} />
+    <div class="order-first sm:order-none xl:hidden">
+      <Socials />
     </div>
   </div>
 </footer>

@@ -1,65 +1,54 @@
 ---
-import { type CollectionEntry, render } from "astro:content";
-import fs from "node:fs";
-import path from "node:path";
+import type { CollectionEntry } from "astro:content";
 import BackButton from "@/components/BackButton.astro";
 import BackToTopButton from "@/components/BackToTopButton.astro";
 import CodeCopy from "@/components/CodeCopy.astro";
 import CodeFolding from "@/components/CodeFolding.astro";
-import Datetime from "@/components/Datetime.astro";
 import FloatingTOC from "@/components/FloatingTOC.astro";
 import Footer from "@/components/Footer.astro";
 import Giscus from "@/components/Giscus.astro";
 import Header from "@/components/Header.astro";
-import Icon from "@/components/Icon.astro";
 import ImageZoom from "@/components/ImageZoom.astro";
 import LicenseInfo from "@/components/LicenseInfo.astro";
+import PostMeta from "@/components/PostMeta.astro";
+import PostNavigation from "@/components/PostNavigation.astro";
 import ShareLinks from "@/components/ShareLinks.astro";
 import Tag from "@/components/Tag.astro";
 import { SITE } from "@/config";
-import { UI } from "@/i18n/ui";
-import { resolveLocale, t, tp } from "@/i18n/utils";
+import { resolveLocale } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
-import {
-  buildPostLayoutProps,
-  buildPostNavigation,
-  getLocalizedPostPath,
-  KATEX_PRELOAD_FONTS,
-} from "@/utils/postPageModel";
+import type { PostIndex } from "@/utils/blogRepository";
+import { buildPostDetailsModel } from "@/utils/postDetailsModel";
 import { slugifyStr } from "@/utils/slugify";
-import { countWords } from "@/utils/wordCount";
 
 type Props = {
   post: CollectionEntry<"blog">;
-  posts: CollectionEntry<"blog">[];
-  translationMap: Record<string, string>;
+  postIndex: PostIndex;
 };
 
-const { post, posts, translationMap } = Astro.props;
+const { post, postIndex } = Astro.props;
 const locale = resolveLocale(Astro.currentLocale);
 
-const { title, pubDatetime, modDatetime, timezone, tags, license } = post.data;
+const { title, pubDatetime, modDatetime, timezone, tags, license, aiLabel } =
+  post.data;
 
-const { Content, headings } = await render(post);
-const layoutProps = buildPostLayoutProps(
-  post,
-  locale,
-  Astro.url.origin,
-  translationMap,
-);
-
-const { prev: prevPost, next: nextPost } = buildPostNavigation(posts, post);
-
-const kaTeXInlineCSS = post.data.math
-  ? fs.readFileSync(path.resolve("public/assets/katex.min.css"), "utf-8")
-  : "";
+const {
+  Content,
+  headings,
+  kaTeXInlineCSS,
+  katexPreloadFonts,
+  layoutProps,
+  nextPost,
+  prevPost,
+  wordCount,
+} = await buildPostDetailsModel({ post, postIndex, locale });
 ---
 
 <Layout {...layoutProps}>
   {post.data.math && <style slot="head" set:html={kaTeXInlineCSS} />}
   {post.data.math && (
     <>
-      {KATEX_PRELOAD_FONTS.map(font => (
+      {katexPreloadFonts.map(font => (
         <link slot="head" rel="preload" href={`/assets/fonts/katex/${font}`} as="font" type="font/woff2" crossorigin />
       ))}
     </>
@@ -72,20 +61,17 @@ const kaTeXInlineCSS = post.data.math
     data-pagefind-body
     data-backurl={`/${locale}/`}
   >
-    <h1
-      transition:name={`p-${slugifyStr(title)}`}
-      class="inline-block text-2xl font-bold text-accent sm:text-3xl"
-    >
-      {title}
-    </h1>
-    <div class="my-2 flex items-center gap-2" data-print-hide>
-      <Datetime {pubDatetime} {modDatetime} {timezone} size="lg" />
-      <span aria-hidden="true" class="max-sm:hidden select-none text-text-muted">&middot;</span>
-      <span class="text-sm text-text-muted max-sm:hidden">
-        {tp(UI.post.wordsCount, locale, String(countWords(post.body ?? "")))}
-      </span>
-
-    </div>
+    <div class="post-grid">
+      <div class="min-w-0">
+    <header class="pane-head">
+      <h1
+        transition:name={`p-${slugifyStr(title)}`}
+        class="type-post-title mt-5 max-w-4xl"
+      >
+        {title}
+      </h1>
+      <PostMeta {locale} {pubDatetime} {modDatetime} {timezone} {wordCount} />
+    </header>
     <article
       id="article"
       class="app-prose mt-8 w-full"
@@ -93,10 +79,14 @@ const kaTeXInlineCSS = post.data.math
       <Content />
     </article>
 
-    <FloatingTOC {headings} />
+      </div>
 
-    <hr class="my-8 border-dashed" />
+      <aside class="post-side hidden xl:block" data-pagefind-ignore data-print-hide>
+        <FloatingTOC {headings} />
+      </aside>
+    </div>
 
+    <hr class="line-section my-8" />
 
     <ul data-print-hide class="mt-4 mb-8 flex flex-wrap gap-4 sm:my-8">
       {tags.map(tag => <Tag tag={slugifyStr(tag)} tagName={tag} size="sm" />)}
@@ -106,49 +96,15 @@ const kaTeXInlineCSS = post.data.math
 
     <ShareLinks />
 
-    <hr class="my-6 border-dashed" />
+    <hr class="line-frame my-6 border-t" />
 
     <LicenseInfo {license} />
 
-    <!-- Previous/Next Post Buttons -->
-    <div data-pagefind-ignore data-print-hide class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-      {
-        prevPost && (
-          <a
-            href={getLocalizedPostPath(prevPost, locale)}
-            class="group justify-self-start"
-          >
-            <div class="inline-flex items-center gap-1 group-hover:text-accent/85 transition-colors duration-200">
-              <Icon name="tabler:chevron-left" class="inline-block flex-none rtl:rotate-180" />
-              <div>
-                <span>{t(UI.post.prev, locale)}</span>
-                <div class="text-sm text-accent/85">{prevPost.title}</div>
-              </div>
-            </div>
-          </a>
-        )
-      }
-      {
-        nextPost && (
-          <a
-            href={getLocalizedPostPath(nextPost, locale)}
-            class="group justify-self-end sm:col-start-2"
-          >
-            <div class="inline-flex items-center gap-1 text-end group-hover:text-accent/85 transition-colors duration-200">
-              <div>
-                <span>{t(UI.post.next, locale)}</span>
-                <div class="text-sm text-accent/85">{nextPost.title}</div>
-              </div>
-              <Icon name="tabler:chevron-right" class="inline-block flex-none rtl:rotate-180" />
-            </div>
-          </a>
-        )
-      }
-    </div>
+    <PostNavigation {locale} {prevPost} {nextPost} />
 
     <Giscus />
   </main>
-  <Footer />
+  <Footer {aiLabel} />
   <ImageZoom />
   <CodeFolding />
   <CodeCopy />
@@ -157,9 +113,6 @@ const kaTeXInlineCSS = post.data.math
 <script src="../scripts/progress.ts"></script>
 
 <style is:inline>
-  .progress-container {
-    z-index: 10;
-  }
   .progress-bar {
     transition: width 150ms linear;
   }

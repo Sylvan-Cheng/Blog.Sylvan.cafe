@@ -1,3 +1,4 @@
+import { unified } from "@astrojs/markdown-remark";
 import partytown from "@astrojs/partytown";
 import sitemap from "@astrojs/sitemap";
 import {
@@ -18,6 +19,7 @@ import { SITE, THEME_DEFS } from "./src/config";
 import { LOCALES } from "./src/i18n/config";
 import { rehypeA11y } from "./src/plugins/rehype-a11y";
 import { rehypeImgProxy } from "./src/plugins/rehypeImgProxy";
+import { rehypeSafeHtml } from "./src/plugins/rehypeSafeHtml";
 import { remarkMermaid } from "./src/plugins/remarkMermaid";
 import { transformerCodeMeta } from "./src/utils/transformers/codeMeta";
 import { transformerLineNumbers } from "./src/utils/transformers/lineNumbers";
@@ -47,14 +49,22 @@ export default defineConfig({
     icon(),
   ],
   markdown: {
-    remarkPlugins: [
-      remarkToc,
-      remarkMath,
-      remarkMermaid,
-      remarkGithubBlockquoteAlert,
-      [remarkCollapse, { test: "Table of contents" }],
-    ],
-    rehypePlugins: [rehypeRaw, rehypeImgProxy, rehypeKatex, rehypeA11y],
+    processor: unified({
+      remarkPlugins: [
+        remarkToc,
+        remarkMath,
+        remarkMermaid,
+        remarkGithubBlockquoteAlert,
+        [remarkCollapse, { test: "Table of contents" }],
+      ],
+      rehypePlugins: [
+        rehypeRaw,
+        rehypeSafeHtml,
+        rehypeImgProxy,
+        rehypeKatex,
+        rehypeA11y,
+      ],
+    }),
     shikiConfig: {
       themes: theme.shiki,
       defaultColor: false,
@@ -70,9 +80,6 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
-    optimizeDeps: {
-      exclude: ["@resvg/resvg-js"],
-    },
   },
   image: {
     responsiveStyles: true,

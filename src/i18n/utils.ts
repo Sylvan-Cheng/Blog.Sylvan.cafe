@@ -5,7 +5,7 @@ export function t(dict: Dict, locale: Locale): string {
   return dict[locale];
 }
 
-export function tp(dict: TemplateDict, locale: Locale, arg: string): string {
+export function tp<T>(dict: TemplateDict<T>, locale: Locale, arg: T): string {
   return dict[locale](arg);
 }
 
