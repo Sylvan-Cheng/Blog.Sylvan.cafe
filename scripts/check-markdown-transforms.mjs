@@ -59,7 +59,9 @@ function loadTsModule(filePath) {
 const { buildHeadingId } = loadTsModule(resolve(rootDir, "src/plugins/headingIds.ts"));
 const { buildImgProxyUrls } = loadTsModule(resolve(rootDir, "src/plugins/imgProxyUrls.ts"));
 const { injectMermaidStyle } = loadTsModule(resolve(rootDir, "src/plugins/mermaidMarkup.ts"));
+const { sanitizeHtmlTree } = loadTsModule(resolve(rootDir, "src/plugins/rehypeSafeHtml.ts"));
 const { getPath } = loadTsModule(resolve(rootDir, "src/utils/getPath.ts"));
+const { serializeJsonLd } = loadTsModule(resolve(rootDir, "src/utils/layoutSeo.ts"));
 const { parseCodeMeta } = loadTsModule(resolve(rootDir, "src/utils/transformers/codeMetaParser.ts"));
 
 const fullMeta = parseCodeMeta('file="demo.ts" collapse nolines');
@@ -78,6 +80,14 @@ assert.equal(buildHeadingId("Hello World", usedIds, "fallback"), "hello-world-2"
 
 assert.equal(getPath("hello-world/zh", "src/data/blog/hello-world/zh.md"), "/posts/hello-world/");
 assert.equal(getPath("hello-world/zh", "src/data/blog/hello-world/zh.md", false), "hello-world");
+assert.throws(
+  () => getPath("hidden/zh", "src/data/blog/_draft/hidden/zh.md"),
+  /Private blog directory/,
+);
+assert.throws(
+  () => getPath("hidden/zh", "D:\\Server\\blog.sylvan.cafe\\src\\data\\blog\\_draft\\hidden\\zh.md"),
+  /Private blog directory/,
+);
 
 assert.equal(buildImgProxyUrls("https://example.com/image.png"), null);
 const imgProxyUrls = buildImgProxyUrls("https://s3.sylvan.cafe/a/b.png", 320, 180);
@@ -90,5 +100,31 @@ assert.equal(
 const injected = injectMermaidStyle("<svg><style>old</style><text>Hi</text></svg>");
 assert.match(injected, /--_text:\s+var\(--mermaid-fg\)/);
 assert.doesNotMatch(injected, /old/);
+
+const jsonLd = serializeJsonLd({ headline: "</script><script>alert(1)</script>" });
+assert.doesNotMatch(jsonLd, /<\/script>/i);
+assert.match(jsonLd, /\\u003c\/script\\u003e/);
+
+const htmlTree = {
+  type: "root",
+  children: [
+    {
+      type: "element",
+      tagName: "img",
+      properties: { onError: "alert(1)", src: "javascript:alert(1)" },
+      children: [],
+    },
+    {
+      type: "element",
+      tagName: "script",
+      properties: {},
+      children: [{ type: "text", value: "alert(1)" }],
+    },
+  ],
+};
+sanitizeHtmlTree(htmlTree);
+assert.equal(htmlTree.children.length, 1);
+assert.equal(htmlTree.children[0].properties.onError, undefined);
+assert.equal(htmlTree.children[0].properties.src, undefined);
 
 console.log("Markdown transform checks passed.");

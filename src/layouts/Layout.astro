@@ -9,6 +9,7 @@ import {
   buildHreflangPath,
   buildStructuredData,
   getDefaultOgImage,
+  serializeJsonLd,
 } from "@/utils/layoutSeo";
 import "@/styles/global.css";
 import "@fontsource/noto-sans/latin-400.css";
@@ -182,7 +183,7 @@ const themeColors = THEME_DEFS[SITE.themeScheme].themeColor;
         <script
           type="application/ld+json"
           is:inline
-          set:html={JSON.stringify(structuredData)}
+          set:html={serializeJsonLd(structuredData)}
         />
       )
     }

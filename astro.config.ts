@@ -19,6 +19,7 @@ import { SITE, THEME_DEFS } from "./src/config";
 import { LOCALES } from "./src/i18n/config";
 import { rehypeA11y } from "./src/plugins/rehype-a11y";
 import { rehypeImgProxy } from "./src/plugins/rehypeImgProxy";
+import { rehypeSafeHtml } from "./src/plugins/rehypeSafeHtml";
 import { remarkMermaid } from "./src/plugins/remarkMermaid";
 import { transformerCodeMeta } from "./src/utils/transformers/codeMeta";
 import { transformerLineNumbers } from "./src/utils/transformers/lineNumbers";
@@ -56,7 +57,13 @@ export default defineConfig({
         remarkGithubBlockquoteAlert,
         [remarkCollapse, { test: "Table of contents" }],
       ],
-      rehypePlugins: [rehypeRaw, rehypeImgProxy, rehypeKatex, rehypeA11y],
+      rehypePlugins: [
+        rehypeRaw,
+        rehypeSafeHtml,
+        rehypeImgProxy,
+        rehypeKatex,
+        rehypeA11y,
+      ],
     }),
     shikiConfig: {
       themes: theme.shiki,

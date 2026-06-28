@@ -7,7 +7,10 @@ import { LOCALES } from "@/i18n/config";
 export const BLOG_PATH = "src/data/blog";
 
 const blog = defineCollection({
-  loader: glob({ pattern: "**/[^_]*.md", base: `./${BLOG_PATH}` }),
+  loader: glob({
+    pattern: ["**/[^_]*.md", "!**/_*/**"],
+    base: `./${BLOG_PATH}`,
+  }),
   schema: z.object({
     // === Required ===
     locale: z.enum(LOCALES).default("zh"),
@@ -30,7 +33,10 @@ const blog = defineCollection({
 });
 
 const pages = defineCollection({
-  loader: glob({ pattern: "**/[^_]*.md", base: "./src/data/pages" }),
+  loader: glob({
+    pattern: ["**/[^_]*.md", "!**/_*/**"],
+    base: "./src/data/pages",
+  }),
   schema: z.object({
     title: z.string(),
     locale: z.enum(LOCALES),

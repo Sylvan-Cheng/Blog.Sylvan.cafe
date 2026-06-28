@@ -69,3 +69,18 @@ export function buildStructuredData({
 export function getDefaultOgImage(): string {
   return "/og.png";
 }
+
+const JSON_LD_ESCAPE_MAP: Record<string, string> = {
+  "&": "\\u0026",
+  "<": "\\u003c",
+  ">": "\\u003e",
+  "\u2028": "\\u2028",
+  "\u2029": "\\u2029",
+};
+
+export function serializeJsonLd(data: unknown): string {
+  return JSON.stringify(data).replace(
+    /[<>&\u2028\u2029]/g,
+    (char) => JSON_LD_ESCAPE_MAP[char],
+  );
+}
