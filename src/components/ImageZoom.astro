@@ -14,7 +14,10 @@
 ---
 
 <script>
+  import { initInteraction, onSwap } from "../scripts/lifecycle";
   import type mediumZoom from "medium-zoom";
+
+  const { signal, onCleanup } = initInteraction("__imgZoomAC");
 
   let zoomInstance: ReturnType<typeof mediumZoom> | null = null;
   let zoomLoading = false;
@@ -57,7 +60,7 @@
     }
   }
 
-  document.addEventListener("astro:page-load", () => {
+  function initImageZoom() {
     destroyImageZoom();
 
     const article = document.getElementById("article");
@@ -72,10 +75,12 @@
         if (zoomInstance) zoomInstance.open({ target: img });
       });
     };
-    article.addEventListener("click", clickHandler);
-  });
+    article.addEventListener("click", clickHandler, { signal });
+  }
 
-  document.addEventListener("astro:before-swap", destroyImageZoom);
+  onCleanup(destroyImageZoom);
+  document.addEventListener("astro:before-swap", destroyImageZoom, { signal });
+  onSwap(initImageZoom, signal);
 </script>
 
 <style is:global>

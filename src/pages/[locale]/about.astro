@@ -1,13 +1,9 @@
 ---
 import { getEntry, render } from "astro:content";
-import Footer from "@/components/Footer.astro";
-import Header from "@/components/Header.astro";
-import { SITE } from "@/config";
 import { LOCALES } from "@/i18n/config";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
-import Layout from "@/layouts/Layout.astro";
-import Main from "@/layouts/Main.astro";
+import StaticPage from "@/layouts/StaticPage.astro";
 
 export function getStaticPaths() {
   return LOCALES.map((locale) => ({ params: { locale } }));
@@ -18,20 +14,9 @@ const page = await getEntry("pages", `about/${locale}`);
 const { Content } = page ? await render(page) : { Content: null };
 ---
 
-<Layout title={`${page?.data.title ?? "About"} | ${SITE.title}`}>
-  <Header />
-  <Main pageTitle={page?.data.title ?? "About"} pageDesc={t(UI.about.desc, locale)}>
-    {
-      Content ? (
-        <article class="app-prose prose-img:border-0">
-          <Content />
-        </article>
-      ) : (
-        <section class="app-prose prose-img:border-0">
-          <p>{t(UI.notFound, locale)}</p>
-        </section>
-      )
-    }
-  </Main>
-  <Footer />
-</Layout>
+<StaticPage
+  {Content}
+  notFoundText={t(UI.notFound, locale)}
+  pageDesc={t(UI.about.desc, locale)}
+  pageTitle={page?.data.title ?? "About"}
+/>

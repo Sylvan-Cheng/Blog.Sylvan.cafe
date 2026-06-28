@@ -28,7 +28,7 @@ const items = locales.map(({ code, label }) => ({
 <div class="relative inline-flex">
     <button
       id="lang-trigger"
-      class="flex p-3 sm:p-1 hover:text-accent text-foreground transition-colors duration-200"
+      class="hover-accent flex p-3 text-foreground sm:p-1"
       aria-label={t(UI.selectLanguage, currentLocale)}
       aria-expanded="false"
       aria-haspopup="listbox"
@@ -38,7 +38,7 @@ const items = locales.map(({ code, label }) => ({
 
   <ul
     id="lang-dropdown"
-    class="absolute top-full right-0 z-50 mt-1 min-w-[120px] list-none rounded-md border border-border bg-background py-1 shadow-lg"
+    class="shape-panel shadow-popover line-frame absolute top-full right-0 z-50 mt-1 min-w-[120px] list-none border bg-background py-1"
     role="listbox"
     hidden
   >
@@ -49,8 +49,7 @@ const items = locales.map(({ code, label }) => ({
             href={url}
             data-locale={code}
             class:list={[
-              "block px-3 py-1.5 text-sm no-underline whitespace-nowrap transition-colors duration-200",
-              "hover:bg-muted",
+              "hover-surface block px-3 py-1.5 text-sm no-underline whitespace-nowrap",
               code === currentLocale
                 ? "text-accent font-semibold"
                 : "text-foreground",

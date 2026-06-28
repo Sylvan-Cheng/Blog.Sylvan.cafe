@@ -7,6 +7,7 @@ math: true
 license: cc-by-nc-sa-4.0
 tags:
   - test
+series: astro-blog-rendering
 description: 一篇包含完整 Markdown 语法测试的中文文章，用于验证博客渲染和多语言功能。
 ---
 

@@ -1,6 +1,6 @@
-import { initScript } from "./lifecycle";
+import { initInteraction, onSwap, setCleanupTimeout } from "./lifecycle";
 
-const signal = initScript("__shareAC");
+const { signal, onCleanup } = initInteraction("__shareAC");
 
 const mobileQuery = window.matchMedia("(max-width: 767px)");
 let mobile = mobileQuery.matches;
@@ -8,8 +8,9 @@ let mobile = mobileQuery.matches;
 let expanded = false;
 const expandStagger = 50;
 const expandDuration = 300;
-let timerWrap: ReturnType<typeof setTimeout> | undefined;
-let copyTimer: ReturnType<typeof setTimeout> | undefined;
+let timerWrap: number | undefined;
+let copyTimer: number | undefined;
+let activeWrapper: HTMLElement | undefined;
 
 type ShareWrapper = HTMLElement & {
   __shareExpandEnd?: (e: TransitionEvent) => void;
@@ -49,7 +50,12 @@ function clearWrapperTransitionEnd(wrapper: HTMLElement): void {
   if (!prev) return;
   shareWrapper.removeEventListener("transitionend", prev);
   shareWrapper.__shareExpandEnd = undefined;
+  if (activeWrapper === wrapper) activeWrapper = undefined;
 }
+
+onCleanup(() => {
+  if (activeWrapper) clearWrapperTransitionEnd(activeWrapper);
+});
 
 function setShareItemsVisible(
   items: NodeListOf<HTMLElement>,
@@ -125,6 +131,7 @@ function expand() {
       clearWrapperTransitionEnd(wrapper);
     };
     wrapper.__shareExpandEnd = onEnd;
+    activeWrapper = wrapper;
     wrapper.addEventListener("transitionend", onEnd);
   } else {
     els.wrapper.style.maxHeight = "none";
@@ -158,17 +165,21 @@ function collapse() {
     clearWrapperTransitionEnd(wrapper);
     wrapper.style.overflow = "hidden";
   }
-  timerWrap = setTimeout(() => {
-    const els2 = getEls();
-    if (!els2?.wrapper) return;
-    els2.wrapper.style.transition = mobile
-      ? "max-height 250ms ease-out"
-      : "max-width 250ms ease-out";
-    els2.wrapper.offsetHeight;
-    if (mobile) els2.wrapper.style.maxHeight = "0";
-    else els2.wrapper.style.maxWidth = "0";
-    timerWrap = undefined;
-  }, 50);
+  timerWrap = setCleanupTimeout(
+    () => {
+      const els2 = getEls();
+      if (!els2?.wrapper) return;
+      els2.wrapper.style.transition = mobile
+        ? "max-height 250ms ease-out"
+        : "max-width 250ms ease-out";
+      els2.wrapper.offsetHeight;
+      if (mobile) els2.wrapper.style.maxHeight = "0";
+      else els2.wrapper.style.maxWidth = "0";
+      timerWrap = undefined;
+    },
+    50,
+    signal,
+  );
 }
 
 function reset() {
@@ -206,11 +217,15 @@ function clipboardCopy() {
       if (els?.copyLive)
         els.copyLive.textContent = els.copyLive.dataset.liveSuccess || "";
       clearTimeout(copyTimer);
-      copyTimer = setTimeout(() => {
-        const els2 = getEls();
-        if (els2?.copySuccess) els2.copySuccess.classList.add("hidden");
-        if (els2?.copyDefault) els2.copyDefault.classList.remove("hidden");
-      }, 1200);
+      copyTimer = setCleanupTimeout(
+        () => {
+          const els2 = getEls();
+          if (els2?.copySuccess) els2.copySuccess.classList.add("hidden");
+          if (els2?.copyDefault) els2.copyDefault.classList.remove("hidden");
+        },
+        1200,
+        signal,
+      );
     })
     .catch(() => {
       if (els?.copyDefault) els.copyDefault.classList.add("hidden");
@@ -265,9 +280,6 @@ function init() {
   els.container.addEventListener("click", onShareBtnClick, { signal });
 }
 
-init();
-reset();
-
 mobileQuery.addEventListener(
   "change",
   () => {
@@ -278,11 +290,7 @@ mobileQuery.addEventListener(
   { signal },
 );
 
-document.addEventListener(
-  "astro:after-swap",
-  () => {
-    init();
-    reset();
-  },
-  { signal },
-);
+onSwap(() => {
+  init();
+  reset();
+}, signal);

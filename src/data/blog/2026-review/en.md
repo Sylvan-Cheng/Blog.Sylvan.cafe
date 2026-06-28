@@ -6,6 +6,7 @@ description: A look back at the growth and changes in technology and life during
 tags:
   - test
   - life
+series: annual-review
 ---
 
 ## Tech Growth

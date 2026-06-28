@@ -14,11 +14,35 @@
    50   — medium-zoom overlay
    ========================================================= */
 
+/* =========================================================
+   Line Scale
+   ---------------------------------------------------------
+   line-frame   — page shell edges: header, side pane, footer
+   line-section — major post separators, always dashed
+   line-pane    — side pane internal sections
+   line-guide   — reading aids: TOC and context rails
+   divide-soft  — repeated list items without enclosing boxes
+   ========================================================= */
+
+/* =========================================================
+   Visual Scale
+   ---------------------------------------------------------
+   Type: hero, post, page, card, section, lead, meta, micro
+   Tone: primary, secondary, muted, link, link-soft
+   Space: page, section, cluster, item
+   Motion: base hover/focus transitions
+   Shape: controls, panels, floating affordances
+   ========================================================= */
+
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @theme inline {
   --font-body: "Noto Sans", sans-serif;
   --font-code: "Fira Code", monospace;
+  --header-h: 4rem;
+  --sidebar-w: 264px;
+  --content-max-w: 64rem;
+  --context-w: 17rem;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-text-secondary: var(--text-secondary);
@@ -40,8 +64,14 @@ html[lang="ja"] {
   * {
     @apply border-border outline-accent/75;
 
+    box-sizing: border-box;
     scrollbar-width: auto;
     scrollbar-color: var(--color-muted) transparent;
+  }
+
+  *::before,
+  *::after {
+    box-sizing: border-box;
   }
 
   html {
@@ -51,9 +81,15 @@ html[lang="ja"] {
   }
 
   body {
-    @apply flex min-h-svh flex-col bg-background font-body text-foreground selection:bg-accent/75 selection:text-background;
+    @apply flex min-h-svh flex-col bg-background pt-16 font-body text-foreground selection:bg-accent/75 selection:text-background;
 
     width: 100%;
+  }
+
+  @media (min-width: 1280px) {
+    body {
+      padding-inline-start: var(--sidebar-w);
+    }
   }
 
   a,
@@ -98,11 +134,254 @@ html[lang="ja"] {
 }
 
 @utility max-w-app {
-  @apply max-w-3xl;
+  max-width: var(--content-max-w);
 }
 
 @utility app-layout {
-  @apply mx-auto w-full max-w-app px-4;
+  @apply mx-auto w-full max-w-app px-4 sm:px-6;
+}
+
+@utility line-frame {
+  @apply border-border;
+}
+
+@utility line-section {
+  @apply border-border border-dashed;
+}
+
+@utility line-pane {
+  @apply border-border/45;
+}
+
+@utility line-guide {
+  @apply border-border/35;
+}
+
+@utility divide-soft {
+  @apply divide-border/35;
+}
+
+@utility type-hero-title {
+  @apply text-4xl font-bold leading-none tracking-[-0.045em] sm:text-5xl;
+}
+
+@utility type-post-title {
+  @apply text-3xl font-bold leading-tight text-accent sm:text-4xl;
+}
+
+@utility type-page-title {
+  @apply text-2xl font-semibold sm:text-3xl;
+}
+
+@utility type-card-title {
+  @apply text-xl font-semibold leading-snug tracking-tight sm:text-2xl;
+}
+
+@utility type-section-label {
+  @apply font-semibold text-accent text-sm tracking-[0.08em];
+}
+
+@utility type-body-lead {
+  @apply text-lg text-text-secondary leading-relaxed;
+}
+
+@utility type-meta {
+  @apply text-text-muted text-sm;
+}
+
+@utility type-micro {
+  @apply text-text-muted text-xs;
+}
+
+@utility type-index {
+  @apply font-mono text-accent text-sm;
+}
+
+@utility type-card-desc {
+  @apply max-w-2xl text-text-secondary leading-relaxed;
+}
+
+.home-hero-title {
+  @apply sm:text-[2.75rem];
+}
+
+@utility tone-link {
+  @apply text-accent decoration-dotted underline-offset-4 transition-colors duration-200 hover:underline;
+}
+
+@utility tone-link-strong {
+  @apply text-accent decoration-dashed underline-offset-4 transition-colors duration-200 hover:underline;
+}
+
+@utility hover-accent {
+  @apply transition-colors duration-200 hover:text-accent;
+}
+
+@utility hover-quiet {
+  @apply transition-colors duration-200 hover:text-foreground;
+}
+
+@utility hover-title {
+  @apply transition-colors duration-200 group-hover:text-accent;
+}
+
+@utility hover-chip {
+  @apply transition-colors duration-200 hover:border-accent hover:text-accent;
+}
+
+@utility hover-surface {
+  @apply transition-colors duration-200 hover:bg-muted;
+}
+
+@utility hover-guide {
+  @apply transition-colors duration-200 hover:border-accent/40 hover:text-accent;
+}
+
+@utility focus-ring {
+  @apply focus-visible:ring-2 focus-visible:ring-accent focus-visible:rounded;
+}
+
+@utility shape-control {
+  @apply rounded-sm;
+}
+
+@utility shape-panel {
+  @apply rounded-md;
+}
+
+@utility shadow-popover {
+  @apply shadow-lg;
+}
+
+@utility tooltip-popover {
+  @apply pointer-events-none fixed z-50 w-max max-w-[200px] whitespace-normal shape-control bg-foreground px-2 py-1 text-xs text-background opacity-0 shadow-popover transition-opacity duration-200 group-hover:opacity-100 group-hover:delay-400;
+}
+
+.site-header {
+  @apply fixed inset-x-0 top-0 z-30 bg-background;
+}
+
+.top-bar {
+  @apply line-frame flex h-16 items-center justify-between border-b px-4 sm:px-6;
+}
+
+.site-pane {
+  display: none;
+}
+
+@media (min-width: 1280px) {
+.site-pane {
+    @apply line-frame fixed start-0 bottom-0 z-20 block overflow-y-auto border-e bg-background px-6 py-6;
+
+    top: var(--header-h);
+    width: var(--sidebar-w);
+  }
+}
+
+.mobile-nav-menu {
+  @apply line-frame absolute top-16 left-0 z-30 w-full border-b bg-background py-4 shadow-lg;
+}
+
+.desktop-nav-menu {
+  @apply line-pane mt-6 w-full border-t pt-5;
+}
+
+.desktop-nav-menu a {
+  @apply hover-accent relative py-2 ps-4 text-base text-text-secondary;
+}
+
+.desktop-nav-menu a::before {
+  content: "";
+
+  @apply absolute start-0 top-1/2 h-0 w-px -translate-y-1/2 bg-accent transition-[height] duration-200;
+}
+
+.desktop-nav-menu a:hover,
+.desktop-nav-menu a.active-nav {
+  @apply text-accent no-underline;
+}
+
+.desktop-nav-menu a.active-nav::before,
+.desktop-nav-menu a:hover::before {
+  @apply h-5;
+}
+
+.site-signature {
+  @apply pb-0;
+}
+
+.site-kicker {
+  @apply type-section-label uppercase;
+}
+
+.site-rss {
+  @apply tone-link mt-4 inline-flex text-sm;
+}
+
+.site-social-links {
+  @apply line-pane mt-auto flex items-center justify-between border-t pt-5;
+}
+
+.site-social-links a {
+  @apply hover-accent p-2 text-text-muted;
+}
+
+.site-social-links li {
+  @apply flex items-center;
+}
+
+.site-social-links li + li::before {
+  content: "";
+
+  @apply mx-2 size-1 rounded-full bg-border/60;
+}
+
+.post-side {
+  @apply sticky overflow-y-auto pb-6;
+
+  top: calc(var(--header-h) + 2rem);
+  max-height: calc(100vh - var(--header-h) - 3rem);
+  overscroll-behavior: auto;
+  scrollbar-width: none;
+}
+
+.post-side::-webkit-scrollbar {
+  display: none;
+}
+
+.post-grid {
+  @apply grid min-w-0 gap-12;
+}
+
+@media (min-width: 1280px) {
+  .post-grid {
+    grid-template-columns: minmax(0, 720px) var(--context-w);
+    align-items: start;
+  }
+}
+
+@utility pane-head {
+  @apply line-frame mb-8 border-b pb-4;
+}
+
+@utility pane-title {
+  @apply type-section-label;
+}
+
+@utility pane-sub {
+  @apply mt-2 max-w-2xl text-text-muted leading-relaxed;
+}
+
+@utility publication-data {
+  @apply line-frame mt-6 w-full max-w-2xl border-y text-sm;
+}
+
+@utility publication-row {
+  @apply line-frame grid grid-cols-[6rem_minmax(0,1fr)] gap-4 border-t py-2 first:border-t-0 sm:grid-cols-[8rem_minmax(0,1fr)];
+}
+
+@utility publication-key {
+  @apply text-accent font-normal;
 }
 
 .active-nav {

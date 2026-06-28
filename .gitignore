@@ -1,6 +1,12 @@
 node_modules
 dist
 .env
+.env.*
+!.env.example
+*.key
+*.p12
+*.pem
+id_rsa*
 .astro
 .opencode/
 .agents

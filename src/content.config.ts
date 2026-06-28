@@ -7,7 +7,10 @@ import { LOCALES } from "@/i18n/config";
 export const BLOG_PATH = "src/data/blog";
 
 const blog = defineCollection({
-  loader: glob({ pattern: "**/[^_]*.md", base: `./${BLOG_PATH}` }),
+  loader: glob({
+    pattern: ["**/[^_]*.md", "!**/_*/**"],
+    base: `./${BLOG_PATH}`,
+  }),
   schema: z.object({
     // === Required ===
     locale: z.enum(LOCALES).default("zh"),
@@ -22,6 +25,10 @@ const blog = defineCollection({
     author: z.string().default(SITE.author),
     modDatetime: z.coerce.date().optional(),
     tags: z.array(z.string()).default(["others"]),
+    series: z.string().optional(),
+    aiLabel: z
+      .enum(["assisted-by-ai", "made-with-ai", "no-ai-used"])
+      .default("assisted-by-ai"),
     math: z.boolean().optional().default(false),
     timezone: z.string().optional(),
     license: z.enum(["cc-by-nc-sa-4.0", "copyright"]).optional(),
@@ -29,7 +36,10 @@ const blog = defineCollection({
 });
 
 const pages = defineCollection({
-  loader: glob({ pattern: "**/[^_]*.md", base: "./src/data/pages" }),
+  loader: glob({
+    pattern: ["**/[^_]*.md", "!**/_*/**"],
+    base: "./src/data/pages",
+  }),
   schema: z.object({
     title: z.string(),
     locale: z.enum(LOCALES),

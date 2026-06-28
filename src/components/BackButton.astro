@@ -14,7 +14,7 @@ const locale = resolveLocale(Astro.currentLocale);
       <LinkButton
         id="back-button"
         href="/"
-        class="-ms-2 mt-8 mb-2 hover:text-foreground/75"
+        class="hover-quiet -ms-2 mt-8 mb-2"
       >
         <Icon name="tabler:chevron-left" class="inline-block size-6 rtl:rotate-180" />
         <span>{t(UI.post.goBack, locale)}</span>
@@ -24,6 +24,9 @@ const locale = resolveLocale(Astro.currentLocale);
 }
 
 <script>
+  import { initScript, onSwap } from "../scripts/lifecycle";
+
+  const signal = initScript("__backBtnAC");
   const LOCALE_RE = /^\/([a-z]{2})\//;
 
   function extractLocale(path: string): string {
@@ -48,12 +51,18 @@ const locale = resolveLocale(Astro.currentLocale);
     if (backUrl) backButton.href = backUrl;
   }
 
-  document.addEventListener("astro:before-swap", () => {
-    if (!/\/posts\/.+/.test(window.location.pathname)) {
-      sessionStorage.setItem("prevUrl", window.location.pathname + window.location.search);
-    }
-  });
+  document.addEventListener(
+    "astro:before-swap",
+    () => {
+      if (!document.querySelector("#article")) {
+        sessionStorage.setItem(
+          "prevUrl",
+          window.location.pathname + window.location.search,
+        );
+      }
+    },
+    { signal },
+  );
 
-  document.addEventListener("astro:page-load", updateGoBackUrl);
-  updateGoBackUrl();
+  onSwap(updateGoBackUrl, signal);
 </script>

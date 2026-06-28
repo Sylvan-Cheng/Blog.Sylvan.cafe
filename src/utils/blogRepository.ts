@@ -1,6 +1,7 @@
 import type { CollectionEntry } from "astro:content";
 import { getCollection } from "astro:content";
 import { LOCALES, type Locale } from "@/i18n/config";
+import { comparePostsByDateDesc } from "./postDates";
 import { groupPostsByTranslationKey } from "./postTranslations";
 
 type BlogPost = CollectionEntry<"blog">;
@@ -23,11 +24,7 @@ export async function getPostsByLocale(
 }
 
 export function sortPosts(posts: BlogPost[]): BlogPost[] {
-  return [...posts].sort(
-    (a, b) =>
-      (b.data.modDatetime ?? b.data.pubDatetime ?? new Date(0)).getTime() -
-      (a.data.modDatetime ?? a.data.pubDatetime ?? new Date(0)).getTime(),
-  );
+  return [...posts].sort(comparePostsByDateDesc);
 }
 
 export async function getSortedPosts(

@@ -6,6 +6,7 @@ description: Оглядываясь на рост и изменения в те�
 tags:
   - test
   - life
+series: annual-review
 ---
 
 ## Технический рост

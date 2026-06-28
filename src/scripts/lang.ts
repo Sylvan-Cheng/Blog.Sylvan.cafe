@@ -1,8 +1,21 @@
 import { initScript, onSwap } from "./lifecycle";
 
 const signal = initScript("__langAC");
+let pickerController: AbortController | undefined;
+
+signal.addEventListener(
+  "abort",
+  () => {
+    pickerController?.abort();
+  },
+  { once: true },
+);
 
 function initLangPicker(): void {
+  pickerController?.abort();
+  pickerController = new AbortController();
+  const pickerSignal = pickerController.signal;
+
   const trigger = document.querySelector<HTMLButtonElement>("#lang-trigger");
   const dropdown = document.querySelector<HTMLUListElement>("#lang-dropdown");
   if (!trigger || !dropdown) return;
@@ -26,7 +39,7 @@ function initLangPicker(): void {
       e.stopPropagation();
       dd.hidden ? open() : close();
     },
-    { signal },
+    { signal: pickerSignal },
   );
 
   dd.addEventListener(
@@ -38,7 +51,7 @@ function initLangPicker(): void {
       }
       close();
     },
-    { signal },
+    { signal: pickerSignal },
   );
 
   document.addEventListener(
@@ -48,7 +61,7 @@ function initLangPicker(): void {
         close();
       }
     },
-    { signal },
+    { signal: pickerSignal },
   );
 
   document.addEventListener(
@@ -56,7 +69,7 @@ function initLangPicker(): void {
     (e) => {
       if (e.key === "Escape") close();
     },
-    { signal },
+    { signal: pickerSignal },
   );
 }
 

@@ -1,4 +1,4 @@
-import type { Dict, TemplateDict } from "./config";
+import type { Dict, ListDict, TemplateDict } from "./config";
 
 export const miscSection = {
   notFound: {
@@ -172,7 +172,7 @@ export const miscSection = {
       "Novembro",
       "Decembro",
     ],
-  },
+  } satisfies ListDict,
 
   /** About page */
   about: {
@@ -236,13 +236,29 @@ export const miscSection = {
       eo: "Sekva",
     } satisfies Dict,
   },
-  notByAI: {
-    zh: "人类创作，而非 AI",
-    en: "Produced By Human Not By AI",
-    ja: "AI ではなく人間による制作",
-    ru: "Создано человеком, а не ИИ",
-    eo: "Kreita de Homo, Ne de AI",
-  } satisfies Dict,
+  aiLabel: {
+    assistedByAI: {
+      zh: "由 AI 辅助创作",
+      en: "Assisted by AI",
+      ja: "AI の支援を受けて制作",
+      ru: "Создано при поддержке ИИ",
+      eo: "Kreita kun helpo de AI",
+    } satisfies Dict,
+    madeWithAI: {
+      zh: "使用 AI 创作",
+      en: "Made with AI",
+      ja: "AI を使用して制作",
+      ru: "Создано с помощью ИИ",
+      eo: "Farita per AI",
+    } satisfies Dict,
+    noAIUsed: {
+      zh: "未使用 AI 创作",
+      en: "No AI used",
+      ja: "AI 未使用で制作",
+      ru: "Создано без ИИ",
+      eo: "Farita sen AI",
+    } satisfies Dict,
+  },
   readingProgress: {
     zh: "阅读进度",
     en: "Reading progress",

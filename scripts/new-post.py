@@ -9,6 +9,7 @@
 """
 
 from datetime import datetime, timezone
+import json
 from pathlib import Path
 
 from rich.console import Console
@@ -28,6 +29,7 @@ LOCALES = {
     "en": "English",
     "ja": "日本語",
     "ru": "Русский",
+    "eo": "Esperanto",
 }
 
 TAG_PRESETS = [
@@ -118,11 +120,20 @@ def validate_description(text: str) -> tuple[bool, str]:
 
 
 def validate_slug(text: str) -> tuple[bool, str]:
-    if not text.strip():
+    slug = text.strip()
+    if not slug:
         return False, "slug 不能为空"
-    if " " in text:
+    if slug != text or " " in slug:
         return False, "slug 不能包含空格，用连字符 - 代替"
+    if any(part in slug for part in ("/", "\\", "..", ":")):
+        return False, "slug 只能是单个安全文件夹名，不能包含路径符号"
+    if Path(slug).is_absolute():
+        return False, "slug 不能是绝对路径"
     return True, ""
+
+
+def yaml_string(value: str) -> str:
+    return json.dumps(value, ensure_ascii=False)
 
 
 # ── 主流程 ────────────────────────────────────────────────────
@@ -152,8 +163,6 @@ def prompt_frontmatter() -> dict:
         tags.extend(t.strip() for t in custom.split(",") if t.strip())
 
     use_math = Confirm.ask("启用 KaTeX 数学公式？", default=False)
-    featured = Confirm.ask("置顶文章？", default=False)
-    draft = Confirm.ask("保存为草稿？", default=False)
 
     lic_idx = ask_choice("版权协议", [desc for _, desc in LICENSE_OPTIONS])
     license_val = LICENSE_OPTIONS[lic_idx][0]
@@ -170,8 +179,6 @@ def prompt_frontmatter() -> dict:
         "description": description,
         "author": author,
         "tags": tags,
-        "featured": featured,
-        "draft": draft,
         "math": use_math,
         "license": license_val,
     }
@@ -181,18 +188,14 @@ def build_frontmatter(data: dict) -> str:
     lines = [
         "---",
         f"locale: {data['locale']}",
-        f'title: "{data["title"]}"',
+        f"title: {yaml_string(data['title'])}",
         f"pubDatetime: {data['pubDatetime']}",
-        f'description: "{data["description"]}"',
+        f"description: {yaml_string(data['description'])}",
     ]
 
     if data["author"] != "Sylvan":
-        lines.append(f'author: "{data["author"]}"')
+        lines.append(f"author: {yaml_string(data['author'])}")
 
-    if data["featured"]:
-        lines.append("featured: true")
-    if data["draft"]:
-        lines.append("draft: true")
     if data["math"]:
         lines.append("math: true")
 
@@ -200,7 +203,7 @@ def build_frontmatter(data: dict) -> str:
 
     lines.append("tags:")
     for tag in data["tags"]:
-        lines.append(f"  - {tag}")
+        lines.append(f"  - {yaml_string(tag)}")
 
     lines.append("---")
     return "\n".join(lines)
@@ -216,11 +219,17 @@ BODY_TEMPLATES = {
     "en": "## Start Writing\n\nWrite your content here...\n",
     "ja": "## 書き始める\n\nここに本文を書く...\n",
     "ru": "## Начать писать\n\nПишите здесь...\n",
+    "eo": "## Komenci skribi\n\nSkribu vian enhavon ĉi tie...\n",
 }
 
 
 def create_post(slug: str, locale: str, frontmatter: str) -> Path | None:
-    post_dir = BLOG_BASE / slug
+    blog_base = BLOG_BASE.resolve()
+    post_dir = (BLOG_BASE / slug).resolve()
+    if not post_dir.is_relative_to(blog_base):
+        err_console.print("[red]slug 指向博客目录之外，已拒绝写入[/red]")
+        return None
+
     post_dir.mkdir(parents=True, exist_ok=True)
     file_path = post_dir / f"{locale}.md"
 

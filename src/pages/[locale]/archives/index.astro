@@ -10,6 +10,7 @@ import { resolveLocale, t } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import Main from "@/layouts/Main.astro";
 import { getPostsByLocale } from "@/utils/blogRepository";
+import { comparePostsByDateDesc } from "@/utils/postDates";
 
 type GroupKey = string | number | symbol;
 
@@ -67,20 +68,10 @@ const posts = await getPostsByLocale(locale);
                     <span class="font-bold">{months[Number(month) - 1]}</span>
                     <sup class="text-xs">{monthGroup.length}</sup>
                   </div>
-                  <ul>
+                  <ul class="line-frame border-b">
                     {monthGroup
-                      .sort(
-                        (a, b) =>
-                          Math.floor(
-                            new Date(b.data.pubDatetime).getTime() / 1000
-                          ) -
-                          Math.floor(
-                            new Date(a.data.pubDatetime).getTime() / 1000
-                          )
-                      )
-                      .map(data => (
-                        <Card {...data} locale={locale} />
-                      ))}
+                      .sort(comparePostsByDateDesc)
+                      .map(data => <Card {...data} locale={locale} />)}
                   </ul>
                 </div>
               ))}
