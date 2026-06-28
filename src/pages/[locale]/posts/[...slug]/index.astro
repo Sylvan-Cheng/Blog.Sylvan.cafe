@@ -2,14 +2,12 @@
 import type { CollectionEntry } from "astro:content";
 import { LOCALES } from "@/i18n/config";
 import PostDetails from "@/layouts/PostDetails.astro";
-import { getPostIndex } from "@/utils/blogRepository";
+import { getPostIndex, type PostIndex } from "@/utils/blogRepository";
 import { getPostSlugPath } from "@/utils/contentIdentity";
-import { buildTranslationMap } from "@/utils/postTranslations";
 
 type Props = {
   post: CollectionEntry<"blog">;
-  translationMap: Record<string, string>;
-  posts: CollectionEntry<"blog">[];
+  postIndex: PostIndex;
 };
 
 export async function getStaticPaths() {
@@ -23,14 +21,13 @@ export async function getStaticPaths() {
           params: { locale, slug: getPostSlugPath(post) },
           props: {
             post,
-            translationMap: buildTranslationMap(post, postIndex.postsByKey),
-            posts: postIndex.sortedPostsByLocale[locale],
+            postIndex,
           },
         };
       }),
   );
 }
 
-const { post, translationMap, posts } = Astro.props;
+const { post, postIndex } = Astro.props;
 ---
-<PostDetails post={post} posts={posts} translationMap={translationMap} />
+<PostDetails post={post} postIndex={postIndex} />

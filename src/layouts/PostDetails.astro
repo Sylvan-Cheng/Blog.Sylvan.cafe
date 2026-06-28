@@ -17,16 +17,16 @@ import Tag from "@/components/Tag.astro";
 import { SITE } from "@/config";
 import { resolveLocale } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
+import type { PostIndex } from "@/utils/blogRepository";
 import { buildPostDetailsModel } from "@/utils/postDetailsModel";
 import { slugifyStr } from "@/utils/slugify";
 
 type Props = {
   post: CollectionEntry<"blog">;
-  posts: CollectionEntry<"blog">[];
-  translationMap: Record<string, string>;
+  postIndex: PostIndex;
 };
 
-const { post, posts, translationMap } = Astro.props;
+const { post, postIndex } = Astro.props;
 const locale = resolveLocale(Astro.currentLocale);
 
 const { title, pubDatetime, modDatetime, timezone, tags, license } = post.data;
@@ -40,7 +40,7 @@ const {
   nextPost,
   prevPost,
   wordCount,
-} = await buildPostDetailsModel({ post, posts, translationMap, locale });
+} = await buildPostDetailsModel({ post, postIndex, locale });
 ---
 
 <Layout {...layoutProps}>
