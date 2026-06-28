@@ -26,6 +26,9 @@ const blog = defineCollection({
     modDatetime: z.coerce.date().optional(),
     tags: z.array(z.string()).default(["others"]),
     series: z.string().optional(),
+    aiLabel: z
+      .enum(["assisted-by-ai", "made-with-ai", "no-ai-used"])
+      .default("assisted-by-ai"),
     math: z.boolean().optional().default(false),
     timezone: z.string().optional(),
     license: z.enum(["cc-by-nc-sa-4.0", "copyright"]).optional(),
