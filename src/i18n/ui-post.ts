@@ -1,4 +1,5 @@
 import type { Dict, TemplateDict } from "./config";
+import { ruPlural } from "./plurals";
 
 export const postSection = {
   /** Post detail */
@@ -32,20 +33,12 @@ export const postSection = {
       eo: "Ĝisdatigita:",
     } satisfies Dict,
     wordsCount: {
-      zh: (count: string) => `${count} 字`,
-      en: (count: string) => `${count} words`,
-      ja: (count: string) => `${count} 文字`,
-      ru: (count: string) => {
-        const n = parseInt(count, 10);
-        const lastDigit = n % 10;
-        const lastTwo = n % 100;
-        if (lastTwo >= 11 && lastTwo <= 14) return `${count} слов`;
-        if (lastDigit === 1) return `${count} слово`;
-        if (lastDigit >= 2 && lastDigit <= 4) return `${count} слова`;
-        return `${count} слов`;
-      },
-      eo: (count: string) => `${count} vortoj`,
-    } satisfies TemplateDict,
+      zh: (count) => `${count} 字`,
+      en: (count) => `${count} words`,
+      ja: (count) => `${count} 文字`,
+      ru: (count) => ruPlural(count, "слово", "слова", "слов"),
+      eo: (count) => `${count} vortoj`,
+    } satisfies TemplateDict<number>,
     continueReading: {
       zh: "继续阅读",
       en: "Continue Reading",

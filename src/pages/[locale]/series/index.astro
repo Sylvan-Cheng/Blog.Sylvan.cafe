@@ -28,7 +28,7 @@ const { seriesGroups } = await buildSeriesPageModel(locale);
           <article>
             <header class="mb-4 pb-1">
               <h2 class="pane-title">{getSeriesLabel(series.key, locale)}</h2>
-              <p class="pane-sub">{tp(UI.series.postCount, locale, String(series.count))} · {t(UI.series.updated, locale)} {series.updatedAt.toISOString().slice(0, 10)}</p>
+              <p class="pane-sub">{tp(UI.series.postCount, locale, series.count)} · {t(UI.series.updated, locale)} {series.updatedAt.toISOString().slice(0, 10)}</p>
             </header>
             <ol class="divide-y divide-soft">
               {series.posts.map((post, index) => (

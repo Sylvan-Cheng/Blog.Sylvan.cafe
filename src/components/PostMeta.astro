@@ -18,5 +18,5 @@ const { locale, modDatetime, pubDatetime, timezone, wordCount } = Astro.props;
 <div class="type-meta mt-4 flex flex-wrap items-center gap-x-3 gap-y-2" data-print-hide>
   <Datetime {pubDatetime} {modDatetime} {timezone} size="lg" />
   <span aria-hidden="true">·</span>
-  <span>{tp(UI.post.wordsCount, locale, String(wordCount))}</span>
+  <span>{tp(UI.post.wordsCount, locale, wordCount)}</span>
 </div>

@@ -1,4 +1,4 @@
-import type { Dict, TemplateDict } from "./config";
+import type { Dict, ListDict, TemplateDict } from "./config";
 
 export const miscSection = {
   notFound: {
@@ -172,7 +172,7 @@ export const miscSection = {
       "Novembro",
       "Decembro",
     ],
-  },
+  } satisfies ListDict,
 
   /** About page */
   about: {

@@ -1,4 +1,5 @@
 import type { Dict, TemplateDict } from "./config";
+import { ruPlural } from "./plurals";
 
 export const seriesSection = {
   series: {
@@ -18,20 +19,11 @@ export const seriesSection = {
     } satisfies Dict,
     postCount: {
       zh: (count) => `${count} 篇文章`,
-      en: (count) => `${count} ${Number(count) === 1 ? "post" : "posts"}`,
+      en: (count) => `${count} ${count === 1 ? "post" : "posts"}`,
       ja: (count) => `${count} 記事`,
-      ru: (count) => {
-        const n = Number(count);
-        const mod10 = n % 10;
-        const mod100 = n % 100;
-        if (mod10 === 1 && mod100 !== 11) return `${count} запись`;
-        if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) {
-          return `${count} записи`;
-        }
-        return `${count} записей`;
-      },
+      ru: (count) => ruPlural(count, "запись", "записи", "записей"),
       eo: (count) => `${count} afiŝoj`,
-    } satisfies TemplateDict,
+    } satisfies TemplateDict<number>,
     updated: {
       zh: "更新于",
       en: "updated",
