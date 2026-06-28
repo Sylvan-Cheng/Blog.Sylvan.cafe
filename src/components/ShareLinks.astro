@@ -1,108 +1,18 @@
 ---
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
+import {
+  getShareHref,
+  getShareLabel,
+  getSharePlatforms,
+} from "@/utils/shareConfig";
 import Icon from "./Icon.astro";
 import LinkButton from "./LinkButton.astro";
 import Tooltip from "./Tooltip.astro";
 
 const locale = resolveLocale(Astro.currentLocale);
 const pageUrl = Astro.url.href;
-
-const shareConfig: Record<string, { primary: string[]; more: string[] }> = {
-  zh: {
-    primary: ["copy", "brand-wechat", "brand-telegram", "brand-qq"],
-    more: [
-      "brand-x",
-      "brand-reddit",
-      "brand-whatsapp",
-      "brand-line",
-      "brand-facebook",
-      "mail",
-    ],
-  },
-  en: {
-    primary: ["copy", "brand-x", "brand-reddit", "mail"],
-    more: [
-      "brand-whatsapp",
-      "brand-telegram",
-      "brand-facebook",
-      "brand-wechat",
-      "brand-line",
-      "brand-qq",
-    ],
-  },
-  ru: {
-    primary: ["copy", "brand-telegram", "brand-x", "mail"],
-    more: [
-      "brand-whatsapp",
-      "brand-reddit",
-      "brand-facebook",
-      "brand-line",
-      "brand-wechat",
-      "brand-qq",
-    ],
-  },
-  ja: {
-    primary: ["copy", "brand-x", "brand-line", "brand-facebook"],
-    more: [
-      "brand-reddit",
-      "brand-whatsapp",
-      "brand-telegram",
-      "brand-wechat",
-      "brand-qq",
-      "mail",
-    ],
-  },
-  eo: {
-    primary: ["copy", "brand-x", "brand-reddit", "mail"],
-    more: [
-      "brand-whatsapp",
-      "brand-telegram",
-      "brand-facebook",
-      "brand-wechat",
-      "brand-line",
-      "brand-qq",
-    ],
-  },
-};
-
-const platformKeyMap: Record<string, keyof typeof UI.share.platforms> = {
-  copy: "copy",
-  "brand-wechat": "wechat",
-  "brand-telegram": "telegram",
-  "brand-qq": "qq",
-  "brand-x": "x",
-  "brand-reddit": "reddit",
-  "brand-whatsapp": "whatsapp",
-  "brand-line": "line",
-  "brand-facebook": "facebook",
-  mail: "mail",
-};
-
-const shareUrls: Record<string, string> = {
-  "brand-whatsapp": "https://wa.me/?text=",
-  "brand-facebook": "https://www.facebook.com/sharer.php?u=",
-  "brand-x": "https://x.com/intent/post?url=",
-  "brand-telegram": "https://t.me/share/url?url=",
-  "brand-reddit": "https://www.reddit.com/submit?url=",
-  "brand-line": "https://social-plugins.line.me/lineit/share?url=",
-  mail: "mailto:?subject=&body=",
-};
-
-const cfg = shareConfig[locale] || shareConfig.en;
-
-function getHref(icon: string): string {
-  if (icon === "copy") return "#";
-  const base = shareUrls[icon];
-  if (!base) return "#";
-  return base + encodeURIComponent(pageUrl);
-}
-
-function getLabel(icon: string): string {
-  const key = platformKeyMap[icon];
-  if (!key) return icon;
-  return t(UI.share.platforms[key], locale);
-}
+const cfg = getSharePlatforms(locale);
 
 const LINK =
   "scale-90 p-2 hover:-translate-y-[0.05rem] transition-transform duration-200 sm:p-1 " +
@@ -125,9 +35,9 @@ const ICON =
 
     <!-- primary buttons -->
     {cfg.primary.map(icon => (
-      <Tooltip text={getLabel(icon)}>
+      <Tooltip text={getShareLabel(icon, locale)}>
         {icon === 'copy' ? (
-          <LinkButton href="#" class={LINK} data-share-btn="copy" aria-label={getLabel('copy')}>
+          <LinkButton href="#" class={LINK} data-share-btn="copy" aria-label={getShareLabel('copy', locale)}>
             <span class="share-copy-default"><Icon name="tabler:copy" class={ICON} /></span>
             <span class="share-copy-success hidden"><Icon name="tabler:check" class={ICON} /></span>
             <span class="sr-only" aria-live="polite" data-share-live
@@ -137,12 +47,12 @@ const ICON =
           </LinkButton>
         ) : (
           <LinkButton
-            href={getHref(icon)}
-            target={getHref(icon) !== '#' ? '_blank' : undefined}
-            rel={getHref(icon) !== '#' ? 'noopener noreferrer' : undefined}
+            href={getShareHref(icon, pageUrl)}
+            target={getShareHref(icon, pageUrl) !== '#' ? '_blank' : undefined}
+            rel={getShareHref(icon, pageUrl) !== '#' ? 'noopener noreferrer' : undefined}
             class={LINK}
             data-share-btn={icon}
-            aria-label={getLabel(icon)}
+            aria-label={getShareLabel(icon, locale)}
           >
             <Icon name={`tabler:${icon}`} class={ICON} />
           </LinkButton>
@@ -157,14 +67,14 @@ const ICON =
       style="max-width:0;max-height:0"
     >
       {cfg.more.map(icon => (
-        <Tooltip text={getLabel(icon)}>
+        <Tooltip text={getShareLabel(icon, locale)}>
           <LinkButton
-            href={getHref(icon)}
-            target={getHref(icon) !== '#' ? '_blank' : undefined}
-            rel={getHref(icon) !== '#' ? 'noopener noreferrer' : undefined}
+            href={getShareHref(icon, pageUrl)}
+            target={getShareHref(icon, pageUrl) !== '#' ? '_blank' : undefined}
+            rel={getShareHref(icon, pageUrl) !== '#' ? 'noopener noreferrer' : undefined}
             class={`more-item shrink-0 ${LINK} opacity-0 pointer-events-none transition-[opacity,transform] duration-300 ease-out`}
             data-share-btn={icon}
-            aria-label={getLabel(icon)}
+            aria-label={getShareLabel(icon, locale)}
             aria-hidden="true"
             tabindex="-1"
           >
