@@ -76,6 +76,7 @@ const {
 } = loadTsModule(resolve(rootDir, "src/utils/localizedContentIndex.ts"));
 const { getPath } = loadTsModule(resolve(rootDir, "src/utils/getPath.ts"));
 const { serializeJsonLd } = loadTsModule(resolve(rootDir, "src/utils/layoutSeo.ts"));
+const { slugifyStr } = loadTsModule(resolve(rootDir, "src/utils/slugify.ts"));
 const { parseCodeMeta } = loadTsModule(resolve(rootDir, "src/utils/transformers/codeMetaParser.ts"));
 
 const fullMeta = parseCodeMeta('file="demo.ts" collapse nolines');
@@ -87,6 +88,12 @@ const emptyMeta = parseCodeMeta();
 assert.equal(emptyMeta.collapse, false);
 assert.equal(emptyMeta.file, undefined);
 assert.equal(emptyMeta.nolines, false);
+
+assert.equal(slugifyStr("E2E Testing"), "e2e-testing");
+assert.equal(slugifyStr("TypeScript 5.0"), "typescript-5.0");
+assert.equal(slugifyStr("中文 标题 123"), "中文-标题-123");
+assert.equal(slugifyStr("Hello 世界 123"), "hello-世界-123");
+assert.equal(slugifyStr("日本語 テスト 7"), "日本語-テスト-7");
 
 const usedIds = new Set();
 assert.equal(buildHeadingId("Hello World", usedIds, "fallback"), "hello-world");
