@@ -1,10 +1,10 @@
 import type { Locale } from "@/i18n/config";
-import { getPostsByLocale } from "./blogRepository";
-import { buildSeriesGroups } from "./seriesModel";
+import { getLocalizedContentIndex } from "./localizedContentIndex";
 
 export async function buildSeriesPageModel(locale: Locale) {
-  const posts = await getPostsByLocale(locale);
+  const contentByLocale = await getLocalizedContentIndex();
+
   return {
-    seriesGroups: buildSeriesGroups(posts),
+    seriesGroups: contentByLocale[locale].seriesGroups,
   };
 }
