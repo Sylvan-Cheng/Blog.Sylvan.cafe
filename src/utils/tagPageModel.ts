@@ -1,25 +1,18 @@
 import type { GetStaticPathsOptions } from "astro";
 import { SITE } from "@/config";
 import { LOCALES } from "@/i18n/config";
-import { getPostsByLocale, sortPosts } from "./blogRepository";
-import { postHasTag } from "./contentIdentity";
-import getUniqueTags from "./getUniqueTags";
+import { getLocalizedContentIndex } from "./localizedContentIndex";
 
 type Paginate = GetStaticPathsOptions["paginate"];
 
 export async function buildTagStaticPaths(paginate: Paginate) {
   const results = [];
+  const contentByLocale = await getLocalizedContentIndex();
 
   for (const locale of LOCALES) {
-    const posts = await getPostsByLocale(locale);
-    const tags = getUniqueTags(posts);
-
-    for (const { tag, tagName } of tags) {
-      const tagPosts = sortPosts(posts.filter((post) => postHasTag(post, tag)));
-      if (tagPosts.length === 0) continue;
-
+    for (const { tag, tagName, posts } of contentByLocale[locale].tags) {
       results.push(
-        ...paginate(tagPosts, {
+        ...paginate(posts, {
           params: { locale, tag },
           props: { tagName },
           pageSize: SITE.postPerPage,
