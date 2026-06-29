@@ -13,3 +13,4 @@ id_rsa*
 AGENTS.md
 CLAUDE.md
 .playwright-mcp/
+graphify-out/

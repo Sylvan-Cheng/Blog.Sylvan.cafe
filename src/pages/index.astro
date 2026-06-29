@@ -1,1 +1,28 @@
-<!DOCTYPE html><meta charset="utf-8"><script>var l=(navigator.language||"zh").slice(0,2);location.replace("/"+(["zh","en","ja","ru","eo"].includes(l)?l:"zh")+"/")</script>
+---
+import { SITE } from "@/config";
+import { LOCALES } from "@/i18n/config";
+
+const defaultLocale = "zh";
+const supportedLocales = LOCALES;
+---
+
+<!doctype html>
+<html lang={defaultLocale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{SITE.title}</title>
+    <link rel="canonical" href={`/${defaultLocale}/`} />
+    <script is:inline define:vars={{ defaultLocale, supportedLocales }}>
+      const locale = (navigator.language || defaultLocale).slice(0, 2);
+      const targetLocale = supportedLocales.includes(locale)
+        ? locale
+        : defaultLocale;
+      location.replace(`/${targetLocale}/`);
+    </script>
+  </head>
+  <body>
+    <a href={`/${defaultLocale}/`}>Continue to {SITE.title}</a>
+  </body>
+</html>
