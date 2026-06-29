@@ -11,7 +11,6 @@ import { defineConfig, envField } from "astro/config";
 import icon from "astro-icon";
 import rehypeKatex from "rehype-katex";
 import rehypeRaw from "rehype-raw";
-import remarkCollapse from "remark-collapse";
 import remarkGithubBlockquoteAlert from "remark-github-blockquote-alert";
 import remarkMath from "remark-math";
 import remarkToc from "remark-toc";
@@ -55,7 +54,6 @@ export default defineConfig({
         remarkMath,
         remarkMermaid,
         remarkGithubBlockquoteAlert,
-        [remarkCollapse, { test: "Table of contents" }],
       ],
       rehypePlugins: [
         rehypeRaw,
