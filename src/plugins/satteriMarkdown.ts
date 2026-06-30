@@ -4,7 +4,6 @@ import type {
 } from "@astrojs/markdown-satteri";
 import { renderMermaidSVG } from "beautiful-mermaid";
 import type { Element, ElementContent, RootContent } from "hast";
-import katex from "katex";
 import { parseCodeMeta } from "../utils/transformers/codeMetaParser";
 import { getTextContent, toClassList } from "./hastUtils";
 import { buildHeadingId } from "./headingIds";
@@ -15,6 +14,7 @@ import {
   sanitizeRawHtml,
   sanitizeSatteriElementProperties,
 } from "./satteriHtmlSafety";
+import { satteriMathHastPlugins, satteriMathMdastPlugins } from "./satteriMath";
 
 type SatteriMdastPlugin = NonNullable<
   SatteriProcessorOptions["mdastPlugins"]
@@ -30,16 +30,6 @@ type SatteriData = {
 };
 
 type AlertType = keyof typeof ALERTS;
-
-const KATEX_DISPLAY_OPTIONS = {
-  displayMode: true,
-  throwOnError: false,
-} as const;
-
-const KATEX_DISPLAY_ARRAYSTRETCH = "1.5";
-const KATEX_PLUGIN_CACHE_KEY = `arraystretch-${KATEX_DISPLAY_ARRAYSTRETCH}`;
-const MULTILINE_MATH_ENV_PATTERN =
-  /\\begin\{(?:align\*?|aligned|alignedat|alignat\*?|gather\*?|gathered|split)\}/;
 
 const ALERTS = {
   note: {
@@ -94,20 +84,7 @@ function isElement(node: RootContent | ElementContent): node is Element {
   return node.type === "element";
 }
 
-function isMathCode(node: Element, kind: "inline" | "display"): boolean {
-  const classes = toClassList(node.properties?.className);
-  return (
-    classes.includes("language-math") &&
-    classes.includes(kind === "inline" ? "math-inline" : "math-display")
-  );
-}
-
-export function addDisplayMathRowSpacing(value: string): string {
-  if (!MULTILINE_MATH_ENV_PATTERN.test(value)) return value;
-  return `\\def\\arraystretch{${KATEX_DISPLAY_ARRAYSTRETCH}}\n${value}`;
-}
-
-export function satteriMermaid(): SatteriMdastPlugin {
+function satteriMermaid(): SatteriMdastPlugin {
   return {
     name: "sylvan-mermaid",
     code(node, ctx) {
@@ -128,7 +105,7 @@ export function satteriMermaid(): SatteriMdastPlugin {
   };
 }
 
-export function satteriGithubAlerts(): SatteriHastPlugin {
+function satteriGithubAlerts(): SatteriHastPlugin {
   return {
     name: "sylvan-github-alerts",
     element: {
@@ -199,7 +176,7 @@ export function satteriGithubAlerts(): SatteriHastPlugin {
   };
 }
 
-export function satteriSafeHtml(): SatteriHastPlugin {
+function satteriSafeHtml(): SatteriHastPlugin {
   return {
     name: "sylvan-safe-html",
     raw(node, ctx) {
@@ -232,7 +209,7 @@ export function satteriSafeHtml(): SatteriHastPlugin {
   };
 }
 
-export function satteriImgProxy(): SatteriHastPlugin {
+function satteriImgProxy(): SatteriHastPlugin {
   return {
     name: "sylvan-img-proxy",
     element: {
@@ -248,58 +225,7 @@ export function satteriImgProxy(): SatteriHastPlugin {
   };
 }
 
-export function satteriKatex(): SatteriHastPlugin {
-  return {
-    name: `sylvan-katex-${KATEX_PLUGIN_CACHE_KEY}`,
-    element: [
-      {
-        filter: ["pre"],
-        visit(node, ctx) {
-          const code = node.children?.find(
-            (child): child is Element =>
-              isElement(child) &&
-              child.tagName === "code" &&
-              isMathCode(child, "display"),
-          );
-          if (!code) return;
-
-          const html = katex.renderToString(
-            addDisplayMathRowSpacing(ctx.textContent(code)),
-            KATEX_DISPLAY_OPTIONS,
-          );
-          ctx.replaceNode(node, { type: "raw", value: html });
-        },
-      },
-      {
-        filter: ["code"],
-        visit(node, ctx) {
-          if (!isMathCode(node, "inline")) return;
-
-          const html = katex.renderToString(ctx.textContent(node), {
-            displayMode: false,
-            throwOnError: false,
-          });
-          ctx.replaceNode(node, { type: "raw", value: html });
-        },
-      },
-    ],
-  };
-}
-
-export function satteriKatexDisplay(): SatteriMdastPlugin {
-  return {
-    name: `sylvan-katex-display-${KATEX_PLUGIN_CACHE_KEY}`,
-    math(node, ctx) {
-      const html = katex.renderToString(
-        addDisplayMathRowSpacing(node.value),
-        KATEX_DISPLAY_OPTIONS,
-      );
-      ctx.replaceNode(node, { rawHtml: html });
-    },
-  };
-}
-
-export function satteriA11y(): SatteriHastPlugin {
+function satteriA11y(): SatteriHastPlugin {
   return {
     name: "sylvan-a11y",
     element: {
@@ -380,7 +306,7 @@ export function satteriA11y(): SatteriHastPlugin {
   };
 }
 
-export function satteriCodeMetaPreprocess(): SatteriMdastPlugin {
+function satteriCodeMetaPreprocess(): SatteriMdastPlugin {
   return {
     name: "sylvan-code-meta-preprocess",
     code(node, ctx) {
@@ -395,7 +321,7 @@ export function satteriCodeMetaPreprocess(): SatteriMdastPlugin {
 
 export const satteriMdastPlugins = [
   satteriMermaid(),
-  satteriKatexDisplay(),
+  ...satteriMathMdastPlugins,
   satteriCodeMetaPreprocess(),
 ];
 
@@ -403,6 +329,6 @@ export const satteriHastPlugins = [
   satteriGithubAlerts(),
   satteriSafeHtml(),
   satteriImgProxy(),
-  satteriKatex(),
+  ...satteriMathHastPlugins,
   satteriA11y(),
 ];
