@@ -43,6 +43,10 @@ export default defineConfig({
     icon(),
   ],
   markdown: {
+    syntaxHighlight: {
+      type: "shiki",
+      excludeLangs: ["math"],
+    },
     processor: satteri({
       features: {
         math: true,
