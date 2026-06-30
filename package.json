@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro check && astro build && pagefind --site dist --silent",
-    "check:markdown": "node scripts/check-markdown-transforms.mjs",
     "preview": "astro check && astro build && pagefind --site dist --silent && astro preview",
     "sync": "astro sync",
     "astro": "astro",

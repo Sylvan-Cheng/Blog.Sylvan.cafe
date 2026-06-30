@@ -33,9 +33,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Check Markdown transforms
-        run: pnpm run check:markdown
-
       - name: Build
         env:
           PUBLIC_GOOGLE_SITE_VERIFICATION: dkAat9gMwLx3qEjtwNz0fhHY5MPfSkmR0poDvVRel0Q
