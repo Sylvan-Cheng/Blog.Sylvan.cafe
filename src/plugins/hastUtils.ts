@@ -14,6 +14,7 @@ export function getTextContent(node: Element): string {
 
 export function toClassList(className: unknown): string[] {
   if (Array.isArray(className)) return className.filter(Boolean).map(String);
-  if (typeof className === "string") return [className];
+  if (typeof className === "string")
+    return className.split(/\s+/).filter(Boolean);
   return [];
 }

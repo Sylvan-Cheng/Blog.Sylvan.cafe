@@ -1,4 +1,4 @@
-import { unified } from "@astrojs/markdown-remark";
+import { satteri } from "@astrojs/markdown-satteri";
 import partytown from "@astrojs/partytown";
 import sitemap from "@astrojs/sitemap";
 import {
@@ -9,17 +9,12 @@ import {
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, envField } from "astro/config";
 import icon from "astro-icon";
-import rehypeKatex from "rehype-katex";
-import rehypeRaw from "rehype-raw";
-import remarkGithubBlockquoteAlert from "remark-github-blockquote-alert";
-import remarkMath from "remark-math";
-import remarkToc from "remark-toc";
 import { SITE, THEME_DEFS } from "./src/config";
 import { LOCALES } from "./src/i18n/config";
-import { rehypeA11y } from "./src/plugins/rehype-a11y";
-import { rehypeImgProxy } from "./src/plugins/rehypeImgProxy";
-import { rehypeSafeHtml } from "./src/plugins/rehypeSafeHtml";
-import { remarkMermaid } from "./src/plugins/remarkMermaid";
+import {
+  satteriHastPlugins,
+  satteriMdastPlugins,
+} from "./src/plugins/satteriMarkdown";
 import { transformerCodeMeta } from "./src/utils/transformers/codeMeta";
 import { transformerLineNumbers } from "./src/utils/transformers/lineNumbers";
 
@@ -48,20 +43,12 @@ export default defineConfig({
     icon(),
   ],
   markdown: {
-    processor: unified({
-      remarkPlugins: [
-        remarkToc,
-        remarkMath,
-        remarkMermaid,
-        remarkGithubBlockquoteAlert,
-      ],
-      rehypePlugins: [
-        rehypeRaw,
-        rehypeSafeHtml,
-        rehypeImgProxy,
-        rehypeKatex,
-        rehypeA11y,
-      ],
+    processor: satteri({
+      features: {
+        math: true,
+      },
+      mdastPlugins: satteriMdastPlugins,
+      hastPlugins: satteriHastPlugins,
     }),
     shikiConfig: {
       themes: theme.shiki,
