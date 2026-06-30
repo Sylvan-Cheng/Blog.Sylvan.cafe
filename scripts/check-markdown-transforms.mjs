@@ -1,14 +1,30 @@
 import assert from "node:assert/strict";
-import { createRequire } from "node:module";
+import { createRequire, registerHooks } from "node:module";
 import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import vm from "node:vm";
 import ts from "typescript";
 import { readFileSync } from "node:fs";
+import { createSatteriMarkdownProcessor } from "@astrojs/markdown-satteri";
 
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const nodeRequire = createRequire(import.meta.url);
 const moduleCache = new Map();
+const rootUrl = pathToFileURL(rootDir).href;
+
+registerHooks({
+  resolve(specifier, context, nextResolve) {
+    if (
+      specifier.startsWith(".") &&
+      !/\.[cm]?[jt]s$/i.test(specifier) &&
+      context.parentURL?.startsWith(rootUrl)
+    ) {
+      return nextResolve(`${specifier}.ts`, context);
+    }
+
+    return nextResolve(specifier, context);
+  },
+});
 
 function resolveModule(request, parentFile) {
   if (request.startsWith(".")) {
@@ -48,9 +64,16 @@ function loadTsModule(filePath) {
     if (request === "astro") {
       return {};
     }
-
+    if (request === "beautiful-mermaid") {
+      return { renderMermaidSVG: () => "<svg><style></style></svg>" };
+    }
+    if (request === "katex") {
+      return { default: { renderToString: (value) => value } };
+    }
     const resolved = resolveModule(request, filePath);
-    return resolved.endsWith(".ts") ? loadTsModule(resolved) : nodeRequire(resolved);
+    return resolved.endsWith(".ts")
+      ? loadTsModule(resolved)
+      : nodeRequire(resolved);
   };
 
   vm.runInNewContext(output, {
@@ -66,7 +89,6 @@ function loadTsModule(filePath) {
 const { buildHeadingId } = loadTsModule(resolve(rootDir, "src/plugins/headingIds.ts"));
 const { buildImgProxyUrls } = loadTsModule(resolve(rootDir, "src/plugins/imgProxyUrls.ts"));
 const { injectMermaidStyle } = loadTsModule(resolve(rootDir, "src/plugins/mermaidMarkup.ts"));
-const { sanitizeHtmlTree } = loadTsModule(resolve(rootDir, "src/plugins/rehypeSafeHtml.ts"));
 const {
   buildDocumentHeadModel,
   getScriptFont,
@@ -78,6 +100,59 @@ const { getPath } = loadTsModule(resolve(rootDir, "src/utils/getPath.ts"));
 const { serializeJsonLd } = loadTsModule(resolve(rootDir, "src/utils/layoutSeo.ts"));
 const { slugifyStr } = loadTsModule(resolve(rootDir, "src/utils/slugify.ts"));
 const { parseCodeMeta } = loadTsModule(resolve(rootDir, "src/utils/transformers/codeMetaParser.ts"));
+const { satteriHastPlugins, satteriMdastPlugins } = await import(
+  "../src/plugins/satteriMarkdown.ts"
+);
+
+async function checkSatteriProcessorSmoke() {
+  const renderer = await createSatteriMarkdownProcessor({
+    syntaxHighlight: false,
+    features: { math: true },
+    mdastPlugins: satteriMdastPlugins,
+    hastPlugins: satteriHastPlugins,
+  });
+
+  const result = await renderer.render(
+    `## Hello World
+
+> [!NOTE]
+> alert body
+
+![s3](https://s3.sylvan.cafe/a/b.png)
+
+<script>alert(1)</script>
+<img src="javascript:alert(1)" onerror="alert(1)" alt="bad">
+<a href="java&#x73;cript:alert(1)" onclick="alert(1)" title="ok">bad</a>
+<div onclick="alert(1)" class="note"><span>ok</span></div>
+
+$$
+x^2
+$$
+`,
+    {
+      fileURL: new URL("file:///satteri-smoke.md"),
+      frontmatter: {},
+    },
+  );
+
+  assert.match(result.code, /markdown-alert-note/);
+  assert.match(result.code, /https:\/\/img\.sylvan\.cafe\/unsafe\/w:800\/plain\/a\/b\.png/);
+  assert.match(result.code, /data-zoom-src="https:\/\/img\.sylvan\.cafe\/unsafe\/plain\/a\/b\.png"/);
+  assert.match(result.code, /class="katex-display"/);
+  assert.match(result.code, /id="hello-world"/);
+  assert.match(result.code, /class="heading-link[^"]*"/);
+  assert.deepEqual(result.metadata.headings, [
+    { depth: 2, slug: "hello-world", text: "Hello World" },
+  ]);
+  assert.doesNotMatch(result.code, /<script/i);
+  assert.doesNotMatch(result.code, /javascript:alert/);
+  assert.doesNotMatch(result.code, /onerror=/i);
+  assert.doesNotMatch(result.code, /onclick=/i);
+  assert.match(result.code, /title="ok"/);
+  assert.match(result.code, /class="note"/);
+  assert.match(result.code, />bad</);
+  assert.match(result.code, />ok</);
+}
 
 const fullMeta = parseCodeMeta('file="demo.ts" collapse nolines');
 assert.equal(fullMeta.collapse, true);
@@ -125,28 +200,6 @@ assert.doesNotMatch(injected, /old/);
 const jsonLd = serializeJsonLd({ headline: "</script><script>alert(1)</script>" });
 assert.doesNotMatch(jsonLd, /<\/script>/i);
 assert.match(jsonLd, /\\u003c\/script\\u003e/);
-
-const htmlTree = {
-  type: "root",
-  children: [
-    {
-      type: "element",
-      tagName: "img",
-      properties: { onError: "alert(1)", src: "javascript:alert(1)" },
-      children: [],
-    },
-    {
-      type: "element",
-      tagName: "script",
-      properties: {},
-      children: [{ type: "text", value: "alert(1)" }],
-    },
-  ],
-};
-sanitizeHtmlTree(htmlTree);
-assert.equal(htmlTree.children.length, 1);
-assert.equal(htmlTree.children[0].properties.onError, undefined);
-assert.equal(htmlTree.children[0].properties.src, undefined);
 
 const post = ({
   id,
@@ -243,5 +296,7 @@ assert.equal(headModel.scriptFont, "/fonts/sc.woff2");
 assert.equal(headModel.isArticle, true);
 assert.equal(headModel.hreflangLinks.find(({ locale }) => locale === "en").url.href, "https://blog.sylvan.cafe/en/posts/post-title/");
 assert.equal(headModel.structuredData["@type"], "BlogPosting");
+
+await checkSatteriProcessorSmoke();
 
 console.log("Markdown transform checks passed.");
