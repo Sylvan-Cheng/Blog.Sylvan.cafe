@@ -41,6 +41,8 @@
 
     img {
       @apply mx-auto border border-border;
+
+      margin-block: 1.5rem;
     }
 
     figcaption {
@@ -179,6 +181,10 @@
 
     pre {
       @apply relative overflow-visible! focus-visible:border-transparent focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-dashed;
+    }
+
+    .heading-link::before {
+      content: "#";
     }
   }
 

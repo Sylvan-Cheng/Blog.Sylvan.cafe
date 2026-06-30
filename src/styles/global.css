@@ -11,7 +11,7 @@
    20   — fixed nav, back-to-top button
    30   — mobile nav drawer (nav-menu)
    40   — floating TOC, tooltips
-   50   — medium-zoom overlay
+   50   — lightbox overlay
    ========================================================= */
 
 /* =========================================================
@@ -395,6 +395,16 @@ html[lang="ja"] {
 
 .katex .katex-html {
   color: inherit;
+}
+
+.katex .katex-mathml {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  border: 0;
 }
 
 html[data-theme="dark"] .katex {

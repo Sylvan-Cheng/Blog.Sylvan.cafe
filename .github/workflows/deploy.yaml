@@ -20,21 +20,8 @@ jobs:
           node-version: '24'
           cache: 'pnpm'
 
-      - name: Cache Astro content
-        uses: actions/cache@v5
-        with:
-          path: |
-            node_modules/.astro
-          key: ${{ runner.os }}-astro-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-astro-${{ hashFiles('**/pnpm-lock.yaml') }}-
-            ${{ runner.os }}-astro-
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Check Markdown transforms
-        run: pnpm run check:markdown
 
       - name: Build
         env:

@@ -5,12 +5,13 @@
   "packageManager": "pnpm@11.8.0",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro check && astro build && pagefind --site dist --silent",
-    "check:markdown": "node scripts/check-markdown-transforms.mjs",
-    "preview": "astro check && astro build && pagefind --site dist --silent && astro preview",
+    "build": "node scripts/collect-image-metadata.mjs && astro check && astro build && pagefind --site dist --silent",
+    "preview": "node scripts/collect-image-metadata.mjs && astro check && astro build && pagefind --site dist --silent && astro preview",
     "sync": "astro sync",
     "astro": "astro",
+    "images:metadata": "node scripts/collect-image-metadata.mjs",
     "generate:og": "node scripts/generate-og-image.mjs",
+    "probe:satteri": "node scripts/probe-satteri-markdown.mjs",
     "prepare": "husky",
     "lint": "biome check . && stylelint \"**/*.{css,astro}\"",
     "lint:fix": "biome check --write . && stylelint \"**/*.{css,astro}\" --fix",
@@ -18,7 +19,7 @@
     "format": "biome format --write ."
   },
   "dependencies": {
-    "@astrojs/markdown-remark": "^7.2.0",
+    "@astrojs/markdown-satteri": "^0.3.2",
     "@astrojs/partytown": "^2.1.7",
     "@astrojs/rss": "^4.0.18",
     "@astrojs/sitemap": "^3.7.3",
@@ -32,17 +33,13 @@
     "astro-icon": "^1.1.5",
     "beautiful-mermaid": "github:Sylvan-Cheng/beautiful-mermaid",
     "dayjs": "^1.11.21",
+    "hast-util-from-html": "^2.0.3",
+    "hast-util-to-html": "^9.0.5",
     "katex": "^0.17.0",
-    "medium-zoom": "^1.1.0",
-    "rehype-katex": "^7.0.1",
-    "rehype-raw": "^7.0.0",
-    "remark-github-blockquote-alert": "^2.1.0",
-    "remark-math": "^6.0.0",
-    "remark-toc": "^9.0.0",
+    "photoswipe": "^5.4.4",
     "sharp": "^0.35.2",
     "slugify": "^1.6.9",
-    "tailwindcss": "^4.3.1",
-    "unist-util-visit": "^5.1.0"
+    "tailwindcss": "^4.3.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",

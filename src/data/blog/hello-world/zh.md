@@ -421,7 +421,7 @@ graph TD
 
 ## 数学公式
 
-通过 remark-math 和 rehype-katex 插件，博客支持 LaTeX 数学公式渲染。
+通过 Markdown 数学管线和 KaTeX，博客支持 LaTeX 数学公式渲染。
 
 ### 行内公式
 
