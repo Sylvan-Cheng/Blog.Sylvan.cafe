@@ -41,6 +41,8 @@
 
     img {
       @apply mx-auto border border-border;
+
+      margin-block: 1.5rem;
     }
 
     figcaption {

@@ -5,10 +5,11 @@
   "packageManager": "pnpm@11.8.0",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro check && astro build && pagefind --site dist --silent",
-    "preview": "astro check && astro build && pagefind --site dist --silent && astro preview",
+    "build": "node scripts/collect-image-metadata.mjs && astro check && astro build && pagefind --site dist --silent",
+    "preview": "node scripts/collect-image-metadata.mjs && astro check && astro build && pagefind --site dist --silent && astro preview",
     "sync": "astro sync",
     "astro": "astro",
+    "images:metadata": "node scripts/collect-image-metadata.mjs",
     "generate:og": "node scripts/generate-og-image.mjs",
     "probe:satteri": "node scripts/probe-satteri-markdown.mjs",
     "prepare": "husky",
@@ -35,7 +36,7 @@
     "hast-util-from-html": "^2.0.3",
     "hast-util-to-html": "^9.0.5",
     "katex": "^0.17.0",
-    "medium-zoom": "^1.1.0",
+    "photoswipe": "^5.4.4",
     "sharp": "^0.35.2",
     "slugify": "^1.6.9",
     "tailwindcss": "^4.3.1"

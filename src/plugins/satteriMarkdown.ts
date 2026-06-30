@@ -3,7 +3,7 @@ import type {
   SatteriProcessorOptions,
 } from "@astrojs/markdown-satteri";
 import { renderMermaidSVG } from "beautiful-mermaid";
-import type { Element, ElementContent, RootContent } from "hast";
+import type { Element, ElementContent, Root, RootContent } from "hast";
 import { parseCodeMeta } from "../utils/transformers/codeMetaParser";
 import { getTextContent, toClassList } from "./hastUtils";
 import { buildHeadingId } from "./headingIds";
@@ -11,6 +11,7 @@ import { injectMermaidStyle, wrapMermaidSvg } from "./mermaidMarkup";
 import {
   applySatteriImgProxyProperties,
   BLOCKED_HTML_TAGS,
+  buildSatteriImageLightboxElement,
   sanitizeRawHtml,
   sanitizeSatteriElementProperties,
 } from "./satteriHtmlSafety";
@@ -30,6 +31,8 @@ type SatteriData = {
 };
 
 type AlertType = keyof typeof ALERTS;
+
+const IMAGE_LIGHTBOX_BLOCKING_PARENTS = new Set(["a", "picture"]);
 
 const ALERTS = {
   note: {
@@ -82,6 +85,13 @@ function svgIcon(path: string): Element {
 
 function isElement(node: RootContent | ElementContent): node is Element {
   return node.type === "element";
+}
+
+function isElementWithTag(
+  node: Root | RootContent | ElementContent | undefined,
+  tagNames: Set<string>,
+): node is Element {
+  return node?.type === "element" && tagNames.has(node.tagName.toLowerCase());
 }
 
 function satteriMermaid(): SatteriMdastPlugin {
@@ -215,6 +225,18 @@ function satteriImgProxy(): SatteriHastPlugin {
     element: {
       filter: ["img"],
       visit(node, ctx) {
+        const parent = ctx.parent(node);
+        const lightboxElement = isElementWithTag(
+          parent,
+          IMAGE_LIGHTBOX_BLOCKING_PARENTS,
+        )
+          ? null
+          : buildSatteriImageLightboxElement(node.properties ?? {});
+        if (lightboxElement) {
+          ctx.replaceNode(node, lightboxElement);
+          return;
+        }
+
         const next = applySatteriImgProxyProperties(node.properties ?? {});
         for (const [key, value] of Object.entries(next)) {
           if (node.properties?.[key] !== value)
