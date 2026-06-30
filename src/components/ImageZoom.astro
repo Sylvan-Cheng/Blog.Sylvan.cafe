@@ -1,7 +1,7 @@
 ---
 /*
  * 图片缩放客户端脚本。
- * 构建期由 rehypeImgProxy 插件为 s3 图片注入 img-zoomable class 和 data-zoom-src。
+ * 构建期由 Sätteri Markdown 插件为 s3 图片注入 img-zoomable class 和 data-zoom-src。
  * 运行时：检测 .img-zoomable → 动态 import medium-zoom → 事件委托点击打开。
  * open 时 src 切到 data-zoom-src 高清原图，close 时切回缩略图。
  *

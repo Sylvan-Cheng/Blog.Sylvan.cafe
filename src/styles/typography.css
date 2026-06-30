@@ -180,6 +180,10 @@
     pre {
       @apply relative overflow-visible! focus-visible:border-transparent focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-dashed;
     }
+
+    .heading-link::before {
+      content: "#";
+    }
   }
 
   @media (min-width: 640px) {

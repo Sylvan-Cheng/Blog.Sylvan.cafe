@@ -3,7 +3,7 @@ import { SITE } from "@/config";
 import type { Locale } from "@/i18n/config";
 import type { PostIndex } from "./blogRepository";
 import { getPostUrl } from "./contentIdentity";
-import { KATEX_PRELOAD_FONTS, loadKatexCss } from "./katexAssets";
+import { KATEX_PRELOAD_FONTS, KATEX_STYLESHEET_HREF } from "./katexAssets";
 import { buildTranslationMap } from "./postTranslations";
 import { countWords } from "./wordCount";
 
@@ -57,7 +57,7 @@ export async function buildPostDetailsModel({
   return {
     Content,
     headings,
-    kaTeXInlineCSS: loadKatexCss(post.data.math),
+    katexStylesheetHref: post.data.math ? KATEX_STYLESHEET_HREF : null,
     katexPreloadFonts: KATEX_PRELOAD_FONTS,
     layoutProps: buildLayoutProps(post, postIndex),
     nextPost: next,

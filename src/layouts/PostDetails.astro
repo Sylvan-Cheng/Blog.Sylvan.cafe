@@ -35,7 +35,7 @@ const { title, pubDatetime, modDatetime, timezone, tags, license, aiLabel } =
 const {
   Content,
   headings,
-  kaTeXInlineCSS,
+  katexStylesheetHref,
   katexPreloadFonts,
   layoutProps,
   nextPost,
@@ -45,14 +45,16 @@ const {
 ---
 
 <Layout {...layoutProps}>
-  {post.data.math && <style slot="head" set:html={kaTeXInlineCSS} />}
-  {post.data.math && (
-    <>
-      {katexPreloadFonts.map(font => (
-        <link slot="head" rel="preload" href={`/assets/fonts/katex/${font}`} as="font" type="font/woff2" crossorigin />
-      ))}
-    </>
-  )}
+  <Fragment slot="head">
+    {katexStylesheetHref && <link rel="stylesheet" href={katexStylesheetHref} />}
+    {post.data.math && (
+      <>
+        {katexPreloadFonts.map(font => (
+          <link rel="preload" href={`/assets/fonts/katex/${font}`} as="font" type="font/woff2" crossorigin />
+        ))}
+      </>
+    )}
+  </Fragment>
   <Header />
   <BackButton />
   <main

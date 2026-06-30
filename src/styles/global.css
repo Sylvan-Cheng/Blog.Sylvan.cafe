@@ -397,6 +397,16 @@ html[lang="ja"] {
   color: inherit;
 }
 
+.katex .katex-mathml {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  border: 0;
+}
+
 html[data-theme="dark"] .katex {
   color: var(--foreground);
 }
