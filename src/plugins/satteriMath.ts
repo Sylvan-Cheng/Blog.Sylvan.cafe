@@ -13,13 +13,13 @@ type SatteriHastPlugin = NonNullable<
 
 const KATEX_DISPLAY_OPTIONS = {
   displayMode: true,
-  output: "html",
+  output: "htmlAndMathml",
   throwOnError: false,
 } as const;
 
 const KATEX_INLINE_OPTIONS = {
   displayMode: false,
-  output: "html",
+  output: "htmlAndMathml",
   throwOnError: false,
 } as const;
 
