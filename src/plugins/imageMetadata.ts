@@ -2,7 +2,10 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 const S3_BASE = "https://s3.sylvan.cafe/";
-const CACHE_PATH = resolve(process.cwd(), ".astro/image-metadata-cache.json");
+const METADATA_PATH = resolve(
+  process.cwd(),
+  "src/generated/image-metadata.json",
+);
 
 type ImageMetadata = {
   height: number;
@@ -14,13 +17,13 @@ let imageMetadataCache: Record<string, ImageMetadata> | null = null;
 
 function loadImageMetadata(): Record<string, ImageMetadata> {
   if (imageMetadataCache) return imageMetadataCache;
-  if (!existsSync(CACHE_PATH)) {
+  if (!existsSync(METADATA_PATH)) {
     imageMetadataCache = {};
     return imageMetadataCache;
   }
 
   try {
-    imageMetadataCache = JSON.parse(readFileSync(CACHE_PATH, "utf8"));
+    imageMetadataCache = JSON.parse(readFileSync(METADATA_PATH, "utf8"));
   } catch {
     imageMetadataCache = {};
   }

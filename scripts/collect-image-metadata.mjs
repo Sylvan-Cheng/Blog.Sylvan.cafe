@@ -1,12 +1,12 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, relative, resolve } from "node:path";
 import sharp from "sharp";
-import { buildImgProxyUrls } from "../src/plugins/imgProxyUrls.ts";
 
 const ROOT_DIR = resolve(import.meta.dirname, "..");
 const CONTENT_GLOBS = ["src/data/blog", "src/data/pages"];
-const CACHE_PATH = resolve(ROOT_DIR, ".astro/image-metadata-cache.json");
+const METADATA_PATH = resolve(ROOT_DIR, "src/generated/image-metadata.json");
 const S3_ORIGIN = "https://s3.sylvan.cafe/";
+const IMGPROXY_ORIGIN = "https://img.sylvan.cafe/unsafe/";
 const IMAGE_MARKDOWN_PATTERN =
   /!\[[^\]]*]\((https:\/\/s3\.sylvan\.cafe\/[^)\s]+)(?:\s+["'][^"']*["'])?\)|<img\b[^>]*\bsrc=["'](https:\/\/s3\.sylvan\.cafe\/[^"']+)["'][^>]*>/gi;
 
@@ -43,19 +43,30 @@ function getS3Key(url) {
   return decodeURI(url.slice(S3_ORIGIN.length));
 }
 
+function buildMetadataFetchUrl(url) {
+  if (!url.startsWith(S3_ORIGIN)) return url;
+  return `${IMGPROXY_ORIGIN}plain/${url.slice(S3_ORIGIN.length)}`;
+}
+
 async function readCache() {
   try {
-    return JSON.parse(await readFile(CACHE_PATH, "utf8"));
+    return JSON.parse(await readFile(METADATA_PATH, "utf8"));
   } catch {
     return {};
   }
 }
 
 async function fetchImageMetadata(url) {
-  const metadataUrl = buildImgProxyUrls(url)?.fullUrl ?? url;
-  const response = await fetch(metadataUrl);
+  const metadataUrl = buildMetadataFetchUrl(url);
+  const response = await fetch(metadataUrl, {
+    headers: {
+      Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+      "User-Agent":
+        "Mozilla/5.0 (compatible; SylvanCafeImageMetadata/1.0; +https://blog.sylvan.cafe/)",
+    },
+  });
   if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`);
+    throw new Error(`HTTP ${response.status} from ${metadataUrl}`);
   }
 
   const buffer = Buffer.from(await response.arrayBuffer());
@@ -111,15 +122,18 @@ async function collectImageMetadata() {
     } catch (error) {
       failed++;
       console.warn(
-        `[image-metadata] ${relative(ROOT_DIR, CACHE_PATH)}: ${url} skipped (${error.message})`,
+        `[image-metadata] ${relative(ROOT_DIR, METADATA_PATH)}: ${url} skipped (${error.message})`,
       );
     }
   }
 
-  await mkdir(dirname(CACHE_PATH), { recursive: true });
-  await writeFile(`${CACHE_PATH}.tmp`, `${JSON.stringify(nextCache, null, 2)}\n`);
+  await mkdir(dirname(METADATA_PATH), { recursive: true });
+  await writeFile(
+    `${METADATA_PATH}.tmp`,
+    `${JSON.stringify(nextCache, null, 2)}\n`,
+  );
   await import("node:fs/promises").then(({ rename }) =>
-    rename(`${CACHE_PATH}.tmp`, CACHE_PATH),
+    rename(`${METADATA_PATH}.tmp`, METADATA_PATH),
   );
 
   console.log(
