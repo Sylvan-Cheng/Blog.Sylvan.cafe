@@ -58,6 +58,16 @@ a &= b + c \\
 d &= e + f
 \end{aligned}
 $$
+
+<details>
+<summary>Click for details</summary>
+
+Hidden **content** should stay inside the details element.
+
+- first item
+- second item
+
+</details>
 `;
 
 const result = await renderer.render(markdown, {
@@ -74,5 +84,15 @@ assert.equal(displayMathCount, 2, "block and aligned math render as display math
 assert.ok(mathMlCount >= 3, "inline, block, and aligned math include MathML");
 assert.doesNotMatch(html, /<pre[^>]*>\s*<code[^>]*language-math/, "display math is not left as a code block");
 assert.doesNotMatch(html, /<span class="katex-display"><\/span>/, "display math is not flattened into an empty KaTeX node");
+assert.match(
+  html,
+  /<details>[\s\S]*<summary>Click for details<\/summary>[\s\S]*Hidden <strong>content<\/strong> should stay inside the details element\.[\s\S]*<ul>[\s\S]*first item[\s\S]*second item[\s\S]*<\/ul>[\s\S]*<\/details>/,
+  "details preserve rendered Markdown content inside the collapsible element",
+);
+assert.doesNotMatch(
+  html,
+  /<\/details>\s*<p>Hidden/,
+  "details content is not emitted after the closing details tag",
+);
 
 console.log("Markdown rendering regression tests passed.");

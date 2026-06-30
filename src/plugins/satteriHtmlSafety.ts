@@ -24,6 +24,7 @@ const URL_PROPERTIES = new Set([
   "xlinkhref",
 ]);
 const IMAGE_LIGHTBOX_BLOCKING_PARENTS = new Set(["a", "picture"]);
+const PARTIAL_RAW_HTML_CONTAINER_TAGS = new Set(["details"]);
 
 const HTML_ENTITY_DECODE_MAP: Record<string, string> = {
   amp: "&",
@@ -219,7 +220,27 @@ export function sanitizeHtmlTree(node: Root | RootContent): void {
 }
 
 export function sanitizeRawHtml(raw: string): string {
+  const closingTag = raw.match(/^\s*<\/([a-z][a-z0-9-]*)\s*>\s*$/i);
+  if (closingTag) {
+    const tagName = closingTag[1].toLowerCase();
+    return PARTIAL_RAW_HTML_CONTAINER_TAGS.has(tagName) ? `</${tagName}>` : "";
+  }
+
+  const partialContainerTag = [...PARTIAL_RAW_HTML_CONTAINER_TAGS].find(
+    (tagName) =>
+      new RegExp(`<${tagName}\\b`, "i").test(raw) &&
+      !new RegExp(`</${tagName}\\s*>`, "i").test(raw),
+  );
   const tree = fromHtml(raw, { fragment: true });
   sanitizeHtmlTree(tree);
-  return toHtml(tree);
+  const sanitized = toHtml(tree);
+
+  if (partialContainerTag) {
+    return sanitized.replace(
+      new RegExp(`</${partialContainerTag}>\\s*$`, "i"),
+      "",
+    );
+  }
+
+  return sanitized;
 }
