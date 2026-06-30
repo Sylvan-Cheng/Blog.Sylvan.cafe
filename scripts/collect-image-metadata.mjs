@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, relative, resolve } from "node:path";
 import sharp from "sharp";
+import { buildImgProxyUrls } from "../src/plugins/imgProxyUrls.ts";
 
 const ROOT_DIR = resolve(import.meta.dirname, "..");
 const CONTENT_GLOBS = ["src/data/blog", "src/data/pages"];
@@ -51,7 +52,8 @@ async function readCache() {
 }
 
 async function fetchImageMetadata(url) {
-  const response = await fetch(url);
+  const metadataUrl = buildImgProxyUrls(url)?.fullUrl ?? url;
+  const response = await fetch(metadataUrl);
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}`);
   }
@@ -123,6 +125,12 @@ async function collectImageMetadata() {
   console.log(
     `[image-metadata] ${urls.size} image(s), ${fetched} fetched, ${reused} cached, ${failed} failed.`,
   );
+
+  if (failed > 0) {
+    throw new Error(
+      `[image-metadata] Failed to collect metadata for ${failed} image(s).`,
+    );
+  }
 }
 
 await collectImageMetadata();
