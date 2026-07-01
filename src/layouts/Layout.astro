@@ -12,10 +12,6 @@ import "@fontsource/noto-sans/latin-400.css";
 import "@fontsource/noto-sans/latin-700.css";
 import "@fontsource/noto-sans/cyrillic-400.css";
 import "@fontsource/noto-sans/cyrillic-700.css";
-import "@fontsource/noto-sans-sc/chinese-simplified-400.css";
-import "@fontsource/noto-sans-sc/chinese-simplified-700.css";
-import "@fontsource/noto-sans-jp/japanese-400.css";
-import "@fontsource/noto-sans-jp/japanese-700.css";
 import "@fontsource/fira-code/latin-400.css";
 
 import cyrillic400 from "@fontsource/noto-sans/files/noto-sans-cyrillic-400-normal.woff2";
@@ -23,7 +19,9 @@ import cyrillic400 from "@fontsource/noto-sans/files/noto-sans-cyrillic-400-norm
 import latin400 from "@fontsource/noto-sans/files/noto-sans-latin-400-normal.woff2";
 import latin700 from "@fontsource/noto-sans/files/noto-sans-latin-700-normal.woff2";
 import jp400 from "@fontsource/noto-sans-jp/files/noto-sans-jp-japanese-400-normal.woff2";
+import jp700 from "@fontsource/noto-sans-jp/files/noto-sans-jp-japanese-700-normal.woff2";
 import sc400 from "@fontsource/noto-sans-sc/files/noto-sans-sc-chinese-simplified-400-normal.woff2";
+import sc700 from "@fontsource/noto-sans-sc/files/noto-sans-sc-chinese-simplified-700-normal.woff2";
 
 type Props = {
   title?: string;
@@ -39,12 +37,53 @@ type Props = {
   locale?: Locale;
 };
 
+type CjkFont = {
+  family: string;
+  regular: string;
+  bold: string;
+};
+
 const locale = Astro.props.locale ?? resolveLocale(Astro.currentLocale);
 const head = buildDocumentHeadModel({
   astro: Astro,
   locale,
   fontAssets: { cyrillic400, jp400, sc400 },
 });
+
+const cjkFonts: Partial<Record<Locale, CjkFont>> = {
+  zh: {
+    family: "Noto Sans SC",
+    regular: sc400,
+    bold: sc700,
+  },
+  ja: {
+    family: "Noto Sans JP",
+    regular: jp400,
+    bold: jp700,
+  },
+};
+
+const cjkFont = cjkFonts[locale];
+const cjkFontFaceStyle = cjkFont
+  ? `
+<style>
+@font-face {
+  font-family: ${JSON.stringify(cjkFont.family)};
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url(${JSON.stringify(cjkFont.regular)}) format("woff2");
+}
+
+@font-face {
+  font-family: ${JSON.stringify(cjkFont.family)};
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url(${JSON.stringify(cjkFont.bold)}) format("woff2");
+}
+</style>`
+  : "";
 ---
 
 <!--
@@ -86,6 +125,7 @@ const head = buildDocumentHeadModel({
         <link rel="preload" href={head.scriptFont} as="font" type="font/woff2" crossorigin />
       )
     }
+    {cjkFontFaceStyle && <Fragment set:html={cjkFontFaceStyle} />}
 
     <!-- hreflang tags for multilingual SEO -->
     {
@@ -229,5 +269,6 @@ const head = buildDocumentHeadModel({
 
     <!-- Load full theme logic -->
     <script src="../scripts/theme.ts"></script>
+    <script src="../scripts/deferred-interactions.ts"></script>
   </body>
 </html>
