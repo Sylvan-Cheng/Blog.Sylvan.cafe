@@ -165,25 +165,11 @@ TOC には表示されませんが、ページ上では通常通りレンダリ�
 
 ## コードブロック
 
-コードブロックは Shiki シンタックスハイライトを使用し、デフォルト行番号、自動折り返し（ハンギングインデント）、コード折りたたみ（`collapse`）、ファイル名ラベル（`file`）、行番号無効化（`nolines`）をサポートします。
+コードブロックは Shiki シンタックスハイライトを使用し、デフォルト行番号、デフォルトの横スクロール、`wrap` による自動折り返し（ハンギングインデント）、コード折りたたみ（`collapse`）、ファイル名ラベル（`file`）、行番号無効化（`nolines`）をサポートします。
 
-### デフォルト行番号
+### 基本注釈：行番号 + file
 
-すべてのコードブロックはデフォルトで行番号が有効です。
-
-```python
-def fib(n: int) -> list[int]:
-    a, b = 0, 1
-    result = []
-    for _ in range(n):
-        result.append(a)
-        a, b = b, a + b
-    return result
-```
-
-### ファイルラベル：file
-
-`file="名前"` で左上にファイル名ラベルを表示します。
+行番号はデフォルトで有効です。`file="名前"` は左上にファイル名ラベルを表示します。
 
 ```python file="fibonacci.py"
 def fib(n: int) -> list[int]:
@@ -203,99 +189,38 @@ pnpm dev
 pnpm build
 ```
 
-### コード折りたたみ：collapse
+### 折りたたみ + 横スクロール：collapse
 
-8行を超えるコードブロックに `collapse` を付けると自動的に折りたたまれ、下部のフェードで続きがあることを示します。展開ボタンは下部中央に配置されます。
+`collapse` は長いコードブロックを自動的に折りたたみます。`wrap` を付けない場合、長い行は1行のまま横スクロールで読めます。
 
-```python collapse file="utils.py"
-def fibonacci(n: int) -> list[int]:
-    """最初の n 個のフィボナッチ数を生成"""
-    a, b = 0, 1
-    result = []
-    for _ in range(n):
-        result.append(a)
-        a, b = b, a + b
-    return result
+```python collapse file="scroll-and-fold.py"
+from datetime import datetime
 
 
-def is_prime(num: int) -> bool:
-    """整数が素数かどうかを判定"""
-    if num < 2:
-        return False
-    for i in range(2, int(num ** 0.5) + 1):
-        if num % i == 0:
-            return False
-    return True
-
-
-def chunk_list(data: list, size: int):
-    """リストを固定サイズのチャンクに分割（ジェネレータを返す）"""
-    for i in range(0, len(data), size):
-        yield data[i:i + size]
-
-
-print(fibonacci(10))
-primes = [x for x in fibonacci(20) if is_prime(x)]
-print(f"Primes: {primes}")
-```
-
-### 折りたたみ + 行番号なし：collapse nolines
-
-複数の注釈を自由に組み合わせられます。
-
-```python collapse nolines
-import json
-from pathlib import Path
-
-
-def load_config(path: str | Path) -> dict:
-    """JSON 設定ファイルを読み込む。存在しない場合は空の辞書を返す。"""
-    config_path = Path(path)
-    if not config_path.exists():
-        return {}
-    return json.loads(config_path.read_text(encoding="utf-8"))
-
-
-def merge_configs(base: dict, override: dict) -> dict:
-    """2つの設定辞書を深くマージする。override が優先。"""
-    result = base.copy()
-    for key, value in override.items():
-        if isinstance(value, dict) and key in result:
-            result[key] = merge_configs(result[key], value)
-        else:
-            result[key] = value
-    return result
-
-
-cfg = load_config("defaults.json")
-user_cfg = load_config("user.json")
-final = merge_configs(cfg, user_cfg)
-print(json.dumps(final, indent=2, ensure_ascii=False))
-```
-
-### 自動折り返し + ハンギングインデント
-
-長すぎる行はコンテナの境界で折り返され、折り返し行はコードの先頭行に合わせてインデントされます。
-
-```python collapse file="dashboard.py"
-def build_dashboard_report(assignments: dict[str, list[dict]], include_history: bool = False) -> str:
-    """各ワーカーノードのタスク割り当て結果から集計ダッシュボードレポートを生成。"""
-    lines = ["# 負荷レポート", f"生成時刻: {datetime.now().isoformat()}", ""]
-    for node_name, tasks in assignments.items():
-        pending = [t for t in tasks if t.get("status") == "pending" and t.get("priority", 0) >= 3]
-        lines.append(f"## {node_name}（{len(pending)} 件の高優先度タスク）")
-        lines.extend(f"  - [{t['priority']}] {t.get('title', '名称未設定')}" for t in sorted(pending, key=lambda x: -x["priority"]))
-    if include_history:
-        lines.append("\n---\n## 履歴トレンド\n*永続ストレージの有効化後に取得可能*")
+def build_release_report(project: str, commits: list[dict[str, str]], include_review_notes: bool = False, timezone: str = "Asia/Shanghai") -> str:
+    """横スクロール確認用に、長い関数シグネチャを保ったリリースレポートを生成。"""
+    lines = [f"# {project} リリースレポート", f"生成時刻: {datetime.now().isoformat()}", ""]
+    for commit in commits:
+        scope = commit.get("scope", "misc")
+        title = commit.get("title", "無題のコミット")
+        lines.append(f"- [{scope}] {title} — {commit.get('hash', 'unknown')} — reviewer={commit.get('reviewer', 'none')} — deployment_window={commit.get('window', 'standard')}")
+    if include_review_notes:
+        lines.append("## レビュー確認")
+        lines.append("移行スクリプト、検索インデックス、静的アセットキャッシュ、ロールバック手順を確認してください。")
     return "\n".join(lines)
 
 
-sample = [
-    {"title": "データ移行", "status": "pending", "priority": 5, "node": "worker-0"},
-    {"title": "ログローテーション", "status": "done", "priority": 1, "node": "worker-0"},
-    {"title": "インデックス再構築", "status": "pending", "priority": 4, "node": "worker-1"},
-]
-print(build_dashboard_report({"worker-0": sample[:2], "worker-1": sample[2:]}, include_history=True))
+sample = [{"scope": "build", "title": "Pagefind インデックス更新", "hash": "abc123", "reviewer": "Sylvan", "window": "nightly"}]
+print(build_release_report("blog.sylvan.cafe", sample, include_review_notes=True))
+```
+
+### 自動折り返し + ハンギングインデント：wrap
+
+コードブロックに `wrap` を付けると、長すぎる行はコンテナの境界で折り返され、折り返し行はコードの先頭行に合わせてインデントされます。
+
+```python wrap file="wrap-example.py"
+def build_query_url(endpoint: str, filters: dict[str, str], include_archived: bool = False, sort: str = "updated_at:desc") -> str:
+    return f"{endpoint}?include_archived={include_archived}&sort={sort}&filters=" + "&".join(f"{key}={value}" for key, value in filters.items())
 ```
 
 ### CSS

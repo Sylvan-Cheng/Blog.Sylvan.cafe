@@ -166,25 +166,11 @@ Listoj estas kerna ilo por organizi informojn.
 
 ## Kodo-Blokoj
 
-Kodo-blokoj uzas Shiki-sintaksan emfazon, subtenante: defaŭltajn lininumerojn, vorto-ĉirkaŭigon (pendanta krommarĝeno), kodo-faldadon (`collapse`), dosiernomajn etikedojn (`file`), kaj malŝaltadon de lininumeroj (`nolines`).
+Kodo-blokoj uzas Shiki-sintaksan emfazon, subtenante: defaŭltajn lininumerojn, defaŭltan horizontalan rulumadon, laŭpetan vorto-ĉirkaŭigon kun `wrap` (pendanta krommarĝeno), kodo-faldadon (`collapse`), dosiernomajn etikedojn (`file`), kaj malŝaltadon de lininumeroj (`nolines`).
 
-### Defaŭltaj Lininumeroj
+### Bazaj Prinotoj: Lininumeroj + file
 
-Ĉiuj kodo-blokoj havas lininumerojn ebligitajn defaŭlte, neniu prinoto bezonata.
-
-```python
-def fib(n: int) -> list[int]:
-    a, b = 0, 1
-    result = []
-    for _ in range(n):
-        result.append(a)
-        a, b = b, a + b
-    return result
-```
-
-### Dosiernoma Etikedo: file
-
-`file="name"` montras dosiernoman etikedon en la supra-maldekstra angulo, kun verda punkto.
+Lininumeroj estas ebligitaj defaŭlte; `file="name"` montras dosiernoman etikedon en la supra-maldekstra angulo.
 
 ```python file="fibonacci.py"
 def fib(n: int) -> list[int]:
@@ -204,99 +190,38 @@ pnpm dev
 pnpm build
 ```
 
-### Kodo-Faldado: collapse
+### Faldado + Horizontala Rulumado: collapse
 
-Kodo-blokoj superantaj 8 liniojn kun `collapse` estas aŭtomate falditaj, kun malsupra forvelko por sugesti pli da enhavo. La etenda butono estas centrita ĉe la malsupro.
+`collapse` aŭtomate faldas longajn kodo-blokojn. Sen `wrap`, tro longaj linioj restas en unu linio kaj uzas horizontalan rulumadon.
 
-```python collapse file="utils.py"
-def fibonacci(n: int) -> list[int]:
-    """Generate the first n Fibonacci numbers"""
-    a, b = 0, 1
-    result = []
-    for _ in range(n):
-        result.append(a)
-        a, b = b, a + b
-    return result
+```python collapse file="scroll-and-fold.py"
+from datetime import datetime
 
 
-def is_prime(num: int) -> bool:
-    """Check if an integer is prime"""
-    if num < 2:
-        return False
-    for i in range(2, int(num ** 0.5) + 1):
-        if num % i == 0:
-            return False
-    return True
-
-
-def chunk_list(data: list, size: int):
-    """Split a list into fixed-size chunks, returning a generator"""
-    for i in range(0, len(data), size):
-        yield data[i:i + size]
-
-
-print(fibonacci(10))
-primes = [x for x in fibonacci(20) if is_prime(x)]
-print(f"Primes: {primes}")
-```
-
-### Faldado + Sen Lininumeroj: collapse nolines
-
-Pluraj prinotoj povas esti libere kombinitaj.
-
-```python collapse nolines
-import json
-from pathlib import Path
-
-
-def load_config(path: str | Path) -> dict:
-    """Load a JSON config file, returning an empty dict if not found."""
-    config_path = Path(path)
-    if not config_path.exists():
-        return {}
-    return json.loads(config_path.read_text(encoding="utf-8"))
-
-
-def merge_configs(base: dict, override: dict) -> dict:
-    """Deep-merge two config dicts, with override taking priority."""
-    result = base.copy()
-    for key, value in override.items():
-        if isinstance(value, dict) and key in result:
-            result[key] = merge_configs(result[key], value)
-        else:
-            result[key] = value
-    return result
-
-
-cfg = load_config("defaults.json")
-user_cfg = load_config("user.json")
-final = merge_configs(cfg, user_cfg)
-print(json.dumps(final, indent=2, ensure_ascii=False))
-```
-
-### Vorto-ĉirkaŭigo + Pendanta Krommarĝeno
-
-Tro longaj linioj ĉirkaŭiĝas ĉe la uja limo, kun la daŭrigo krommarĝenigita por vicigi kun la unua linio de kodo.
-
-```python collapse file="dashboard.py"
-def build_dashboard_report(assignments: dict[str, list[dict]], include_history: bool = False) -> str:
-    """Generate an aggregated dashboard report from task assignments across worker nodes."""
-    lines = ["# Load Report", f"Generated at: {datetime.now().isoformat()}", ""]
-    for node_name, tasks in assignments.items():
-        pending = [t for t in tasks if t.get("status") == "pending" and t.get("priority", 0) >= 3]
-        lines.append(f"## {node_name} ({len(pending)} high-priority tasks)")
-        lines.extend(f"  - [{t['priority']}] {t.get('title', 'Unnamed')}" for t in sorted(pending, key=lambda x: -x["priority"]))
-    if include_history:
-        lines.append("\n---\n## Historical Trends\n*Requires persistent storage to be enabled*")
+def build_release_report(project: str, commits: list[dict[str, str]], include_review_notes: bool = False, timezone: str = "Asia/Shanghai") -> str:
+    """Generate a release report while keeping a long signature for horizontal-scroll testing."""
+    lines = [f"# {project} Release Report", f"Generated at: {datetime.now().isoformat()}", ""]
+    for commit in commits:
+        scope = commit.get("scope", "misc")
+        title = commit.get("title", "Untitled commit")
+        lines.append(f"- [{scope}] {title} — {commit.get('hash', 'unknown')} — reviewer={commit.get('reviewer', 'none')} — deployment_window={commit.get('window', 'standard')}")
+    if include_review_notes:
+        lines.append("## Review Notes")
+        lines.append("Confirm migration scripts, search indexes, static asset caches, and rollback paths before shipping.")
     return "\n".join(lines)
 
 
-sample = [
-    {"title": "Data Migration", "status": "pending", "priority": 5, "node": "worker-0"},
-    {"title": "Log Rotation", "status": "done", "priority": 1, "node": "worker-0"},
-    {"title": "Index Rebuild", "status": "pending", "priority": 4, "node": "worker-1"},
-]
-print(build_dashboard_report({"worker-0": sample[:2], "worker-1": sample[2:]}, include_history=True))
+sample = [{"scope": "build", "title": "Refresh Pagefind index", "hash": "abc123", "reviewer": "Sylvan", "window": "nightly"}]
+print(build_release_report("blog.sylvan.cafe", sample, include_review_notes=True))
+```
+
+### Vorto-ĉirkaŭigo + Pendanta Krommarĝeno: wrap
+
+Aldonu `wrap` kiam tro longaj linioj devas ĉirkaŭiĝi ĉe la uja limo, kun la daŭrigo krommarĝenigita por vicigi kun la unua linio de kodo.
+
+```python wrap file="wrap-example.py"
+def build_query_url(endpoint: str, filters: dict[str, str], include_archived: bool = False, sort: str = "updated_at:desc") -> str:
+    return f"{endpoint}?include_archived={include_archived}&sort={sort}&filters=" + "&".join(f"{key}={value}" for key, value in filters.items())
 ```
 
 ### CSS
