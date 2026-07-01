@@ -27,6 +27,17 @@ const URL_PROPERTIES = new Set([
 ]);
 export const IMAGE_LIGHTBOX_BLOCKING_PARENTS = new Set(["a", "picture"]);
 const PARTIAL_RAW_HTML_CONTAINER_TAGS = new Set(["details"]);
+const SHIKI_STYLE_PROPERTIES = new Set([
+  "--shiki-dark",
+  "--shiki-dark-bg",
+  "--shiki-light",
+  "--shiki-light-bg",
+]);
+const SHIKI_PRE_STYLE_VALUES = new Map([
+  ["overflow-x", "auto"],
+  ["white-space", "pre-wrap"],
+  ["word-wrap", "break-word"],
+]);
 
 const HTML_ENTITY_DECODE_MAP: Record<string, string> = {
   amp: "&",
@@ -113,10 +124,80 @@ function isTrustedRawHtmlContainer(node: Root | RootContent): boolean {
   );
 }
 
+function isGeneratedCodeContainer(node: Root | RootContent): boolean {
+  if (node.type !== "element" || node.tagName.toLowerCase() !== "pre") {
+    return false;
+  }
+  return toClassList(node.properties?.className).includes("astro-code");
+}
+
 function hasChildren(
   node: Root | RootContent,
 ): node is (Root | Element) & { children: RootContent[] } {
   return "children" in node && Array.isArray(node.children);
+}
+
+function getStyleValue(properties: Properties): string | null {
+  const style = properties.style;
+  if (typeof style === "string") return style;
+  if (Array.isArray(style)) return style.filter(Boolean).join(";");
+  return null;
+}
+
+function isUnsafeStyleValue(value: string): boolean {
+  return /(?:@import|expression\s*\(|url\s*\(|[<>])/i.test(value);
+}
+
+function sanitizeGeneratedCodeStyle(
+  style: string,
+  tagName: string,
+): string | null {
+  const declarations: string[] = [];
+
+  for (const declaration of style.split(";")) {
+    const separator = declaration.indexOf(":");
+    if (separator === -1) continue;
+
+    const property = declaration.slice(0, separator).trim().toLowerCase();
+    const value = declaration.slice(separator + 1).trim();
+    if (!property || !value || isUnsafeStyleValue(value)) continue;
+
+    if (SHIKI_STYLE_PROPERTIES.has(property)) {
+      declarations.push(`${property}: ${value}`);
+      continue;
+    }
+
+    if (
+      tagName === "pre" &&
+      property === "--file-name-offset" &&
+      /^-?\d*\.?\d+(?:px|rem|em)$/i.test(value)
+    ) {
+      declarations.push(`${property}: ${value}`);
+      continue;
+    }
+
+    if (tagName === "pre" && SHIKI_PRE_STYLE_VALUES.get(property) === value) {
+      declarations.push(`${property}: ${value}`);
+    }
+  }
+
+  return declarations.length > 0 ? `${declarations.join("; ")};` : null;
+}
+
+function sanitizeGeneratedCodeProperties(
+  tagName: string,
+  properties: Properties,
+): Properties {
+  const style = getStyleValue(properties);
+  if (!style) return properties;
+
+  const sanitizedStyle = sanitizeGeneratedCodeStyle(style, tagName);
+  if (!sanitizedStyle) {
+    const { style: _style, ...rest } = properties;
+    return rest;
+  }
+
+  return { ...properties, style: sanitizedStyle };
 }
 
 export function sanitizeSatteriElementProperties(
@@ -217,13 +298,17 @@ export function enhanceSatteriImage(
 
 export function sanitizeHtmlTree(
   node: Root | RootContent,
-  context: { trustedMermaid: boolean } = { trustedMermaid: false },
+  context: { trustedMermaid: boolean; generatedCode: boolean } = {
+    trustedMermaid: false,
+    generatedCode: false,
+  },
 ): void {
   if (!hasChildren(node)) return;
 
   const nextChildren: RootContent[] = [];
   const trustedMermaid =
     context.trustedMermaid || isTrustedRawHtmlContainer(node);
+  const generatedCode = context.generatedCode || isGeneratedCodeContainer(node);
   const canWrapChildImages = !isElementWithTag(
     node,
     IMAGE_LIGHTBOX_BLOCKING_PARENTS,
@@ -236,6 +321,8 @@ export function sanitizeHtmlTree(
     if (isElement(child)) {
       const tagName = child.tagName.toLowerCase();
       childTrustedMermaid = trustedMermaid || isTrustedRawHtmlContainer(child);
+      const childGeneratedCode =
+        generatedCode || isGeneratedCodeContainer(child);
       const isBlockedTag =
         BLOCKED_HTML_TAGS.has(tagName) &&
         !(tagName === "style" && childTrustedMermaid);
@@ -243,7 +330,16 @@ export function sanitizeHtmlTree(
 
       child.properties = sanitizeSatteriElementProperties(
         child.properties ?? {},
+        {
+          allowStyle: childTrustedMermaid || childGeneratedCode,
+        },
       );
+      if (childGeneratedCode && !childTrustedMermaid) {
+        child.properties = sanitizeGeneratedCodeProperties(
+          tagName,
+          child.properties,
+        );
+      }
       delete child.properties[MERMAID_TRUST_ATTRIBUTE];
       delete child.properties.dataSylvanMermaidToken;
 
@@ -259,7 +355,10 @@ export function sanitizeHtmlTree(
       }
     }
 
-    sanitizeHtmlTree(nextChild, { trustedMermaid: childTrustedMermaid });
+    sanitizeHtmlTree(nextChild, {
+      generatedCode: generatedCode || isGeneratedCodeContainer(nextChild),
+      trustedMermaid: childTrustedMermaid,
+    });
     nextChildren.push(nextChild);
   }
 
