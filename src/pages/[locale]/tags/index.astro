@@ -8,16 +8,14 @@ import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import Main from "@/layouts/Main.astro";
-import { getPostsByLocale } from "@/utils/blogRepository";
-import getUniqueTags from "@/utils/getUniqueTags";
+import { getLocalizedContent } from "@/utils/localizedContentIndex";
 
 export function getStaticPaths() {
   return LOCALES.map((locale) => ({ params: { locale } }));
 }
 
 const locale = resolveLocale(Astro.currentLocale);
-const posts = await getPostsByLocale(locale);
-let tags = getUniqueTags(posts);
+const tags = (await getLocalizedContent(locale))?.tags ?? [];
 ---
 
 <Layout title={`${t(UI.tags.title, locale)} | ${SITE.title}`}>

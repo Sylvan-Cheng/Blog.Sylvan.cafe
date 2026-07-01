@@ -9,9 +9,9 @@ import { getTextContent, toClassList } from "./hastUtils";
 import { buildHeadingId } from "./headingIds";
 import { injectMermaidStyle, wrapMermaidSvg } from "./mermaidMarkup";
 import {
-  applySatteriImgProxyProperties,
   BLOCKED_HTML_TAGS,
-  buildSatteriImageLightboxElement,
+  enhanceSatteriImage,
+  IMAGE_LIGHTBOX_BLOCKING_PARENTS,
   sanitizeRawHtml,
   sanitizeSatteriElementProperties,
 } from "./satteriHtmlSafety";
@@ -31,8 +31,6 @@ type SatteriData = {
 };
 
 type AlertType = keyof typeof ALERTS;
-
-const IMAGE_LIGHTBOX_BLOCKING_PARENTS = new Set(["a", "picture"]);
 
 const ALERTS = {
   note: {
@@ -226,19 +224,20 @@ function satteriImgProxy(): SatteriHastPlugin {
       filter: ["img"],
       visit(node, ctx) {
         const parent = ctx.parent(node);
-        const lightboxElement = isElementWithTag(
-          parent,
-          IMAGE_LIGHTBOX_BLOCKING_PARENTS,
-        )
-          ? null
-          : buildSatteriImageLightboxElement(node.properties ?? {});
-        if (lightboxElement) {
-          ctx.replaceNode(node, lightboxElement);
+        const enhancement = enhanceSatteriImage(node.properties ?? {}, {
+          allowLightbox: !isElementWithTag(
+            parent,
+            IMAGE_LIGHTBOX_BLOCKING_PARENTS,
+          ),
+        });
+        if (enhancement.kind === "element") {
+          ctx.replaceNode(node, enhancement.element);
           return;
         }
 
-        const next = applySatteriImgProxyProperties(node.properties ?? {});
-        for (const [key, value] of Object.entries(next)) {
+        if (enhancement.kind === "none") return;
+
+        for (const [key, value] of Object.entries(enhancement.properties)) {
           if (node.properties?.[key] !== value)
             ctx.setProperty(node, key, value);
         }
@@ -341,16 +340,43 @@ function satteriCodeMetaPreprocess(): SatteriMdastPlugin {
   };
 }
 
+const mdastContentTransforms = [satteriMermaid()];
+// Display math must become `language-math` before Shiki sees code blocks.
+const mdastMathBridge = [...satteriMathMdastPlugins];
+const mdastCodeMetaTransforms = [satteriCodeMetaPreprocess()];
+
+const hastContentTransforms = [satteriGithubAlerts()];
+// Raw HTML is sanitized before image enhancement can add proxy/lightbox markup.
+const hastSanitizeStage = [satteriSafeHtml()];
+const hastImageEnhancementStage = [satteriImgProxy()];
+const hastMathRenderStage = [...satteriMathHastPlugins];
+const hastA11yStage = [satteriA11y()];
+
+export const satteriMarkdownPipeline = {
+  mdast: {
+    content: mdastContentTransforms,
+    mathBridge: mdastMathBridge,
+    codeMeta: mdastCodeMetaTransforms,
+  },
+  hast: {
+    content: hastContentTransforms,
+    sanitize: hastSanitizeStage,
+    imageEnhancement: hastImageEnhancementStage,
+    mathRender: hastMathRenderStage,
+    accessibility: hastA11yStage,
+  },
+} as const;
+
 export const satteriMdastPlugins = [
-  satteriMermaid(),
-  ...satteriMathMdastPlugins,
-  satteriCodeMetaPreprocess(),
+  ...satteriMarkdownPipeline.mdast.content,
+  ...satteriMarkdownPipeline.mdast.mathBridge,
+  ...satteriMarkdownPipeline.mdast.codeMeta,
 ];
 
 export const satteriHastPlugins = [
-  satteriGithubAlerts(),
-  satteriSafeHtml(),
-  satteriImgProxy(),
-  ...satteriMathHastPlugins,
-  satteriA11y(),
+  ...satteriMarkdownPipeline.hast.content,
+  ...satteriMarkdownPipeline.hast.sanitize,
+  ...satteriMarkdownPipeline.hast.imageEnhancement,
+  ...satteriMarkdownPipeline.hast.mathRender,
+  ...satteriMarkdownPipeline.hast.accessibility,
 ];

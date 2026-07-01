@@ -51,7 +51,7 @@ export async function buildPostDetailsModel({
   locale,
 }: PostDetailsModelInput) {
   const { Content, headings } = await render(post);
-  const posts = postIndex.sortedPostsByLocale[locale];
+  const posts = postIndex.contentByLocale[locale].posts;
   const { prev, next } = getAdjacentPosts(posts, post, locale);
 
   return {

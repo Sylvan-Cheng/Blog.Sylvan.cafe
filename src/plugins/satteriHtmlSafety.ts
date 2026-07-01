@@ -23,7 +23,7 @@ const URL_PROPERTIES = new Set([
   "xlink:href",
   "xlinkhref",
 ]);
-const IMAGE_LIGHTBOX_BLOCKING_PARENTS = new Set(["a", "picture"]);
+export const IMAGE_LIGHTBOX_BLOCKING_PARENTS = new Set(["a", "picture"]);
 const PARTIAL_RAW_HTML_CONTAINER_TAGS = new Set(["details"]);
 
 const HTML_ENTITY_DECODE_MAP: Record<string, string> = {
@@ -180,6 +180,26 @@ export function buildSatteriImageLightboxElement(
   };
 }
 
+type SatteriImageEnhancement =
+  | { kind: "none"; properties: Properties }
+  | { kind: "properties"; properties: Properties }
+  | { kind: "element"; element: Element };
+
+export function enhanceSatteriImage(
+  properties: Properties,
+  options: { allowLightbox: boolean },
+): SatteriImageEnhancement {
+  const lightboxElement = options.allowLightbox
+    ? buildSatteriImageLightboxElement(properties)
+    : null;
+  if (lightboxElement) return { kind: "element", element: lightboxElement };
+
+  const nextProperties = applySatteriImgProxyProperties(properties);
+  return nextProperties === properties
+    ? { kind: "none", properties }
+    : { kind: "properties", properties: nextProperties };
+}
+
 export function sanitizeHtmlTree(node: Root | RootContent): void {
   if (!hasChildren(node)) return;
 
@@ -201,13 +221,13 @@ export function sanitizeHtmlTree(node: Root | RootContent): void {
       );
 
       if (tagName === "img") {
-        const lightboxElement = canWrapChildImages
-          ? buildSatteriImageLightboxElement(child.properties)
-          : null;
-        if (lightboxElement) {
-          nextChild = lightboxElement;
-        } else {
-          child.properties = applySatteriImgProxyProperties(child.properties);
+        const enhancement = enhanceSatteriImage(child.properties, {
+          allowLightbox: canWrapChildImages,
+        });
+        if (enhancement.kind === "element") {
+          nextChild = enhancement.element;
+        } else if (enhancement.kind === "properties") {
+          child.properties = enhancement.properties;
         }
       }
     }
