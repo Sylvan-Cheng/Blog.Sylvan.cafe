@@ -14,15 +14,18 @@ type Props = {
 };
 
 const { locale } = Astro.props;
+const notFoundText = t(UI.notFound, locale);
+const notFoundTitle = notFoundText.replace(/[.!?。！？]+$/u, "");
 const localeUrls = Object.fromEntries(
   LOCALES.map((loc) => [loc, `/${loc}/404/`]),
 );
 ---
 
 <Layout
-  title={`404 Not Found | ${SITE.title}`}
+  title={`404 ${notFoundTitle} | ${SITE.title}`}
   alternateLinks={false}
   canonical={false}
+  description={notFoundText}
   locale={locale}
   robots="noindex"
 >
@@ -36,7 +39,7 @@ const localeUrls = Object.fromEntries(
       <h1 class="text-9xl font-bold text-accent">404</h1>
       <span aria-hidden="true">&macr;\_(ツ)_/&macr;</span>
       <p id="not-found-text" class="mt-4 text-2xl sm:text-3xl">
-        {t(UI.notFound, locale)}
+        {notFoundText}
       </p>
       <LinkButton
         id="go-home-link"
