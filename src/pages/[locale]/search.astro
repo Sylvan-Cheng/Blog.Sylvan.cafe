@@ -14,8 +14,25 @@ export function getStaticPaths() {
 }
 
 const locale = resolveLocale(Astro.currentLocale);
+const isDev = import.meta.env.DEV;
 
 const backUrl = SITE.showBackButton ? `${Astro.url.pathname}` : "/";
+
+const devSearchWarningTitle = {
+  zh: "开发模式提示",
+  en: "Development mode",
+  ja: "開発モード",
+  ru: "Режим разработки",
+  eo: "Evoluiga reĝimo",
+} satisfies Record<(typeof LOCALES)[number], string>;
+
+const devSearchWarningDesc = {
+  zh: "搜索索引只会在构建后生成。请运行以下命令预览搜索结果。",
+  en: "The search index is generated only after build. Run the command below to preview search results.",
+  ja: "検索インデックスはビルド後に生成されます。検索結果を確認するには次のコマンドを実行してください。",
+  ru: "Поисковый индекс создаётся только после сборки. Выполните команду ниже, чтобы проверить поиск.",
+  eo: "La serĉa indekso kreiĝas nur post konstruo. Rulu la jenan komandon por antaŭrigardi serĉrezultojn.",
+} satisfies Record<(typeof LOCALES)[number], string>;
 ---
 
 <Layout title={`${t(UI.search.title, locale)} | ${SITE.title}`}>
@@ -26,12 +43,35 @@ const backUrl = SITE.showBackButton ? `${Astro.url.pathname}` : "/";
       class="search-ui"
       transition:persist
       data-backurl={backUrl}
-      data-pagefind-search
+      data-pagefind-search={isDev ? undefined : true}
       data-search-locale={locale}
     >
-      <pagefind-input instance="site-search" autofocus placeholder={t(UI.search.title, locale)}></pagefind-input>
-      <pagefind-summary instance="site-search"></pagefind-summary>
-      <pagefind-results instance="site-search" show-images="false" max-sub-results="4"></pagefind-results>
+      {
+        isDev ? (
+          <div class="bg-muted/75 rounded p-4 space-y-4" data-pagefind-dev-warning>
+            <p>
+              <strong>{devSearchWarningTitle[locale]}</strong>
+              <br />
+              {devSearchWarningDesc[locale]}
+            </p>
+            <code class="block bg-black text-white px-2 py-1 rounded">pnpm run preview</code>
+          </div>
+        ) : (
+          <>
+            <pagefind-input
+              instance="site-search"
+              autofocus
+              placeholder={t(UI.search.title, locale)}
+            ></pagefind-input>
+            <pagefind-summary instance="site-search"></pagefind-summary>
+            <pagefind-results
+              instance="site-search"
+              show-images="false"
+              max-sub-results="4"
+            ></pagefind-results>
+          </>
+        )
+      }
     </div>
   </Main>
   <Footer />

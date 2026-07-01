@@ -20,6 +20,9 @@ registerHooks({
 const { satteriHastPlugins, satteriMdastPlugins } = await import(
   "../src/plugins/satteriMarkdown.ts"
 );
+const { createSylvanShikiTransformers } = await import(
+  "../src/utils/transformers/shikiPreset.ts"
+);
 
 const renderer = await createSatteriMarkdownProcessor({
   syntaxHighlight: {
@@ -33,6 +36,7 @@ const renderer = await createSatteriMarkdownProcessor({
       light: "github-light",
       dark: "github-dark",
     },
+    transformers: createSylvanShikiTransformers(),
   },
   features: {
     math: true,
@@ -68,6 +72,22 @@ Hidden **content** should stay inside the details element.
 - second item
 
 </details>
+
+~~~mermaid
+flowchart TD
+  A[Start] --> B{Ready?}
+  B -- yes --> C[Ship]
+~~~
+
+~~~ts file="example.ts"
+const answer = 42;
+~~~
+
+<style>body { background: red; }</style>
+
+<div style="position: fixed; inset: 0;" onclick="alert(1)">Unsafe style</div>
+
+<pre class="astro-code" style="position: fixed; --shiki-light: #fff;"><code><span style="color: red; --shiki-light: #fff;">Fake generated code</span></code></pre>
 `;
 
 const result = await renderer.render(markdown, {
@@ -93,6 +113,42 @@ assert.doesNotMatch(
   html,
   /<\/details>\s*<p>Hidden/,
   "details content is not emitted after the closing details tag",
+);
+assert.doesNotMatch(html, /background:\s*red/i, "raw HTML style tag content is removed");
+assert.match(
+  html,
+  /<figure class="mermaid-diagram">[\s\S]*<style>[\s\S]*--_node-fill/i,
+  "trusted Mermaid SVG styles are preserved",
+);
+assert.doesNotMatch(
+  html,
+  /data-sylvan-mermaid-token/i,
+  "internal Mermaid trust token is removed from rendered HTML",
+);
+assert.match(
+  html,
+  /<pre[^>]*class="[^"]*\bastro-code\b[^"]*"[^>]*style="[^"]*--file-name-offset/i,
+  "Shiki code block keeps renderer-owned filename offset style",
+);
+assert.match(
+  html,
+  /<span style="--shiki-light:[^"]*--shiki-dark:/i,
+  "Shiki token spans keep renderer-owned color variables",
+);
+assert.doesNotMatch(
+  html,
+  /position:\s*fixed/i,
+  "raw HTML style attributes are removed without rejecting renderer-owned styles",
+);
+assert.doesNotMatch(
+  html,
+  /color:\s*red/i,
+  "raw HTML cannot smuggle non-whitelisted styles through generated code classes",
+);
+assert.doesNotMatch(
+  html,
+  /\sonclick=/i,
+  "raw HTML event handler attributes are removed",
 );
 
 console.log("Markdown rendering regression tests passed.");

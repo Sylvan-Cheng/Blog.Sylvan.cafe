@@ -4,6 +4,7 @@ import { toHtml } from "hast-util-to-html";
 import { toClassList } from "./hastUtils";
 import { getS3ImageMetadata } from "./imageMetadata";
 import { buildImgProxyUrls } from "./imgProxyUrls";
+import { MERMAID_TRUST_ATTRIBUTE, MERMAID_TRUST_TOKEN } from "./mermaidMarkup";
 
 export const BLOCKED_HTML_TAGS = new Set([
   "embed",
@@ -11,6 +12,7 @@ export const BLOCKED_HTML_TAGS = new Set([
   "iframe",
   "object",
   "script",
+  "style",
 ]);
 
 const URL_PROPERTIES = new Set([
@@ -23,8 +25,19 @@ const URL_PROPERTIES = new Set([
   "xlink:href",
   "xlinkhref",
 ]);
-const IMAGE_LIGHTBOX_BLOCKING_PARENTS = new Set(["a", "picture"]);
+export const IMAGE_LIGHTBOX_BLOCKING_PARENTS = new Set(["a", "picture"]);
 const PARTIAL_RAW_HTML_CONTAINER_TAGS = new Set(["details"]);
+const SHIKI_STYLE_PROPERTIES = new Set([
+  "--shiki-dark",
+  "--shiki-dark-bg",
+  "--shiki-light",
+  "--shiki-light-bg",
+]);
+const SHIKI_PRE_STYLE_VALUES = new Map([
+  ["overflow-x", "auto"],
+  ["white-space", "pre-wrap"],
+  ["word-wrap", "break-word"],
+]);
 
 const HTML_ENTITY_DECODE_MAP: Record<string, string> = {
   amp: "&",
@@ -100,14 +113,96 @@ function isElementWithTag(
   return node.type === "element" && tagNames.has(node.tagName.toLowerCase());
 }
 
+function isTrustedRawHtmlContainer(node: Root | RootContent): boolean {
+  if (node.type !== "element") return false;
+  const classNames = toClassList(node.properties?.className);
+  const token =
+    node.properties?.[MERMAID_TRUST_ATTRIBUTE] ??
+    node.properties?.dataSylvanMermaidToken;
+  return (
+    classNames.includes("mermaid-diagram") && token === MERMAID_TRUST_TOKEN
+  );
+}
+
+function isGeneratedCodeContainer(node: Root | RootContent): boolean {
+  if (node.type !== "element" || node.tagName.toLowerCase() !== "pre") {
+    return false;
+  }
+  return toClassList(node.properties?.className).includes("astro-code");
+}
+
 function hasChildren(
   node: Root | RootContent,
 ): node is (Root | Element) & { children: RootContent[] } {
   return "children" in node && Array.isArray(node.children);
 }
 
+function getStyleValue(properties: Properties): string | null {
+  const style = properties.style;
+  if (typeof style === "string") return style;
+  if (Array.isArray(style)) return style.filter(Boolean).join(";");
+  return null;
+}
+
+function isUnsafeStyleValue(value: string): boolean {
+  return /(?:@import|expression\s*\(|url\s*\(|[<>])/i.test(value);
+}
+
+function sanitizeGeneratedCodeStyle(
+  style: string,
+  tagName: string,
+): string | null {
+  const declarations: string[] = [];
+
+  for (const declaration of style.split(";")) {
+    const separator = declaration.indexOf(":");
+    if (separator === -1) continue;
+
+    const property = declaration.slice(0, separator).trim().toLowerCase();
+    const value = declaration.slice(separator + 1).trim();
+    if (!property || !value || isUnsafeStyleValue(value)) continue;
+
+    if (SHIKI_STYLE_PROPERTIES.has(property)) {
+      declarations.push(`${property}: ${value}`);
+      continue;
+    }
+
+    if (
+      tagName === "pre" &&
+      property === "--file-name-offset" &&
+      /^-?\d*\.?\d+(?:px|rem|em)$/i.test(value)
+    ) {
+      declarations.push(`${property}: ${value}`);
+      continue;
+    }
+
+    if (tagName === "pre" && SHIKI_PRE_STYLE_VALUES.get(property) === value) {
+      declarations.push(`${property}: ${value}`);
+    }
+  }
+
+  return declarations.length > 0 ? `${declarations.join("; ")};` : null;
+}
+
+function sanitizeGeneratedCodeProperties(
+  tagName: string,
+  properties: Properties,
+): Properties {
+  const style = getStyleValue(properties);
+  if (!style) return properties;
+
+  const sanitizedStyle = sanitizeGeneratedCodeStyle(style, tagName);
+  if (!sanitizedStyle) {
+    const { style: _style, ...rest } = properties;
+    return rest;
+  }
+
+  return { ...properties, style: sanitizedStyle };
+}
+
 export function sanitizeSatteriElementProperties(
   properties: Properties,
+  options: { allowStyle?: boolean } = {},
 ): Properties {
   const sanitized: Properties = { ...properties };
   for (const key of Object.keys(sanitized)) {
@@ -115,6 +210,7 @@ export function sanitizeSatteriElementProperties(
     const value = sanitized[key];
     if (
       normalizedKey === "srcdoc" ||
+      (!options.allowStyle && normalizedKey === "style") ||
       normalizedKey.startsWith("on") ||
       (URL_PROPERTIES.has(normalizedKey) &&
         (Array.isArray(value)
@@ -180,10 +276,39 @@ export function buildSatteriImageLightboxElement(
   };
 }
 
-export function sanitizeHtmlTree(node: Root | RootContent): void {
+type SatteriImageEnhancement =
+  | { kind: "none"; properties: Properties }
+  | { kind: "properties"; properties: Properties }
+  | { kind: "element"; element: Element };
+
+export function enhanceSatteriImage(
+  properties: Properties,
+  options: { allowLightbox: boolean },
+): SatteriImageEnhancement {
+  const lightboxElement = options.allowLightbox
+    ? buildSatteriImageLightboxElement(properties)
+    : null;
+  if (lightboxElement) return { kind: "element", element: lightboxElement };
+
+  const nextProperties = applySatteriImgProxyProperties(properties);
+  return nextProperties === properties
+    ? { kind: "none", properties }
+    : { kind: "properties", properties: nextProperties };
+}
+
+export function sanitizeHtmlTree(
+  node: Root | RootContent,
+  context: { trustedMermaid: boolean; generatedCode: boolean } = {
+    trustedMermaid: false,
+    generatedCode: false,
+  },
+): void {
   if (!hasChildren(node)) return;
 
   const nextChildren: RootContent[] = [];
+  const trustedMermaid =
+    context.trustedMermaid || isTrustedRawHtmlContainer(node);
+  const generatedCode = context.generatedCode || isGeneratedCodeContainer(node);
   const canWrapChildImages = !isElementWithTag(
     node,
     IMAGE_LIGHTBOX_BLOCKING_PARENTS,
@@ -191,28 +316,49 @@ export function sanitizeHtmlTree(node: Root | RootContent): void {
 
   for (const child of node.children) {
     let nextChild = child;
+    let childTrustedMermaid = trustedMermaid;
 
     if (isElement(child)) {
       const tagName = child.tagName.toLowerCase();
-      if (BLOCKED_HTML_TAGS.has(tagName)) continue;
+      childTrustedMermaid = trustedMermaid || isTrustedRawHtmlContainer(child);
+      const childGeneratedCode =
+        generatedCode || isGeneratedCodeContainer(child);
+      const isBlockedTag =
+        BLOCKED_HTML_TAGS.has(tagName) &&
+        !(tagName === "style" && childTrustedMermaid);
+      if (isBlockedTag) continue;
 
       child.properties = sanitizeSatteriElementProperties(
         child.properties ?? {},
+        {
+          allowStyle: childTrustedMermaid || childGeneratedCode,
+        },
       );
+      if (childGeneratedCode && !childTrustedMermaid) {
+        child.properties = sanitizeGeneratedCodeProperties(
+          tagName,
+          child.properties,
+        );
+      }
+      delete child.properties[MERMAID_TRUST_ATTRIBUTE];
+      delete child.properties.dataSylvanMermaidToken;
 
       if (tagName === "img") {
-        const lightboxElement = canWrapChildImages
-          ? buildSatteriImageLightboxElement(child.properties)
-          : null;
-        if (lightboxElement) {
-          nextChild = lightboxElement;
-        } else {
-          child.properties = applySatteriImgProxyProperties(child.properties);
+        const enhancement = enhanceSatteriImage(child.properties, {
+          allowLightbox: canWrapChildImages,
+        });
+        if (enhancement.kind === "element") {
+          nextChild = enhancement.element;
+        } else if (enhancement.kind === "properties") {
+          child.properties = enhancement.properties;
         }
       }
     }
 
-    sanitizeHtmlTree(nextChild);
+    sanitizeHtmlTree(nextChild, {
+      generatedCode: generatedCode || isGeneratedCodeContainer(nextChild),
+      trustedMermaid: childTrustedMermaid,
+    });
     nextChildren.push(nextChild);
   }
 

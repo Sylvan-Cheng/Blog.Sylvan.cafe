@@ -1,11 +1,6 @@
 import { satteri } from "@astrojs/markdown-satteri";
 import partytown from "@astrojs/partytown";
 import sitemap from "@astrojs/sitemap";
-import {
-  transformerNotationDiff,
-  transformerNotationHighlight,
-  transformerNotationWordHighlight,
-} from "@shikijs/transformers";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, envField } from "astro/config";
 import icon from "astro-icon";
@@ -15,8 +10,7 @@ import {
   satteriHastPlugins,
   satteriMdastPlugins,
 } from "./src/plugins/satteriMarkdown";
-import { transformerCodeMeta } from "./src/utils/transformers/codeMeta";
-import { transformerLineNumbers } from "./src/utils/transformers/lineNumbers";
+import { createSylvanShikiTransformers } from "./src/utils/transformers/shikiPreset";
 
 const theme = THEME_DEFS[SITE.themeScheme];
 
@@ -58,13 +52,7 @@ export default defineConfig({
       themes: theme.shiki,
       defaultColor: false,
       wrap: true,
-      transformers: [
-        transformerCodeMeta({ style: "v2", hideDot: false }),
-        transformerLineNumbers(),
-        transformerNotationHighlight(),
-        transformerNotationWordHighlight(),
-        transformerNotationDiff({ matchAlgorithm: "v3" }),
-      ],
+      transformers: createSylvanShikiTransformers(),
     },
   },
   vite: {

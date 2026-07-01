@@ -1,11 +1,18 @@
 ---
 import { Icon } from "astro-icon/components";
+import type { Locale } from "@/i18n/config";
 import { LOCALE_META, LOCALES } from "@/i18n/config";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
 
-const currentLocale = resolveLocale(Astro.currentLocale);
 const pathname = Astro.url.pathname;
+type Props = {
+  locale?: Locale;
+  localeUrls?: Partial<Record<string, string>>;
+};
+
+const { locale: localeOverride, localeUrls = {} } = Astro.props;
+const currentLocale = localeOverride ?? resolveLocale(Astro.currentLocale);
 
 const locales = LOCALES.map((code) => ({
   code,
@@ -21,7 +28,7 @@ function switchLocale(path: string, to: string): string {
 const items = locales.map(({ code, label }) => ({
   code,
   label,
-  url: switchLocale(pathname, code),
+  url: localeUrls[code] ?? switchLocale(pathname, code),
 }));
 ---
 

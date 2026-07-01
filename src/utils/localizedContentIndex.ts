@@ -1,9 +1,10 @@
 import type { CollectionEntry } from "astro:content";
+import { getCollection } from "astro:content";
 import type { Locale } from "@/i18n/config";
 import { LOCALES } from "@/i18n/config";
-import { getPosts, sortPosts } from "./blogRepository";
 import { postHasTag } from "./contentIdentity";
 import getUniqueTags from "./getUniqueTags";
+import { comparePostsByDateDesc } from "./postDates";
 import { buildSeriesGroups, type SeriesGroup } from "./seriesModel";
 
 type BlogPost = CollectionEntry<"blog">;
@@ -27,9 +28,9 @@ function buildLocalizedContent(
   locale: Locale,
   posts: BlogPost[],
 ): LocalizedContent {
-  const localizedPosts = sortPosts(
-    posts.filter((post) => post.data.locale === locale),
-  );
+  const localizedPosts = posts
+    .filter((post) => post.data.locale === locale)
+    .sort(comparePostsByDateDesc);
   const tags = getUniqueTags(localizedPosts)
     .map(({ tag, tagName }) => ({
       tag,
@@ -55,5 +56,12 @@ export function buildLocalizedContentIndex(
 }
 
 export async function getLocalizedContentIndex(): Promise<LocalizedContentIndex> {
-  return buildLocalizedContentIndex(await getPosts());
+  return buildLocalizedContentIndex(await getCollection("blog"));
+}
+
+export async function getLocalizedContent(
+  locale: Locale | string,
+): Promise<LocalizedContent | null> {
+  const contentByLocale = await getLocalizedContentIndex();
+  return contentByLocale[locale as Locale] ?? null;
 }

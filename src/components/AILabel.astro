@@ -1,4 +1,5 @@
 ---
+import type { Locale } from "@/i18n/config";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
 import assistedByAiSvg from "../assets/badges/ai-label/assisted-by-ai.svg?raw";
@@ -9,10 +10,11 @@ export type AILabelType = "assisted-by-ai" | "made-with-ai" | "no-ai-used";
 
 type Props = {
   label: AILabelType;
+  locale?: Locale;
 };
 
-const { label } = Astro.props;
-const locale = resolveLocale(Astro.currentLocale);
+const { label, locale: localeOverride } = Astro.props;
+const locale = localeOverride ?? resolveLocale(Astro.currentLocale);
 
 const labels: Record<AILabelType, { ariaLabel: string; svg: string }> = {
   "assisted-by-ai": {

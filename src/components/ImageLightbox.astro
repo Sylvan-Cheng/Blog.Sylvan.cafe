@@ -7,8 +7,8 @@
 ---
 
 <script>
-  import PhotoSwipeLightbox from "photoswipe/lightbox";
-  import "photoswipe/style.css";
+  import type PhotoSwipeLightbox from "photoswipe/lightbox";
+  import photoSwipeStylesUrl from "photoswipe/style.css?url";
   import { initInteraction, onSwap } from "../scripts/lifecycle";
 
   const { signal, onCleanup } = initInteraction("__imgLightboxAC");
@@ -23,19 +23,63 @@
     '<svg aria-hidden="true" class="pswp__icn" viewBox="0 0 24 24" width="24" height="24"><g class="pswp-tabler-zoom-in"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0m4 0h6m-3-3v6m11 8l-6-6"/></g><g class="pswp-tabler-zoom-out"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0m4 0h6m8 11l-6-6"/></g></svg>';
 
   let lightbox: PhotoSwipeLightbox | null = null;
+  let lightboxReady: Promise<PhotoSwipeLightbox | null> | null = null;
+  let interactionController: AbortController | null = null;
+  let stylesReady: Promise<void> | null = null;
+
+  function loadPhotoSwipeStyles() {
+    if (stylesReady) return stylesReady;
+
+    const existingStyles = document.querySelector<HTMLLinkElement>(
+      'link[data-photoswipe-styles="true"]',
+    );
+    if (existingStyles) {
+      stylesReady = Promise.resolve();
+      return stylesReady;
+    }
+
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = photoSwipeStylesUrl;
+    link.dataset.photoswipeStyles = "true";
+    stylesReady = new Promise((resolve) => {
+      link.addEventListener("load", () => resolve(), { once: true });
+      link.addEventListener("error", () => resolve(), { once: true });
+    });
+    document.head.append(link);
+    return stylesReady;
+  }
 
   function destroyImageLightbox() {
+    interactionController?.abort();
+    interactionController = null;
+
+    lightboxReady = null;
+
     if (lightbox) {
       lightbox.destroy();
       lightbox = null;
     }
   }
 
-  function initImageLightbox() {
-    destroyImageLightbox();
-
+  function getLightboxLinks(): HTMLAnchorElement[] {
     const article = document.getElementById("article");
-    if (!article?.querySelector(".image-lightbox-link")) return;
+    if (!article) return [];
+    return [...article.querySelectorAll<HTMLAnchorElement>(".image-lightbox-link")];
+  }
+
+  async function loadImageLightbox() {
+    if (lightbox) return lightbox;
+    if (signal.aborted) return null;
+
+    const links = getLightboxLinks();
+    if (links.length === 0) return null;
+
+    const [{ default: PhotoSwipeLightbox }] = await Promise.all([
+      import("photoswipe/lightbox"),
+      loadPhotoSwipeStyles(),
+    ]);
+    if (signal.aborted) return null;
 
     lightbox = new PhotoSwipeLightbox({
       arrowNextSVG: TABLER_ARROW_NEXT_SVG,
@@ -48,6 +92,66 @@
       zoomSVG: TABLER_ZOOM_SVG,
     });
     lightbox.init();
+    return lightbox;
+  }
+
+  function ensureImageLightbox() {
+    lightboxReady ??= loadImageLightbox();
+    return lightboxReady;
+  }
+
+  async function openImageLightbox(link: HTMLAnchorElement) {
+    const links = getLightboxLinks();
+    const index = links.indexOf(link);
+    if (index === -1) return;
+
+    const loadedLightbox = await ensureImageLightbox();
+    loadedLightbox?.loadAndOpen(index);
+  }
+
+  function preloadImageLightboxFromEvent(event: Event) {
+    const link = (event.target as Element | null)?.closest<HTMLAnchorElement>(
+      ".image-lightbox-link",
+    );
+    if (!link) return;
+
+    void ensureImageLightbox();
+  }
+
+  function handleImageLightboxClick(event: Event) {
+    const link = (event.target as Element | null)?.closest<HTMLAnchorElement>(
+      ".image-lightbox-link",
+    );
+    if (!link) return;
+
+    event.preventDefault();
+    void openImageLightbox(link);
+  }
+
+  function initImageLightbox() {
+    destroyImageLightbox();
+
+    const article = document.getElementById("article");
+    if (!article?.querySelector(".image-lightbox-link")) return;
+
+    interactionController = new AbortController();
+    signal.addEventListener("abort", () => interactionController?.abort(), {
+      once: true,
+    });
+    article.addEventListener("click", handleImageLightboxClick, {
+      signal: interactionController.signal,
+    });
+    article.addEventListener("pointerover", preloadImageLightboxFromEvent, {
+      passive: true,
+      signal: interactionController.signal,
+    });
+    article.addEventListener("focusin", preloadImageLightboxFromEvent, {
+      signal: interactionController.signal,
+    });
+    article.addEventListener("touchstart", preloadImageLightboxFromEvent, {
+      passive: true,
+      signal: interactionController.signal,
+    });
   }
 
   onCleanup(destroyImageLightbox);

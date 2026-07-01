@@ -1,5 +1,4 @@
 ---
-import type { CollectionEntry } from "astro:content";
 import Card from "@/components/Card.astro";
 import Footer from "@/components/Footer.astro";
 import Header from "@/components/Header.astro";
@@ -9,23 +8,7 @@ import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import Main from "@/layouts/Main.astro";
-import { getPostsByLocale } from "@/utils/blogRepository";
-import { comparePostsByDateDesc } from "@/utils/postDates";
-
-type GroupKey = string | number | symbol;
-
-function groupBy(
-  posts: CollectionEntry<"blog">[],
-  fn: (item: CollectionEntry<"blog">) => GroupKey,
-): Record<GroupKey, CollectionEntry<"blog">[]> {
-  const result: Record<GroupKey, CollectionEntry<"blog">[]> = {};
-  for (const post of posts) {
-    const key = fn(post);
-    if (!result[key]) result[key] = [];
-    result[key].push(post);
-  }
-  return result;
-}
+import { buildArchivePageModel } from "@/utils/archivePageModel";
 
 export function getStaticPaths() {
   return LOCALES.map((locale) => ({ params: { locale } }));
@@ -37,41 +20,25 @@ if (!SITE.showArchives) {
 
 const locale = resolveLocale(Astro.currentLocale);
 const months = UI.months[locale] ?? UI.months.en;
-
-const posts = await getPostsByLocale(locale);
+const { archiveGroups } = await buildArchivePageModel(locale, months);
 ---
 
 <Layout title={`${t(UI.archives.title, locale)} | ${SITE.title}`}>
   <Header />
   <Main pageTitle={t(UI.archives.title, locale)} pageDesc={t(UI.archives.desc, locale)}>
     {
-      Object.entries(
-        groupBy(posts, post =>
-          post.data.pubDatetime.getFullYear()
-        )
-      )
-        .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
-        .map(([year, yearGroup]) => (
+      archiveGroups.map((yearGroup) => (
           <div>
-            <span class="text-2xl font-bold">{year}</span>
-            <sup class="text-sm">{yearGroup.length}</sup>
-            {Object.entries(
-              groupBy(
-                yearGroup,
-                post => post.data.pubDatetime.getMonth() + 1
-              )
-            )
-              .sort(([monthA], [monthB]) => Number(monthB) - Number(monthA))
-              .map(([month, monthGroup]) => (
+            <span class="text-2xl font-bold">{yearGroup.year}</span>
+            <sup class="text-sm">{yearGroup.count}</sup>
+            {yearGroup.months.map((monthGroup) => (
                 <div class="flex flex-col sm:flex-row">
                   <div class="mt-6 min-w-36 text-lg sm:my-6">
-                    <span class="font-bold">{months[Number(month) - 1]}</span>
-                    <sup class="text-xs">{monthGroup.length}</sup>
+                    <span class="font-bold">{monthGroup.label}</span>
+                    <sup class="text-xs">{monthGroup.posts.length}</sup>
                   </div>
                   <ul class="line-frame border-b">
-                    {monthGroup
-                      .sort(comparePostsByDateDesc)
-                      .map(data => <Card {...data} locale={locale} />)}
+                    {monthGroup.posts.map(data => <Card {...data} locale={locale} />)}
                   </ul>
                 </div>
               ))}

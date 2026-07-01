@@ -59,7 +59,7 @@ const {
   <BackButton />
   <main
     id="main-content"
-    class:list={["app-layout overflow-x-clip pb-12", { "mt-8": !SITE.showBackButton }]}
+    class:list={["app-layout post-layout overflow-x-clip pb-12", { "mt-8": !SITE.showBackButton }]}
     data-pagefind-body
     data-backurl={`/${locale}/`}
   >
@@ -83,7 +83,7 @@ const {
 
       </div>
 
-      <aside class="post-side hidden xl:block" data-pagefind-ignore data-print-hide>
+      <aside class="post-side hidden 2xl:block" data-pagefind-ignore data-print-hide>
         <FloatingTOC {headings} />
       </aside>
     </div>

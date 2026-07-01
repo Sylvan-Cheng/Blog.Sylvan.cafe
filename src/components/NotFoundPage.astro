@@ -1,0 +1,55 @@
+---
+import Footer from "@/components/Footer.astro";
+import Header from "@/components/Header.astro";
+import LinkButton from "@/components/LinkButton.astro";
+import { SITE } from "@/config";
+import type { Locale } from "@/i18n/config";
+import { LOCALES } from "@/i18n/config";
+import { UI } from "@/i18n/ui";
+import { t } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+
+type Props = {
+  locale: Locale;
+};
+
+const { locale } = Astro.props;
+const notFoundText = t(UI.notFound, locale);
+const notFoundTitle = notFoundText.replace(/[.!?。！？]+$/u, "");
+const localeUrls = Object.fromEntries(
+  LOCALES.map((loc) => [loc, `/${loc}/404/`]),
+);
+---
+
+<Layout
+  title={`404 ${notFoundTitle} | ${SITE.title}`}
+  alternateLinks={false}
+  canonical={false}
+  description={notFoundText}
+  locale={locale}
+  robots="noindex"
+>
+  <Header locale={locale} localeUrls={localeUrls} />
+
+  <main
+    id="main-content"
+    class="app-layout flex flex-1 items-center justify-center"
+  >
+    <div class="mb-14 flex flex-col items-center justify-center">
+      <h1 class="text-9xl font-bold text-accent">404</h1>
+      <span aria-hidden="true">&macr;\_(ツ)_/&macr;</span>
+      <p id="not-found-text" class="mt-4 text-2xl sm:text-3xl">
+        {notFoundText}
+      </p>
+      <LinkButton
+        id="go-home-link"
+        href={`/${locale}/`}
+        class="tone-link-strong my-6 text-lg"
+      >
+        {t(UI.goHome, locale)}
+      </LinkButton>
+    </div>
+  </main>
+
+  <Footer locale={locale} />
+</Layout>

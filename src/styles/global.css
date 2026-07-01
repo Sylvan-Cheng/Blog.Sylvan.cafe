@@ -42,6 +42,8 @@
   --header-h: 4rem;
   --sidebar-w: 264px;
   --content-max-w: 64rem;
+  --post-content-max-w: 72rem;
+  --post-main-w: 48rem;
   --context-w: 17rem;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -139,6 +141,10 @@ html[lang="ja"] {
 
 @utility app-layout {
   @apply mx-auto w-full max-w-app px-4 sm:px-6;
+}
+
+@utility post-layout {
+  @apply max-w-app;
 }
 
 @utility line-frame {
@@ -353,9 +359,13 @@ html[lang="ja"] {
   @apply grid min-w-0 gap-12;
 }
 
-@media (min-width: 1280px) {
+@media (min-width: 1536px) {
+  .post-layout {
+    max-width: var(--post-content-max-w);
+  }
+
   .post-grid {
-    grid-template-columns: minmax(0, 720px) var(--context-w);
+    grid-template-columns: minmax(0, var(--post-main-w)) var(--context-w);
     align-items: start;
   }
 }
