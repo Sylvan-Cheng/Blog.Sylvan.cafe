@@ -78,18 +78,6 @@ function initSearch() {
       });
     }
 
-    if (import.meta.env.DEV) {
-      searchRoot.insertAdjacentHTML(
-        "afterbegin",
-        `
-        <div class="bg-muted/75 rounded p-4 space-y-4 mb-4" data-pagefind-dev-warning>
-          <p><strong>DEV mode Warning! </strong>You need to build the project at least once to see the search results during development.</p>
-          <code class="block bg-black text-white px-2 py-1 rounded">pnpm run build</code>
-        </div>
-      `,
-      );
-    }
-
     if (query) instance.triggerSearch(query);
   });
 }
