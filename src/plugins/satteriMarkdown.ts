@@ -366,7 +366,7 @@ function satteriCodeMetaPreprocess(): SatteriMdastPlugin {
     name: "sylvan-code-meta-preprocess",
     code(node, ctx) {
       const meta = parseCodeMeta(node.meta ?? undefined);
-      if (!meta.file && !meta.collapse && !meta.nolines) return;
+      if (!meta.file && !meta.collapse && !meta.nolines && !meta.wrap) return;
 
       // Keep meta syntax normalized for Shiki's highlighter and transformers.
       ctx.setProperty(node, "meta", node.meta ?? "");

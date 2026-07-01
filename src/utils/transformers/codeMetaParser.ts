@@ -2,6 +2,7 @@ export type ParsedCodeMeta = {
   collapse: boolean;
   file?: string;
   nolines: boolean;
+  wrap: boolean;
 };
 
 export function parseCodeMeta(raw?: string): ParsedCodeMeta {
@@ -20,5 +21,6 @@ export function parseCodeMeta(raw?: string): ParsedCodeMeta {
     collapse: metaMap.get("collapse") === "true",
     file: metaMap.get("file"),
     nolines: metaMap.get("nolines") === "true",
+    wrap: metaMap.get("wrap") === "true",
   };
 }

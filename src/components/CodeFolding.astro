@@ -17,7 +17,7 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
 
   pre[data-collapse] > code {
     max-height: var(--cf-max-h);
-    overflow: hidden;
+    overflow: auto hidden;
     -webkit-mask-image: linear-gradient(
       to bottom,
       black calc(100% - 3rem),
@@ -29,6 +29,10 @@ const labelCollapse = t(UI.codeBlock.collapse, locale);
       transparent
     );
     transition: max-height var(--cf-duration) var(--cf-easing);
+  }
+
+  pre[data-collapse][data-wrap] > code {
+    overflow: hidden;
   }
 
   /* 折叠按钮 — 底部居中 */

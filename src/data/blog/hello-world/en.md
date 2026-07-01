@@ -165,25 +165,11 @@ Lists are a core tool for organizing information.
 
 ## Code Blocks
 
-Code blocks use Shiki syntax highlighting, supporting: default line numbers, word wrap (hanging indent), code folding (`collapse`), filename labels (`file`), and disabling line numbers (`nolines`).
+Code blocks use Shiki syntax highlighting, supporting: default line numbers, horizontal scrolling by default, opt-in word wrap with hanging indent (`wrap`), code folding (`collapse`), filename labels (`file`), and disabling line numbers (`nolines`).
 
-### Default Line Numbers
+### Basic Annotations: Line Numbers + file
 
-All code blocks have line numbers enabled by default, no annotation needed.
-
-```python
-def fib(n: int) -> list[int]:
-    a, b = 0, 1
-    result = []
-    for _ in range(n):
-        result.append(a)
-        a, b = b, a + b
-    return result
-```
-
-### File Label: file
-
-`file="name"` displays a filename label in the top-left corner, with a green dot.
+Line numbers are enabled by default; `file="name"` displays a filename label in the top-left corner.
 
 ```python file="fibonacci.py"
 def fib(n: int) -> list[int]:
@@ -203,99 +189,38 @@ pnpm dev
 pnpm build
 ```
 
-### Code Folding: collapse
+### Folding + Horizontal Scroll: collapse
 
-Code blocks exceeding 8 lines with `collapse` are automatically folded, with a bottom fade to hint at more content. The expand button is centered at the bottom.
+`collapse` folds long code blocks automatically. Without `wrap`, overly long lines still stay on one line and use horizontal scrolling.
 
-```python collapse file="utils.py"
-def fibonacci(n: int) -> list[int]:
-    """Generate the first n Fibonacci numbers"""
-    a, b = 0, 1
-    result = []
-    for _ in range(n):
-        result.append(a)
-        a, b = b, a + b
-    return result
+```python collapse file="scroll-and-fold.py"
+from datetime import datetime
 
 
-def is_prime(num: int) -> bool:
-    """Check if an integer is prime"""
-    if num < 2:
-        return False
-    for i in range(2, int(num ** 0.5) + 1):
-        if num % i == 0:
-            return False
-    return True
-
-
-def chunk_list(data: list, size: int):
-    """Split a list into fixed-size chunks, returning a generator"""
-    for i in range(0, len(data), size):
-        yield data[i:i + size]
-
-
-print(fibonacci(10))
-primes = [x for x in fibonacci(20) if is_prime(x)]
-print(f"Primes: {primes}")
-```
-
-### Folding + No Line Numbers: collapse nolines
-
-Multiple annotations can be freely combined.
-
-```python collapse nolines
-import json
-from pathlib import Path
-
-
-def load_config(path: str | Path) -> dict:
-    """Load a JSON config file, returning an empty dict if not found."""
-    config_path = Path(path)
-    if not config_path.exists():
-        return {}
-    return json.loads(config_path.read_text(encoding="utf-8"))
-
-
-def merge_configs(base: dict, override: dict) -> dict:
-    """Deep-merge two config dicts, with override taking priority."""
-    result = base.copy()
-    for key, value in override.items():
-        if isinstance(value, dict) and key in result:
-            result[key] = merge_configs(result[key], value)
-        else:
-            result[key] = value
-    return result
-
-
-cfg = load_config("defaults.json")
-user_cfg = load_config("user.json")
-final = merge_configs(cfg, user_cfg)
-print(json.dumps(final, indent=2, ensure_ascii=False))
-```
-
-### Word Wrap + Hanging Indent
-
-Overly long lines wrap at the container boundary, with the continuation indented to align with the first line of code.
-
-```python collapse file="dashboard.py"
-def build_dashboard_report(assignments: dict[str, list[dict]], include_history: bool = False) -> str:
-    """Generate an aggregated dashboard report from task assignments across worker nodes."""
-    lines = ["# Load Report", f"Generated at: {datetime.now().isoformat()}", ""]
-    for node_name, tasks in assignments.items():
-        pending = [t for t in tasks if t.get("status") == "pending" and t.get("priority", 0) >= 3]
-        lines.append(f"## {node_name} ({len(pending)} high-priority tasks)")
-        lines.extend(f"  - [{t['priority']}] {t.get('title', 'Unnamed')}" for t in sorted(pending, key=lambda x: -x["priority"]))
-    if include_history:
-        lines.append("\n---\n## Historical Trends\n*Requires persistent storage to be enabled*")
+def build_release_report(project: str, commits: list[dict[str, str]], include_review_notes: bool = False, timezone: str = "Asia/Shanghai") -> str:
+    """Generate a release report while keeping a long signature for horizontal-scroll testing."""
+    lines = [f"# {project} Release Report", f"Generated at: {datetime.now().isoformat()}", ""]
+    for commit in commits:
+        scope = commit.get("scope", "misc")
+        title = commit.get("title", "Untitled commit")
+        lines.append(f"- [{scope}] {title} — {commit.get('hash', 'unknown')} — reviewer={commit.get('reviewer', 'none')} — deployment_window={commit.get('window', 'standard')}")
+    if include_review_notes:
+        lines.append("## Review Notes")
+        lines.append("Confirm migration scripts, search indexes, static asset caches, and rollback paths before shipping.")
     return "\n".join(lines)
 
 
-sample = [
-    {"title": "Data Migration", "status": "pending", "priority": 5, "node": "worker-0"},
-    {"title": "Log Rotation", "status": "done", "priority": 1, "node": "worker-0"},
-    {"title": "Index Rebuild", "status": "pending", "priority": 4, "node": "worker-1"},
-]
-print(build_dashboard_report({"worker-0": sample[:2], "worker-1": sample[2:]}, include_history=True))
+sample = [{"scope": "build", "title": "Refresh Pagefind index", "hash": "abc123", "reviewer": "Sylvan", "window": "nightly"}]
+print(build_release_report("blog.sylvan.cafe", sample, include_review_notes=True))
+```
+
+### Word Wrap + Hanging Indent: wrap
+
+Add `wrap` when overly long lines should wrap at the container boundary, with the continuation indented to align with the first line of code.
+
+```python wrap file="wrap-example.py"
+def build_query_url(endpoint: str, filters: dict[str, str], include_archived: bool = False, sort: str = "updated_at:desc") -> str:
+    return f"{endpoint}?include_archived={include_archived}&sort={sort}&filters=" + "&".join(f"{key}={value}" for key, value in filters.items())
 ```
 
 ### CSS

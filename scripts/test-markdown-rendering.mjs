@@ -31,7 +31,7 @@ const renderer = await createSatteriMarkdownProcessor({
   },
   shikiConfig: {
     defaultColor: false,
-    wrap: true,
+    wrap: false,
     themes: {
       light: "github-light",
       dark: "github-dark",
@@ -83,6 +83,18 @@ flowchart TD
 const answer = 42;
 ~~~
 
+~~~ts
+const defaultCodeBlockShouldScroll = "without wrap meta ".repeat(20);
+~~~
+
+~~~ts collapse file="scroll-fold.ts"
+const collapsedCodeBlockShouldScroll = "collapse keeps default horizontal scrolling ".repeat(20);
+~~~
+
+~~~ts wrap collapse file="wrapped-example.ts"
+const wrappedCodeBlockShouldOptIn = "with wrap, collapse, and file metadata";
+~~~
+
 <style>body { background: red; }</style>
 
 <div style="position: fixed; inset: 0;" onclick="alert(1)">Unsafe style</div>
@@ -129,6 +141,26 @@ assert.match(
   html,
   /<pre[^>]*class="[^"]*\bastro-code\b[^"]*"[^>]*style="[^"]*--file-name-offset/i,
   "Shiki code block keeps renderer-owned filename offset style",
+);
+assert.doesNotMatch(
+  html,
+  /<pre(?=[^>]*class="[^"]*\bastro-code\b)(?=[^>]*>[\s\S]*defaultCodeBlockShouldScroll)[^>]*\sdata-wrap=/i,
+  "code blocks do not wrap unless wrap meta is present",
+);
+assert.match(
+  html,
+  /<pre(?=[^>]*class="[^"]*\bastro-code\b)(?=[^>]*\sdata-collapse="true")(?=[^>]*\sdata-filename="true")(?=[^>]*>[\s\S]*collapsedCodeBlockShouldScroll)[^>]*>/i,
+  "collapse and filename metadata are preserved without requiring wrap",
+);
+assert.doesNotMatch(
+  html,
+  /<pre(?=[^>]*class="[^"]*\bastro-code\b)(?=[^>]*>[\s\S]*collapsedCodeBlockShouldScroll)[^>]*\sdata-wrap=/i,
+  "collapsed code blocks keep default scroll behavior unless wrap meta is present",
+);
+assert.match(
+  html,
+  /<pre(?=[^>]*class="[^"]*\bastro-code\b)(?=[^>]*\sdata-wrap="true")(?=[^>]*\sdata-collapse="true")(?=[^>]*\sdata-filename="true")[^>]*>[\s\S]*wrappedCodeBlockShouldOptIn/i,
+  "wrap meta is preserved alongside collapse and filename metadata",
 );
 assert.match(
   html,

@@ -189,25 +189,11 @@ Markdown 的文本样式非常直观。使用双星号或双下划线包裹文�
 
 ## 代码块
 
-代码块基于 Shiki 语法高亮，支持：默认行号、自动换行（悬挂缩进）、代码折叠（`collapse`）、文件名标签（`file`）、关闭行号（`nolines`）。
+代码块基于 Shiki 语法高亮，支持：默认行号、默认横向滚动、按需自动换行（`wrap`，悬挂缩进）、代码折叠（`collapse`）、文件名标签（`file`）、关闭行号（`nolines`）。
 
-### 默认行号
+### 基础标记：行号 + file
 
-所有代码块默认开启行号，无需任何标记。
-
-```python
-def fib(n: int) -> list[int]:
-    a, b = 0, 1
-    result = []
-    for _ in range(n):
-        result.append(a)
-        a, b = b, a + b
-    return result
-```
-
-### 文件标签：file
-
-`file="名称"` 在左上角显示文件名标签，带绿色圆点。
+默认开启行号；`file="名称"` 会在左上角显示文件名标签。
 
 ```python file="fibonacci.py"
 def fib(n: int) -> list[int]:
@@ -227,99 +213,38 @@ pnpm dev
 pnpm build
 ```
 
-### 代码折叠：collapse
+### 折叠 + 横向滚动：collapse
 
-超过 8 行的代码块加 `collapse` 自动折叠，底部渐隐提示还有内容，展开按钮在底部居中。
+`collapse` 自动折叠长代码块；不加 `wrap` 时，超长行仍保持单行并使用横向滚动。
 
-```python collapse file="utils.py"
-def fibonacci(n: int) -> list[int]:
-    """生成前 n 个斐波那契数"""
-    a, b = 0, 1
-    result = []
-    for _ in range(n):
-        result.append(a)
-        a, b = b, a + b
-    return result
+```python collapse file="scroll-and-fold.py"
+from datetime import datetime
 
 
-def is_prime(num: int) -> bool:
-    """判断整数是否为素数"""
-    if num < 2:
-        return False
-    for i in range(2, int(num ** 0.5) + 1):
-        if num % i == 0:
-            return False
-    return True
-
-
-def chunk_list(data: list, size: int):
-    """将列表按固定大小分块，返回生成器"""
-    for i in range(0, len(data), size):
-        yield data[i:i + size]
-
-
-print(fibonacci(10))
-primes = [x for x in fibonacci(20) if is_prime(x)]
-print(f"Primes: {primes}")
-```
-
-### 折叠 + 无行号：collapse nolines
-
-多个标记可自由组合。
-
-```python collapse nolines
-import json
-from pathlib import Path
-
-
-def load_config(path: str | Path) -> dict:
-    """加载 JSON 配置文件，若不存在则返回空字典。"""
-    config_path = Path(path)
-    if not config_path.exists():
-        return {}
-    return json.loads(config_path.read_text(encoding="utf-8"))
-
-
-def merge_configs(base: dict, override: dict) -> dict:
-    """深度合并两个配置字典，override 优先。"""
-    result = base.copy()
-    for key, value in override.items():
-        if isinstance(value, dict) and key in result:
-            result[key] = merge_configs(result[key], value)
-        else:
-            result[key] = value
-    return result
-
-
-cfg = load_config("defaults.json")
-user_cfg = load_config("user.json")
-final = merge_configs(cfg, user_cfg)
-print(json.dumps(final, indent=2, ensure_ascii=False))
-```
-
-### 自动换行 + 悬挂缩进
-
-超长代码行会在容器边界自动折行，且折行缩进与首行代码对齐。
-
-```python collapse file="dashboard.py"
-def build_dashboard_report(assignments: dict[str, list[dict]], include_history: bool = False) -> str:
-    """根据各工作节点的任务分配结果，生成供运维使用的聚合仪表盘报告。"""
-    lines = ["# 负载报告", f"生成时间: {datetime.now().isoformat()}", ""]
-    for node_name, tasks in assignments.items():
-        pending = [t for t in tasks if t.get("status") == "pending" and t.get("priority", 0) >= 3]
-        lines.append(f"## {node_name}（{len(pending)} 个高优任务）")
-        lines.extend(f"  - [{t['priority']}] {t.get('title', '未命名')}" for t in sorted(pending, key=lambda x: -x["priority"]))
-    if include_history:
-        lines.append("\n---\n## 历史趋势\n*需启用持久化存储后获取*")
+def build_release_report(project: str, commits: list[dict[str, str]], include_review_notes: bool = False, timezone: str = "Asia/Shanghai") -> str:
+    """生成发布报告，并刻意保留很长的函数签名用于横向滚动测试。"""
+    lines = [f"# {project} 发布报告", f"生成时间: {datetime.now().isoformat()}", ""]
+    for commit in commits:
+        scope = commit.get("scope", "misc")
+        title = commit.get("title", "未命名提交")
+        lines.append(f"- [{scope}] {title} — {commit.get('hash', 'unknown')} — reviewer={commit.get('reviewer', 'none')} — deployment_window={commit.get('window', 'standard')}")
+    if include_review_notes:
+        lines.append("## 复核说明")
+        lines.append("请确认迁移脚本、搜索索引、静态资源缓存和回滚路径都已完成验证。")
     return "\n".join(lines)
 
 
-sample = [
-    {"title": "数据迁移", "status": "pending", "priority": 5, "node": "worker-0"},
-    {"title": "日志轮转", "status": "done", "priority": 1, "node": "worker-0"},
-    {"title": "索引重建", "status": "pending", "priority": 4, "node": "worker-1"},
-]
-print(build_dashboard_report({"worker-0": sample[:2], "worker-1": sample[2:]}, include_history=True))
+sample = [{"scope": "build", "title": "刷新 Pagefind 索引", "hash": "abc123", "reviewer": "Sylvan", "window": "nightly"}]
+print(build_release_report("blog.sylvan.cafe", sample, include_review_notes=True))
+```
+
+### 自动换行 + 悬挂缩进：wrap
+
+给代码块加 `wrap` 后，超长代码行会在容器边界自动折行，且折行缩进与首行代码对齐。
+
+```python wrap file="wrap-example.py"
+def build_query_url(endpoint: str, filters: dict[str, str], include_archived: bool = False, sort: str = "updated_at:desc") -> str:
+    return f"{endpoint}?include_archived={include_archived}&sort={sort}&filters=" + "&".join(f"{key}={value}" for key, value in filters.items())
 ```
 
 ### CSS

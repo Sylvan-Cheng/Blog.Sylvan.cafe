@@ -27,6 +27,53 @@ const labelCopied = t(UI.codeBlock.copied, locale);
   .copy-btn:focus-visible {
     background: var(--color-border);
   }
+
+  .code-scrollbar {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.35rem;
+    left: 0.75rem;
+    z-index: 8;
+    height: 0.25rem;
+    border-radius: 999px;
+    background: transparent;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 150ms ease-out;
+  }
+
+  .code-scrollbar[hidden] {
+    display: none;
+  }
+
+  .astro-code.code-scroll-enhanced:hover > .code-scrollbar,
+  .astro-code.code-scroll-enhanced:focus-within > .code-scrollbar,
+  .astro-code.code-scroll-enhanced:focus > .code-scrollbar {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .code-scrollbar-thumb {
+    display: block;
+    height: 100%;
+    min-width: 1.5rem;
+    border-radius: inherit;
+    background: color-mix(
+      in srgb,
+      var(--color-foreground) 28%,
+      transparent
+    );
+    transition: background-color 150ms ease-out;
+  }
+
+  .code-scrollbar:hover .code-scrollbar-thumb,
+  .code-scrollbar:focus-visible .code-scrollbar-thumb {
+    background: color-mix(
+      in srgb,
+      var(--color-foreground) 42%,
+      transparent
+    );
+  }
 </style>
 
 <div hidden data-code-copy-labels data-label-copy={labelCopy} data-label-copied={labelCopied}></div>

@@ -165,25 +165,11 @@ TOC включает только h2 и h3, но статья содержит �
 
 ## Блоки кода
 
-Блоки кода используют подсветку Shiki с поддержкой: нумерации строк по умолчанию, автоматического переноса (висячий отступ), сворачивания кода (`collapse`), меток файлов (`file`) и отключения нумерации (`nolines`).
+Блоки кода используют подсветку Shiki с поддержкой: нумерации строк по умолчанию, горизонтальной прокрутки по умолчанию, переноса строк по `wrap` с висячим отступом, сворачивания кода (`collapse`), меток файлов (`file`) и отключения нумерации (`nolines`).
 
-### Нумерация строк по умолчанию
+### Базовые аннотации: нумерация + file
 
-Во всех блоках кода нумерация строк включена по умолчанию.
-
-```python
-def fib(n: int) -> list[int]:
-    a, b = 0, 1
-    result = []
-    for _ in range(n):
-        result.append(a)
-        a, b = b, a + b
-    return result
-```
-
-### Метка файла: file
-
-`file="имя"` отображает метку с названием файла в левом верхнем углу с зелёной точкой.
+Нумерация строк включена по умолчанию; `file="имя"` отображает метку с названием файла в левом верхнем углу.
 
 ```python file="fibonacci.py"
 def fib(n: int) -> list[int]:
@@ -203,99 +189,38 @@ pnpm dev
 pnpm build
 ```
 
-### Сворачивание кода: collapse
+### Сворачивание + горизонтальная прокрутка: collapse
 
-Блоки кода длиннее 8 строк с пометкой `collapse` автоматически сворачиваются с затемнением внизу, намекающим на продолжение. Кнопка разворачивания расположена по центру внизу.
+`collapse` автоматически сворачивает длинные блоки кода. Без `wrap` слишком длинные строки остаются одной строкой и читаются через горизонтальную прокрутку.
 
-```python collapse file="utils.py"
-def fibonacci(n: int) -> list[int]:
-    """Генерация первых n чисел Фибоначчи"""
-    a, b = 0, 1
-    result = []
-    for _ in range(n):
-        result.append(a)
-        a, b = b, a + b
-    return result
+```python collapse file="scroll-and-fold.py"
+from datetime import datetime
 
 
-def is_prime(num: int) -> bool:
-    """Проверка, является ли целое число простым"""
-    if num < 2:
-        return False
-    for i in range(2, int(num ** 0.5) + 1):
-        if num % i == 0:
-            return False
-    return True
-
-
-def chunk_list(data: list, size: int):
-    """Разбиение списка на части фиксированного размера (возвращает генератор)"""
-    for i in range(0, len(data), size):
-        yield data[i:i + size]
-
-
-print(fibonacci(10))
-primes = [x for x in fibonacci(20) if is_prime(x)]
-print(f"Primes: {primes}")
-```
-
-### Сворачивание + без нумерации: collapse nolines
-
-Несколько аннотаций можно свободно комбинировать.
-
-```python collapse nolines
-import json
-from pathlib import Path
-
-
-def load_config(path: str | Path) -> dict:
-    """Загрузка JSON-конфигурации. Возвращает пустой словарь, если файл не найден."""
-    config_path = Path(path)
-    if not config_path.exists():
-        return {}
-    return json.loads(config_path.read_text(encoding="utf-8"))
-
-
-def merge_configs(base: dict, override: dict) -> dict:
-    """Глубокое слияние двух словарей конфигурации. override имеет приоритет."""
-    result = base.copy()
-    for key, value in override.items():
-        if isinstance(value, dict) and key in result:
-            result[key] = merge_configs(result[key], value)
-        else:
-            result[key] = value
-    return result
-
-
-cfg = load_config("defaults.json")
-user_cfg = load_config("user.json")
-final = merge_configs(cfg, user_cfg)
-print(json.dumps(final, indent=2, ensure_ascii=False))
-```
-
-### Автоперенос + висячий отступ
-
-Слишком длинные строки переносятся по границе контейнера, а продолжение выравнивается с отступом первой строки кода.
-
-```python collapse file="dashboard.py"
-def build_dashboard_report(assignments: dict[str, list[dict]], include_history: bool = False) -> str:
-    """Генерация сводного отчёта на основе назначений задач по рабочим узлам."""
-    lines = ["# Отчёт о нагрузке", f"Сформирован: {datetime.now().isoformat()}", ""]
-    for node_name, tasks in assignments.items():
-        pending = [t for t in tasks if t.get("status") == "pending" and t.get("priority", 0) >= 3]
-        lines.append(f"## {node_name} ({len(pending)} высокоприоритетных задач)")
-        lines.extend(f"  - [{t['priority']}] {t.get('title', 'Без названия')}" for t in sorted(pending, key=lambda x: -x["priority"]))
-    if include_history:
-        lines.append("\n---\n## Исторические тренды\n*Требуется включение постоянного хранилища*")
+def build_release_report(project: str, commits: list[dict[str, str]], include_review_notes: bool = False, timezone: str = "Asia/Shanghai") -> str:
+    """Создаёт релизный отчёт и сохраняет длинную сигнатуру для проверки горизонтальной прокрутки."""
+    lines = [f"# Релизный отчёт {project}", f"Сформирован: {datetime.now().isoformat()}", ""]
+    for commit in commits:
+        scope = commit.get("scope", "misc")
+        title = commit.get("title", "Коммит без названия")
+        lines.append(f"- [{scope}] {title} — {commit.get('hash', 'unknown')} — reviewer={commit.get('reviewer', 'none')} — deployment_window={commit.get('window', 'standard')}")
+    if include_review_notes:
+        lines.append("## Проверка")
+        lines.append("Проверьте миграции, поисковый индекс, кэш статических ресурсов и путь отката перед публикацией.")
     return "\n".join(lines)
 
 
-sample = [
-    {"title": "Миграция данных", "status": "pending", "priority": 5, "node": "worker-0"},
-    {"title": "Ротация логов", "status": "done", "priority": 1, "node": "worker-0"},
-    {"title": "Перестроение индекса", "status": "pending", "priority": 4, "node": "worker-1"},
-]
-print(build_dashboard_report({"worker-0": sample[:2], "worker-1": sample[2:]}, include_history=True))
+sample = [{"scope": "build", "title": "Обновить индекс Pagefind", "hash": "abc123", "reviewer": "Sylvan", "window": "nightly"}]
+print(build_release_report("blog.sylvan.cafe", sample, include_review_notes=True))
+```
+
+### Автоперенос + висячий отступ: wrap
+
+Если добавить `wrap`, слишком длинные строки переносятся по границе контейнера, а продолжение выравнивается с отступом первой строки кода.
+
+```python wrap file="wrap-example.py"
+def build_query_url(endpoint: str, filters: dict[str, str], include_archived: bool = False, sort: str = "updated_at:desc") -> str:
+    return f"{endpoint}?include_archived={include_archived}&sort={sort}&filters=" + "&".join(f"{key}={value}" for key, value in filters.items())
 ```
 
 ### CSS
