@@ -51,7 +51,7 @@ export default defineConfig({
     shikiConfig: {
       themes: theme.shiki,
       defaultColor: false,
-      wrap: true,
+      wrap: false,
       transformers: createSylvanShikiTransformers(),
     },
   },

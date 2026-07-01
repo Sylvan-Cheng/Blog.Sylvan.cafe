@@ -18,6 +18,7 @@ interface CodeMetaOptions {
  *   file="name"   → 文件名牌照 + data-filename
  *   collapse      → data-collapse="true"（无 = 默认为 true）
  *   nolines       → data-nolines="true"（关闭行号）
+ *   wrap          → data-wrap="true"（启用自动换行）
  */
 export const transformerCodeMeta = ({
   style = "v2",
@@ -34,6 +35,10 @@ export const transformerCodeMeta = ({
 
     if (meta.nolines) {
       node.properties["data-nolines"] = "true";
+    }
+
+    if (meta.wrap) {
+      node.properties["data-wrap"] = "true";
     }
 
     const file = meta.file;
