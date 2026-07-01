@@ -3,6 +3,9 @@ import { initInteraction, onSwap } from "./lifecycle";
 const { signal, onCleanup } = initInteraction("__searchAC");
 
 const SEARCH_INSTANCE = "site-search";
+const searchWindow = window as Window & {
+  __pagefindSearchUrlSyncRegistered?: boolean;
+};
 
 function scheduleIdle(callback: () => void): void {
   if (typeof window.requestIdleCallback === "function") {
@@ -64,13 +67,16 @@ function initSearch() {
 
     const instance = getInstanceManager().getInstance(SEARCH_INSTANCE);
     instance.setLanguage(getSearchLocale(searchRoot));
-    instance.on(
-      "search",
-      (term) => {
-        if (typeof term === "string") updateSearchParam(term);
-      },
-      searchRoot,
-    );
+    if (!searchWindow.__pagefindSearchUrlSyncRegistered) {
+      searchWindow.__pagefindSearchUrlSyncRegistered = true;
+      instance.on("search", (term) => {
+        if (
+          typeof term === "string" &&
+          document.querySelector("[data-pagefind-search]")
+        )
+          updateSearchParam(term);
+      });
+    }
 
     if (import.meta.env.DEV) {
       searchRoot.insertAdjacentHTML(
