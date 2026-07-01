@@ -2,7 +2,7 @@
 import { PUBLIC_GOOGLE_SITE_VERIFICATION } from "astro:env/client";
 import { ClientRouter } from "astro:transitions";
 import { SITE } from "@/config";
-import { LOCALE_META } from "@/i18n/config";
+import { LOCALE_META, type Locale } from "@/i18n/config";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
 import { buildDocumentHeadModel } from "@/utils/documentHeadModel";
@@ -33,9 +33,13 @@ type Props = {
   pubDatetime?: Date;
   modDatetime?: Date | null;
   hreflangs?: Record<string, string>;
+  canonical?: boolean;
+  alternateLinks?: boolean;
+  robots?: string;
+  locale?: Locale;
 };
 
-const locale = resolveLocale(Astro.currentLocale);
+const locale = Astro.props.locale ?? resolveLocale(Astro.currentLocale);
 const head = buildDocumentHeadModel({
   astro: Astro,
   locale,
@@ -63,7 +67,8 @@ const head = buildDocumentHeadModel({
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, viewport-fit=cover" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="canonical" href={head.canonicalURL} />
+    {head.canonicalURL && <link rel="canonical" href={head.canonicalURL} />}
+    {head.robots && <meta name="robots" content={head.robots} />}
     <meta name="generator" content={head.generator} />
 
     <!-- Preconnect to Umami analytics early -->
@@ -92,11 +97,15 @@ const head = buildDocumentHeadModel({
         />
       ))
     }
-    <link
-      rel="alternate"
-      hreflang="x-default"
-      href={head.xDefaultUrl}
-    />
+    {
+      head.xDefaultUrl && (
+        <link
+          rel="alternate"
+          hreflang="x-default"
+          href={head.xDefaultUrl}
+        />
+      )
+    }
 
     <!-- General Meta Tags -->
     <title>{head.title}</title>
@@ -112,7 +121,7 @@ const head = buildDocumentHeadModel({
     <meta property="og:site_name" content={SITE.title} />
     <meta property="og:title" content={head.title} />
     <meta property="og:description" content={head.description} />
-    <meta property="og:url" content={head.canonicalURL} />
+    {head.canonicalURL && <meta property="og:url" content={head.canonicalURL} />}
     <meta property="og:image" content={head.socialImageURL} />
 
     <!-- Article Published/Modified time -->
@@ -135,7 +144,7 @@ const head = buildDocumentHeadModel({
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content={head.canonicalURL} />
+    {head.canonicalURL && <meta property="twitter:url" content={head.canonicalURL} />}
     <meta property="twitter:title" content={head.title} />
     <meta property="twitter:description" content={head.description} />
     <meta property="twitter:image" content={head.socialImageURL} />

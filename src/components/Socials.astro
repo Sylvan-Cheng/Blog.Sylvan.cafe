@@ -1,13 +1,19 @@
 ---
 import { SITE } from "@/config";
 import { SOCIALS } from "@/constants";
+import type { Locale } from "@/i18n/config";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, tp } from "@/i18n/utils";
 import Icon from "./Icon.astro";
 import LinkButton from "./LinkButton.astro";
 import Tooltip from "./Tooltip.astro";
 
-const locale = resolveLocale(Astro.currentLocale);
+type Props = {
+  locale?: Locale;
+};
+
+const { locale: localeOverride } = Astro.props;
+const locale = localeOverride ?? resolveLocale(Astro.currentLocale);
 
 const socialLabelMap: Record<string, string> = {
   GitHub: tp(UI.social.github, locale, SITE.author),

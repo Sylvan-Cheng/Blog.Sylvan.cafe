@@ -22,6 +22,9 @@ export type DocumentHeadProps = {
   pubDatetime?: Date;
   modDatetime?: Date | null;
   hreflangs?: Record<string, string>;
+  canonical?: boolean;
+  alternateLinks?: boolean;
+  robots?: string;
 };
 
 export type DocumentHeadModelInput = {
@@ -53,10 +56,13 @@ export function buildDocumentHeadModel({
     pubDatetime,
     modDatetime,
     hreflangs,
+    canonical = true,
+    alternateLinks = true,
+    robots,
   } = astro.props as DocumentHeadProps;
 
   const currentPath = astro.url.pathname;
-  const canonicalURL = new URL(currentPath, astro.url);
+  const canonicalURL = canonical ? new URL(currentPath, astro.url) : null;
   const socialImageURL = new URL(getDefaultOgImage(), astro.url);
   const themeColors = THEME_DEFS[SITE.themeScheme].themeColor;
   const scriptFont = getScriptFont(locale, fontAssets);
@@ -71,13 +77,18 @@ export function buildDocumentHeadModel({
     pubDatetime,
     modDatetime,
     canonicalURL,
+    robots,
     generator: astro.generator,
-    hreflangLinks: LOCALES.map((targetLocale) => ({
-      locale: targetLocale,
-      lang: LOCALE_META[targetLocale].lang,
-      url: new URL(hreflangUrl(targetLocale), astro.site),
-    })),
-    xDefaultUrl: new URL(hreflangUrl(LOCALES[0]), astro.site),
+    hreflangLinks: alternateLinks
+      ? LOCALES.map((targetLocale) => ({
+          locale: targetLocale,
+          lang: LOCALE_META[targetLocale].lang,
+          url: new URL(hreflangUrl(targetLocale), astro.site),
+        }))
+      : [],
+    xDefaultUrl: alternateLinks
+      ? new URL(hreflangUrl(LOCALES[0]), astro.site)
+      : null,
     socialImageURL,
     structuredData: buildStructuredData({
       title,
@@ -85,7 +96,7 @@ export function buildDocumentHeadModel({
       profile,
       description,
       socialImageURL,
-      canonicalURL,
+      canonicalURL: canonicalURL ?? new URL(currentPath, astro.url),
       locale,
       pubDatetime,
       modDatetime,
