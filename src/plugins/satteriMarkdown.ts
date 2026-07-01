@@ -213,6 +213,7 @@ function satteriSafeHtml(): SatteriHastPlugin {
 
         const sanitized = sanitizeSatteriElementProperties(
           node.properties ?? {},
+          { allowStyle: true },
         );
         for (const key of Object.keys(node.properties ?? {})) {
           if (!(key in sanitized)) ctx.setProperty(node, key, null);

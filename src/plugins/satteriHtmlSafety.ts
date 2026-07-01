@@ -4,6 +4,7 @@ import { toHtml } from "hast-util-to-html";
 import { toClassList } from "./hastUtils";
 import { getS3ImageMetadata } from "./imageMetadata";
 import { buildImgProxyUrls } from "./imgProxyUrls";
+import { MERMAID_TRUST_ATTRIBUTE, MERMAID_TRUST_TOKEN } from "./mermaidMarkup";
 
 export const BLOCKED_HTML_TAGS = new Set([
   "embed",
@@ -11,6 +12,7 @@ export const BLOCKED_HTML_TAGS = new Set([
   "iframe",
   "object",
   "script",
+  "style",
 ]);
 
 const URL_PROPERTIES = new Set([
@@ -100,6 +102,17 @@ function isElementWithTag(
   return node.type === "element" && tagNames.has(node.tagName.toLowerCase());
 }
 
+function isTrustedRawHtmlContainer(node: Root | RootContent): boolean {
+  if (node.type !== "element") return false;
+  const classNames = toClassList(node.properties?.className);
+  const token =
+    node.properties?.[MERMAID_TRUST_ATTRIBUTE] ??
+    node.properties?.dataSylvanMermaidToken;
+  return (
+    classNames.includes("mermaid-diagram") && token === MERMAID_TRUST_TOKEN
+  );
+}
+
 function hasChildren(
   node: Root | RootContent,
 ): node is (Root | Element) & { children: RootContent[] } {
@@ -108,6 +121,7 @@ function hasChildren(
 
 export function sanitizeSatteriElementProperties(
   properties: Properties,
+  options: { allowStyle?: boolean } = {},
 ): Properties {
   const sanitized: Properties = { ...properties };
   for (const key of Object.keys(sanitized)) {
@@ -115,6 +129,7 @@ export function sanitizeSatteriElementProperties(
     const value = sanitized[key];
     if (
       normalizedKey === "srcdoc" ||
+      (!options.allowStyle && normalizedKey === "style") ||
       normalizedKey.startsWith("on") ||
       (URL_PROPERTIES.has(normalizedKey) &&
         (Array.isArray(value)
@@ -200,10 +215,15 @@ export function enhanceSatteriImage(
     : { kind: "properties", properties: nextProperties };
 }
 
-export function sanitizeHtmlTree(node: Root | RootContent): void {
+export function sanitizeHtmlTree(
+  node: Root | RootContent,
+  context: { trustedMermaid: boolean } = { trustedMermaid: false },
+): void {
   if (!hasChildren(node)) return;
 
   const nextChildren: RootContent[] = [];
+  const trustedMermaid =
+    context.trustedMermaid || isTrustedRawHtmlContainer(node);
   const canWrapChildImages = !isElementWithTag(
     node,
     IMAGE_LIGHTBOX_BLOCKING_PARENTS,
@@ -211,14 +231,21 @@ export function sanitizeHtmlTree(node: Root | RootContent): void {
 
   for (const child of node.children) {
     let nextChild = child;
+    let childTrustedMermaid = trustedMermaid;
 
     if (isElement(child)) {
       const tagName = child.tagName.toLowerCase();
-      if (BLOCKED_HTML_TAGS.has(tagName)) continue;
+      childTrustedMermaid = trustedMermaid || isTrustedRawHtmlContainer(child);
+      const isBlockedTag =
+        BLOCKED_HTML_TAGS.has(tagName) &&
+        !(tagName === "style" && childTrustedMermaid);
+      if (isBlockedTag) continue;
 
       child.properties = sanitizeSatteriElementProperties(
         child.properties ?? {},
       );
+      delete child.properties[MERMAID_TRUST_ATTRIBUTE];
+      delete child.properties.dataSylvanMermaidToken;
 
       if (tagName === "img") {
         const enhancement = enhanceSatteriImage(child.properties, {
@@ -232,7 +259,7 @@ export function sanitizeHtmlTree(node: Root | RootContent): void {
       }
     }
 
-    sanitizeHtmlTree(nextChild);
+    sanitizeHtmlTree(nextChild, { trustedMermaid: childTrustedMermaid });
     nextChildren.push(nextChild);
   }
 
