@@ -49,12 +49,15 @@
       @apply opacity-75;
     }
 
-    table {
-      @apply w-full border-separate border-spacing-0 border border-border/50 rounded-lg text-left;
+    .markdown-table-scroll {
+      @apply my-8 max-w-full overflow-x-auto rounded-lg border border-border/50;
+    }
 
-      display: block;
-      max-width: 100%;
-      overflow-x: auto;
+    table {
+      @apply my-0 border-separate border-spacing-0 text-left;
+
+      width: max-content;
+      min-width: 100%;
 
       thead {
         th {

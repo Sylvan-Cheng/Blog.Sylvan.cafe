@@ -81,8 +81,13 @@ function svgIcon(path: string): Element {
   };
 }
 
-function isElement(node: RootContent | ElementContent): node is Element {
-  return node.type === "element";
+function isElement(node: unknown): node is Element {
+  return (
+    typeof node === "object" &&
+    node !== null &&
+    "type" in node &&
+    node.type === "element"
+  );
 }
 
 function isElementWithTag(
@@ -246,6 +251,34 @@ function satteriImgProxy(): SatteriHastPlugin {
   };
 }
 
+function satteriTableScrollContainers(): SatteriHastPlugin {
+  return {
+    name: "sylvan-table-scroll-containers",
+    element: {
+      filter: ["table"],
+      visit(node, ctx) {
+        const parent = ctx.parent(node);
+        if (
+          isElement(parent) &&
+          toClassList(parent.properties?.className).includes(
+            "markdown-table-scroll",
+          )
+        )
+          return;
+
+        ctx.replaceNode(node, {
+          type: "element",
+          tagName: "div",
+          properties: {
+            className: ["markdown-table-scroll"],
+          },
+          children: [node],
+        });
+      },
+    },
+  };
+}
+
 function satteriA11y(): SatteriHastPlugin {
   return {
     name: "sylvan-a11y",
@@ -350,6 +383,7 @@ const hastContentTransforms = [satteriGithubAlerts()];
 const hastSanitizeStage = [satteriSafeHtml()];
 const hastImageEnhancementStage = [satteriImgProxy()];
 const hastMathRenderStage = [...satteriMathHastPlugins];
+const hastTableStage = [satteriTableScrollContainers()];
 const hastA11yStage = [satteriA11y()];
 
 export const satteriMarkdownPipeline = {
@@ -363,6 +397,7 @@ export const satteriMarkdownPipeline = {
     sanitize: hastSanitizeStage,
     imageEnhancement: hastImageEnhancementStage,
     mathRender: hastMathRenderStage,
+    tables: hastTableStage,
     accessibility: hastA11yStage,
   },
 } as const;
@@ -378,5 +413,6 @@ export const satteriHastPlugins = [
   ...satteriMarkdownPipeline.hast.sanitize,
   ...satteriMarkdownPipeline.hast.imageEnhancement,
   ...satteriMarkdownPipeline.hast.mathRender,
+  ...satteriMarkdownPipeline.hast.tables,
   ...satteriMarkdownPipeline.hast.accessibility,
 ];
