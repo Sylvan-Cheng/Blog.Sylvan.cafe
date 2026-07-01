@@ -43,6 +43,7 @@ function initBackToTop(): void {
   backToTopBtn.addEventListener(
     "click",
     () => {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
       document.body.scrollTop = 0;
       rootElement.scrollTop = 0;
     },
