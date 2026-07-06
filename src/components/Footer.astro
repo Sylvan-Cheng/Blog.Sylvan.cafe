@@ -29,23 +29,28 @@ const locale = localeOverride ?? resolveLocale(Astro.currentLocale);
 >
   <div
     class:list={[
-      "py-6 sm:py-4",
+      "py-4",
       "line-frame border-t",
-      "flex flex-col items-center gap-4 sm:flex-row sm:justify-between",
+      "flex flex-col items-center gap-2 sm:flex-row sm:justify-between sm:gap-4",
     ]}
   >
-    <div
-      class="my-2 flex flex-col items-center whitespace-nowrap text-sm text-text-secondary sm:flex-row order-last sm:order-none"
-    >
-      <span>Copyright &#169; {currentYear} Sylvan</span>
-      <span class="hidden sm:inline">&nbsp;|&nbsp;</span>
-      <span>Some rights reserved.</span>
-      <span class="hidden sm:inline">&nbsp;|&nbsp;</span>
-      <a href={`/${locale}/license`} class="hover-accent">License</a>
+    <div class="order-first flex items-center justify-center gap-3 sm:contents">
+      <div class="xl:hidden sm:order-3">
+        <Socials locale={locale} />
+      </div>
+      <div class="sm:order-2">
+        <AILabel label={aiLabel} locale={locale} />
+      </div>
     </div>
-    <AILabel label={aiLabel} locale={locale} />
-    <div class="order-first sm:order-none xl:hidden">
-      <Socials locale={locale} />
+    <div
+      class="order-last flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1 text-center text-xs text-text-secondary sm:order-1 sm:flex-nowrap sm:whitespace-nowrap sm:text-sm"
+    >
+      <span class="sm:hidden">&#169; {currentYear} Sylvan</span>
+      <span class="hidden sm:inline">Copyright &#169; {currentYear} Sylvan</span>
+      <span aria-hidden="true">|</span>
+      <span>Some rights reserved.</span>
+      <span aria-hidden="true">|</span>
+      <a href={`/${locale}/license`} class="hover-accent">License</a>
     </div>
   </div>
 </footer>
