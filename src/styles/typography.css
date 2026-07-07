@@ -261,15 +261,29 @@
 
   /* https://shiki.style/packages/transformers */
   .astro-code .line.diff.add {
-    @apply relative inline-block w-full bg-green-400/20 before:absolute before:left-[-3rem] before:text-green-500 before:content-['+'];
+    @apply relative inline-block w-full before:absolute before:left-[-3rem] before:content-['+'];
+
+    background: color-mix(in srgb, var(--palette-green) 20%, transparent);
+
+    &::before {
+      color: var(--palette-green);
+    }
   }
 
   .astro-code .line.diff.remove {
-    @apply relative inline-block w-full bg-red-500/20 before:absolute before:left-[-3rem] before:text-red-500 before:content-['-'];
+    @apply relative inline-block w-full before:absolute before:left-[-3rem] before:content-['-'];
+
+    background: color-mix(in srgb, var(--palette-red) 20%, transparent);
+
+    &::before {
+      color: var(--palette-red);
+    }
   }
 
   .astro-code .line.highlighted {
-    @apply inline-block w-full bg-slate-400/20;
+    @apply inline-block w-full;
+
+    background: color-mix(in srgb, var(--accent) 16%, transparent);
   }
 
   .astro-code .highlighted-word {

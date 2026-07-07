@@ -86,7 +86,7 @@
   .app-prose a[href]::after {
     content: " (" attr(href) ")";
     font-size: 0.8em;
-    color: #666;
+    color: var(--text-muted);
     word-break: break-all;
   }
 

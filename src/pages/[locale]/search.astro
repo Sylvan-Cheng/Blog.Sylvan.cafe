@@ -54,7 +54,7 @@ const devSearchWarningDesc = {
               <br />
               {devSearchWarningDesc[locale]}
             </p>
-            <code class="block bg-black text-white px-2 py-1 rounded">pnpm run preview</code>
+            <code class="block bg-foreground px-2 py-1 text-background rounded">pnpm run preview</code>
           </div>
         ) : (
           <>
@@ -84,7 +84,7 @@ const devSearchWarningDesc = {
   #pagefind-search pagefind-input,
   #pagefind-search pagefind-summary,
   #pagefind-search pagefind-results {
-    --pf-font: var(--font-app);
+    --pf-font: var(--font-body);
     --pf-text: var(--foreground);
     --pf-text-secondary: var(--text-secondary);
     --pf-text-muted: var(--text-muted);
