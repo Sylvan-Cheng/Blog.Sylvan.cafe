@@ -48,7 +48,7 @@ const devSearchWarningDesc = {
     >
       {
         isDev ? (
-          <div class="bg-muted/75 rounded p-4 space-y-4" data-pagefind-dev-warning>
+          <div class="bg-surface-muted/75 rounded p-4 space-y-4" data-pagefind-dev-warning>
             <p>
               <strong>{devSearchWarningTitle[locale]}</strong>
               <br />
@@ -90,12 +90,12 @@ const devSearchWarningDesc = {
     --pf-text-muted: var(--text-muted);
     --pf-background: var(--background);
     --pf-border: var(--border);
-    --pf-border-focus: var(--accent);
-    --pf-hover: var(--muted);
+    --pf-border-focus: var(--focus);
+    --pf-hover: var(--surface-muted);
     --pf-mark: var(--accent);
-    --pf-skeleton: var(--muted);
-    --pf-skeleton-shine: color-mix(in srgb, var(--muted) 80%, var(--foreground));
-    --pf-outline-focus: var(--accent);
+    --pf-skeleton: var(--surface-muted);
+    --pf-skeleton-shine: color-mix(in srgb, var(--surface-muted) 80%, var(--foreground));
+    --pf-outline-focus: var(--focus);
     --pf-input-height: 2.75rem;
     --pf-input-font-size: 1rem;
     --pf-summary-font-size: 0.875rem;
@@ -134,7 +134,7 @@ const devSearchWarningDesc = {
 
   #pagefind-search .pf-input:focus,
   #pagefind-search .pf-input:focus-visible {
-    border-color: var(--accent) !important;
+    border-color: var(--focus) !important;
     box-shadow: none !important;
     outline: 0 !important;
   }
@@ -144,14 +144,14 @@ const devSearchWarningDesc = {
   }
 
   #pagefind-search .pf-input-clear:hover {
-    background: var(--muted);
+    background: var(--surface-muted);
     color: var(--foreground);
   }
 
   #pagefind-search .pf-input-clear:focus-visible,
   #pagefind-search .pf-result-link:focus-visible,
   #pagefind-search .pf-heading-link:focus-visible {
-    outline: 2px dashed var(--accent) !important;
+    outline: 2px dashed var(--focus) !important;
     outline-offset: 2px !important;
   }
 
@@ -162,19 +162,19 @@ const devSearchWarningDesc = {
 
   #pagefind-search .pf-result-card {
     border-color: var(--border);
-    background: color-mix(in srgb, var(--background) 92%, var(--muted));
+    background: color-mix(in srgb, var(--background) 92%, var(--surface-muted));
     color: var(--foreground);
   }
 
   #pagefind-search .pf-result-card:hover {
-    background: var(--muted);
+    background: var(--surface-muted);
   }
 
   #pagefind-search .pf-result-link,
   #pagefind-search .pf-heading-link {
     color: var(--foreground);
     outline-offset: 1px;
-    outline-color: var(--accent);
+    outline-color: var(--focus);
     text-decoration-style: dashed;
     text-underline-offset: 4px;
   }

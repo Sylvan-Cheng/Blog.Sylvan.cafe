@@ -1,17 +1,17 @@
 export const MERMAID_STYLE_INJECTION = `<style>
   svg {
-    --_text:         var(--mermaid-fg);
-    --_text-sec:     var(--mermaid-fg);
-    --_text-muted:   var(--mermaid-fg);
-    --_text-faint:   var(--mermaid-fg);
-    --_line:         var(--mermaid-line);
-    --_arrow:        var(--mermaid-line);
-    --_node-fill:    var(--mermaid-node-fill);
-    --_node-stroke:  var(--mermaid-node-stroke);
-    --_group-fill:   var(--mermaid-group-fill);
-    --_group-hdr:    var(--mermaid-group-hdr);
-    --_inner-stroke: var(--mermaid-inner-stroke);
-    --_key-badge:    var(--mermaid-inner-stroke);
+    --_text:         var(--diagram-fg);
+    --_text-sec:     var(--diagram-fg);
+    --_text-muted:   var(--diagram-fg);
+    --_text-faint:   var(--diagram-fg);
+    --_line:         var(--diagram-line);
+    --_arrow:        var(--diagram-line);
+    --_node-fill:    var(--diagram-node-fill);
+    --_node-stroke:  var(--diagram-node-stroke);
+    --_group-fill:   var(--diagram-group-fill);
+    --_group-hdr:    var(--diagram-group-hdr);
+    --_inner-stroke: var(--diagram-inner-stroke);
+    --_key-badge:    var(--diagram-inner-stroke);
   }
   text { font-family: var(--font-body), system-ui, sans-serif; }
 </style>`;

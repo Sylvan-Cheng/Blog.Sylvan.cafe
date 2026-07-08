@@ -309,10 +309,10 @@ graph TD
     Err --> Fix
     Fix --> Check
 
-    classDef ok fill:var(--mermaid-green),color:var(--mermaid-bg)
-    classDef err fill:var(--mermaid-red),color:var(--mermaid-bg)
-    classDef warn fill:var(--mermaid-yellow),color:var(--mermaid-bg)
-    classDef info fill:var(--mermaid-blue),color:var(--mermaid-bg)
+    classDef ok fill:var(--diagram-success),color:var(--diagram-bg)
+    classDef err fill:var(--diagram-danger),color:var(--diagram-bg)
+    classDef warn fill:var(--diagram-warning),color:var(--diagram-bg)
+    classDef info fill:var(--diagram-info),color:var(--diagram-bg)
     class Start,Build,Deploy ok
     class Err err
     class Fix warn

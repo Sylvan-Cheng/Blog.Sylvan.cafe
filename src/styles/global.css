@@ -46,11 +46,23 @@
   --post-main-w: 48rem;
   --context-w: 17rem;
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-raised: var(--surface-raised);
   --color-foreground: var(--foreground);
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
+  --color-selection: var(--selection);
+  --color-selection-foreground: var(--selection-foreground);
   --color-accent: var(--accent);
-  --color-muted: var(--muted);
+  --color-accent-contrast: var(--accent-contrast);
+  --color-link: var(--link);
+  --color-focus: var(--focus);
+  --color-important: var(--important);
+  --color-info: var(--info);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
   --color-border: var(--border);
 }
 
@@ -64,11 +76,11 @@ html[lang="ja"] {
 
 @layer base {
   * {
-    @apply border-border outline-accent/75;
+    @apply border-border outline-focus/75;
 
     box-sizing: border-box;
     scrollbar-width: auto;
-    scrollbar-color: var(--color-muted) transparent;
+    scrollbar-color: var(--color-surface-muted) transparent;
   }
 
   *::before,
@@ -83,7 +95,7 @@ html[lang="ja"] {
   }
 
   body {
-    @apply flex min-h-svh flex-col bg-background pt-16 font-body text-foreground selection:bg-accent/75 selection:text-background;
+    @apply flex min-h-svh flex-col bg-background pt-16 font-body text-foreground selection:bg-selection selection:text-selection-foreground;
 
     width: 100%;
   }
@@ -96,7 +108,7 @@ html[lang="ja"] {
 
   a,
   button {
-    @apply outline-offset-1 outline-accent focus-visible:no-underline focus-visible:outline-2 focus-visible:outline-dashed;
+    @apply outline-offset-1 outline-focus focus-visible:no-underline focus-visible:outline-2 focus-visible:outline-dashed;
   }
 
   button:not(:disabled),
@@ -212,7 +224,7 @@ html[lang="ja"] {
 }
 
 @utility tone-link {
-  @apply text-accent decoration-dotted underline-offset-4 transition-colors duration-200 hover:underline;
+  @apply text-link decoration-dotted underline-offset-4 transition-colors duration-200 hover:text-accent hover:underline;
 }
 
 @utility tone-link-strong {
@@ -236,7 +248,7 @@ html[lang="ja"] {
 }
 
 @utility hover-surface {
-  @apply transition-colors duration-200 hover:bg-muted;
+  @apply transition-colors duration-200 hover:bg-surface-muted;
 }
 
 @utility hover-guide {
@@ -244,7 +256,7 @@ html[lang="ja"] {
 }
 
 @utility focus-ring {
-  @apply focus-visible:ring-2 focus-visible:ring-accent focus-visible:rounded;
+  @apply focus-visible:ring-2 focus-visible:ring-focus focus-visible:rounded;
 }
 
 @utility shape-control {
