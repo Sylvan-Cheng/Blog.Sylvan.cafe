@@ -81,8 +81,9 @@ Hidden **content** should stay inside the details element.
 
 ~~~mermaid
 flowchart TD
-  A[Start] --> B{Ready?}
-  B -- yes --> C[Ship]
+  开始[开始] --> 判断{条件判断}
+  判断 -->|是| 处理[处理]
+  判断 -->|否| 结束[结束]
 ~~~
 
 ~~~ts file="example.ts"
@@ -140,6 +141,13 @@ assert.match(
   /<figure class="mermaid-diagram">[\s\S]*<style>[\s\S]*--_node-fill/i,
   "trusted Mermaid SVG styles are preserved",
 );
+for (const label of ["开始", "条件判断", "处理", "结束"]) {
+  assert.match(
+    html,
+    new RegExp(`>${label}<`),
+    `Mermaid renders the CJK label: ${label}`,
+  );
+}
 assert.doesNotMatch(
   html,
   /data-sylvan-mermaid-token/i,

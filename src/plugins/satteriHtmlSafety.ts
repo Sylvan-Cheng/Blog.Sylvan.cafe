@@ -140,7 +140,6 @@ function hasChildren(
 function getStyleValue(properties: Properties): string | null {
   const style = properties.style;
   if (typeof style === "string") return style;
-  if (Array.isArray(style)) return style.filter(Boolean).join(";");
   return null;
 }
 
