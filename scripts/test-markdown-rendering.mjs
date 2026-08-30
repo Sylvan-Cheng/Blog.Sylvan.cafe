@@ -3,6 +3,9 @@ import { createSatteriMarkdownProcessor } from "@astrojs/markdown-satteri";
 import { registerHooks } from "node:module";
 import { pathToFileURL } from "node:url";
 
+process.env.IMGPROXY_KEY = "00".repeat(32);
+process.env.IMGPROXY_SALT = "11".repeat(32);
+
 registerHooks({
   resolve(specifier, context, nextResolve) {
     if (
@@ -19,6 +22,9 @@ registerHooks({
 
 const { satteriHastPlugins, satteriMdastPlugins } = await import(
   "../src/plugins/satteriMarkdown.ts"
+);
+const { buildImgProxyUrls } = await import(
+  "../src/plugins/imgProxyUrls.ts"
 );
 const { createSylvanShikiTransformers } = await import(
   "../src/utils/transformers/shikiPreset.ts"
@@ -100,6 +106,8 @@ const wrappedCodeBlockShouldOptIn = "with wrap, collapse, and file metadata";
 <div style="position: fixed; inset: 0;" onclick="alert(1)">Unsafe style</div>
 
 <pre class="astro-code" style="position: fixed; --shiki-light: #fff;"><code><span style="color: red; --shiki-light: #fff;">Fake generated code</span></code></pre>
+
+![Signed image](https://s3.sylvan.cafe/img/blog/2026/05/photo.avif)
 `;
 
 const result = await renderer.render(markdown, {
@@ -181,6 +189,31 @@ assert.doesNotMatch(
   html,
   /\sonclick=/i,
   "raw HTML event handler attributes are removed",
+);
+assert.match(
+  html,
+  /https:\/\/img\.sylvan\.cafe\/[A-Za-z0-9_-]{16}\/w:800\/plain\/2026\/05\/photo\.avif/,
+  "S3 blog images use a 16-character signed imgproxy thumbnail URL",
+);
+assert.doesNotMatch(
+  html,
+  /img\.sylvan\.cafe\/[^"']*\/plain\/img\/blog\//,
+  "imgproxy URLs omit the base RustFS bucket and blog prefix",
+);
+
+const signedImageUrls = buildImgProxyUrls(
+  "https://s3.sylvan.cafe/img/blog/2026/05/photo.avif",
+);
+assert.ok(signedImageUrls, "S3 blog images produce imgproxy URLs");
+assert.match(
+  signedImageUrls.fullUrl,
+  /^https:\/\/img\.sylvan\.cafe\/[A-Za-z0-9_-]{16}\/plain\/2026\/05\/photo\.avif$/,
+  "full image URL uses the compact signed path",
+);
+assert.match(
+  signedImageUrls.thumbUrl,
+  /^https:\/\/img\.sylvan\.cafe\/[A-Za-z0-9_-]{16}\/w:800\/plain\/2026\/05\/photo\.avif$/,
+  "thumbnail URL signs its processing options and compact source path",
 );
 
 console.log("Markdown rendering regression tests passed.");
