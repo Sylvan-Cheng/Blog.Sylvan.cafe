@@ -1,15 +1,13 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, relative, resolve } from "node:path";
-import { createHmac } from "node:crypto";
 import sharp from "sharp";
+import { buildImgProxyUrl } from "../src/utils/imgProxySigning.ts";
 
 const ROOT_DIR = resolve(import.meta.dirname, "..");
 const CONTENT_GLOBS = ["src/data/blog", "src/data/pages"];
 const METADATA_PATH = resolve(ROOT_DIR, "src/generated/image-metadata.json");
 const S3_ORIGIN = "https://s3.sylvan.cafe/";
 const S3_BLOG_BASE = `${S3_ORIGIN}img/blog/`;
-const IMGPROXY_HOST = "https://img.sylvan.cafe";
-const SIGNATURE_SIZE = 12;
 const IMAGE_MARKDOWN_PATTERN =
   /!\[[^\]]*]\((https:\/\/s3\.sylvan\.cafe\/[^)\s]+)(?:\s+["'][^"']*["'])?\)|<img\b[^>]*\bsrc=["'](https:\/\/s3\.sylvan\.cafe\/[^"']+)["'][^>]*>/gi;
 
@@ -49,25 +47,6 @@ function getS3Key(url) {
 function buildMetadataFetchUrl(url) {
   if (!url.startsWith(S3_BLOG_BASE)) return url;
   return buildImgProxyUrl(`plain/${url.slice(S3_BLOG_BASE.length)}`);
-}
-
-function buildImgProxyUrl(path) {
-  const key = process.env.IMGPROXY_KEY?.trim() ?? "";
-  const salt = process.env.IMGPROXY_SALT?.trim() ?? "";
-  if (!/^[0-9a-f]{64}$/i.test(key) || !/^[0-9a-f]{64}$/i.test(salt)) {
-    return `${IMGPROXY_HOST}/unsafe/${path}`;
-  }
-
-  const canonicalPath = path.startsWith("/") ? path : `/${path}`;
-  const signature = createHmac("sha256", Buffer.from(key, "hex"))
-    .update(Buffer.concat([
-      Buffer.from(salt, "hex"),
-      Buffer.from(canonicalPath),
-    ]))
-    .digest()
-    .subarray(0, SIGNATURE_SIZE)
-    .toString("base64url");
-  return `${IMGPROXY_HOST}/${signature}/${path}`;
 }
 
 async function readCache() {

@@ -26,6 +26,9 @@ const { satteriHastPlugins, satteriMdastPlugins } = await import(
 const { buildImgProxyUrls } = await import(
   "../src/plugins/imgProxyUrls.ts"
 );
+const { buildImgProxyUrl } = await import(
+  "../src/utils/imgProxySigning.ts"
+);
 const { createSylvanShikiTransformers } = await import(
   "../src/utils/transformers/shikiPreset.ts"
 );
@@ -222,6 +225,11 @@ assert.match(
   signedImageUrls.thumbUrl,
   /^https:\/\/img\.sylvan\.cafe\/[A-Za-z0-9_-]{16}\/w:800\/plain\/2026\/05\/photo\.avif$/,
   "thumbnail URL signs its processing options and compact source path",
+);
+assert.equal(
+  buildImgProxyUrl("/plain/2026/05/photo.avif"),
+  buildImgProxyUrl("plain/2026/05/photo.avif"),
+  "imgproxy signing normalizes a leading path slash",
 );
 
 console.log("Markdown rendering regression tests passed.");

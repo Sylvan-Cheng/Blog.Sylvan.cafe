@@ -1,7 +1,6 @@
 import { createHmac } from "node:crypto";
 
 const IMGPROXY_HOST = "https://img.sylvan.cafe";
-const UNSAFE_PREFIX = `${IMGPROXY_HOST}/unsafe/`;
 const SIGNATURE_SIZE = 12;
 
 function getSigningMaterial() {
@@ -21,14 +20,14 @@ function getSigningMaterial() {
 /** Build an imgproxy URL; local builds retain unsafe URLs until CI secrets exist. */
 export function buildImgProxyUrl(path: string): string {
   const material = getSigningMaterial();
-  if (!material) return `${UNSAFE_PREFIX}${path}`;
-
   const canonicalPath = path.startsWith("/") ? path : `/${path}`;
+  if (!material) return `${IMGPROXY_HOST}/unsafe${canonicalPath}`;
+
   const signature = createHmac("sha256", material.key)
     .update(Buffer.concat([material.salt, Buffer.from(canonicalPath, "utf8")]))
     .digest()
     .subarray(0, SIGNATURE_SIZE)
     .toString("base64url");
 
-  return `${IMGPROXY_HOST}/${signature}/${path}`;
+  return `${IMGPROXY_HOST}/${signature}${canonicalPath}`;
 }
