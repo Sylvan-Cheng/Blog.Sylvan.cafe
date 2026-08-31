@@ -61,7 +61,7 @@
 
       thead {
         th {
-          @apply bg-muted/30 text-sm font-semibold tracking-wider;
+          @apply bg-surface-muted/45 text-sm font-semibold tracking-wider;
         }
 
         th:first-child {
@@ -82,11 +82,11 @@
         @apply transition-colors duration-150;
 
         &:nth-child(even) {
-          @apply bg-muted/10;
+          @apply bg-surface-muted/20;
         }
-        
+
         &:hover {
-          @apply bg-muted/40;
+          @apply bg-surface-muted/50;
         }
       }
 
@@ -110,7 +110,7 @@
     }
 
     code {
-      @apply rounded bg-muted/75 p-1 wrap-break-word text-foreground before:content-none after:content-none;
+      @apply rounded bg-surface-muted/75 p-1 wrap-break-word text-foreground before:content-none after:content-none;
     }
 
     .astro-code code {
@@ -169,12 +169,12 @@
     }
 
     .markdown-alert {
-      border-left: 3px solid var(--alert-color);
+      border-left: 3px solid var(--callout-color);
       border-radius: 0 0.25rem 0.25rem 0;
       margin: 1.25rem 0;
       padding: 0.75rem 1rem;
       font-style: normal;
-      background-color: var(--muted);
+      background-color: var(--surface-muted);
 
       > *:first-child { margin-top: 0; }
       > *:last-child { margin-bottom: 0; }
@@ -205,7 +205,7 @@
       text-transform: uppercase;
       letter-spacing: 0.05em;
       font-style: normal;
-      color: var(--alert-color);
+      color: var(--callout-color);
     }
 
     .markdown-alert .octicon {
@@ -215,11 +215,11 @@
       fill: currentcolor;
     }
 
-    .markdown-alert-note      { --alert-color: var(--alert-note); }
-    .markdown-alert-tip       { --alert-color: var(--alert-tip); }
-    .markdown-alert-important { --alert-color: var(--alert-important); }
-    .markdown-alert-warning   { --alert-color: var(--alert-warning); }
-    .markdown-alert-caution   { --alert-color: var(--alert-caution); }
+    .markdown-alert-note      { --callout-color: var(--info); }
+    .markdown-alert-tip       { --callout-color: var(--success); }
+    .markdown-alert-important { --callout-color: var(--important); }
+    .markdown-alert-warning   { --callout-color: var(--warning); }
+    .markdown-alert-caution   { --callout-color: var(--danger); }
 
     details {
       @apply block text-foreground;
@@ -230,11 +230,11 @@
     }
 
     summary {
-      @apply cursor-pointer select-none focus-visible:no-underline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent focus-visible:outline-dashed;
+      @apply cursor-pointer select-none focus-visible:no-underline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-focus focus-visible:outline-dashed;
     }
 
     pre {
-      @apply relative overflow-visible! focus-visible:border-transparent focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-dashed;
+      @apply relative overflow-visible! focus-visible:border-transparent focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-dashed;
     }
 
     .heading-link::before {
@@ -261,15 +261,29 @@
 
   /* https://shiki.style/packages/transformers */
   .astro-code .line.diff.add {
-    @apply relative inline-block w-full bg-green-400/20 before:absolute before:left-[-3rem] before:text-green-500 before:content-['+'];
+    @apply relative inline-block w-full before:absolute before:left-[-3rem] before:content-['+'];
+
+    background: color-mix(in srgb, var(--success) 20%, transparent);
+
+    &::before {
+      color: var(--success);
+    }
   }
 
   .astro-code .line.diff.remove {
-    @apply relative inline-block w-full bg-red-500/20 before:absolute before:left-[-3rem] before:text-red-500 before:content-['-'];
+    @apply relative inline-block w-full before:absolute before:left-[-3rem] before:content-['-'];
+
+    background: color-mix(in srgb, var(--danger) 20%, transparent);
+
+    &::before {
+      color: var(--danger);
+    }
   }
 
   .astro-code .line.highlighted {
-    @apply inline-block w-full bg-slate-400/20;
+    @apply inline-block w-full;
+
+    background: color-mix(in srgb, var(--accent) 16%, transparent);
   }
 
   .astro-code .highlighted-word {

@@ -105,8 +105,8 @@ function satteriMermaid(): SatteriMdastPlugin {
 
       try {
         let svg = renderMermaidSVG(node.value || "", {
-          bg: "var(--background)",
-          fg: "var(--foreground)",
+          bg: "var(--diagram-bg)",
+          fg: "var(--diagram-fg)",
           transparent: true,
         });
         svg = injectMermaidStyle(svg);

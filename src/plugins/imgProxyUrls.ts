@@ -1,15 +1,16 @@
-const S3_BASE = "https://s3.sylvan.cafe/";
-const PROXY_BASE = "https://img.sylvan.cafe/unsafe/";
+import { buildImgProxyUrl } from "../utils/imgProxySigning";
+
+const S3_BLOG_BASE = "https://s3.sylvan.cafe/img/blog/";
 
 export function buildImgProxyUrls(
   src: string,
   width?: unknown,
   height?: unknown,
 ) {
-  if (!src.startsWith(S3_BASE)) return null;
+  if (!src.startsWith(S3_BLOG_BASE)) return null;
 
-  const path = src.slice(S3_BASE.length);
-  const fullUrl = `${PROXY_BASE}plain/${path}`;
+  const path = src.slice(S3_BLOG_BASE.length);
+  const fullUrl = buildImgProxyUrl(`plain/${path}`);
   const numericWidth = Number(width);
   const numericHeight = Number(height);
   const thumbUrl =
@@ -17,8 +18,10 @@ export function buildImgProxyUrls(
     height !== undefined &&
     numericWidth > 0 &&
     numericHeight > 0
-      ? `${PROXY_BASE}rs:fit:${numericWidth}:${numericHeight}/plain/${path}`
-      : `${PROXY_BASE}w:800/plain/${path}`;
+      ? buildImgProxyUrl(
+          `rs:fit:${numericWidth}:${numericHeight}/plain/${path}`,
+        )
+      : buildImgProxyUrl(`w:800/plain/${path}`);
 
   return { fullUrl, thumbUrl };
 }

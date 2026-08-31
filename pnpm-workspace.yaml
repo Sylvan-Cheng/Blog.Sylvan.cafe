@@ -2,9 +2,7 @@ allowBuilds:
   esbuild: true
   sharp: true
 
-# Temporary security overrides for transitive dependencies.
-# Remove when astro-icon/@astrojs/check resolve these through upstream releases.
+# Temporary security override for Astro's transitive unifont dependency.
+# Remove when unifont resolves undici 7.29.0 or newer upstream.
 overrides:
-  tar: 7.5.16
-  undici: 7.28.0
-  yaml: 2.9.0
+  undici: 7.29.0

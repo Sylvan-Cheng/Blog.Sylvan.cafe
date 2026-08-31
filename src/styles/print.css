@@ -25,12 +25,24 @@
   html,
   html[data-theme="dark"] {
     --background: #fff !important;
+    --surface: #fff !important;
+    --surface-muted: #eee !important;
+    --surface-raised: #fff !important;
     --foreground: #000 !important;
     --text-secondary: #333 !important;
     --text-muted: #666 !important;
     --accent: #333 !important;
-    --muted: #eee !important;
+    --accent-contrast: #fff !important;
+    --link: #000 !important;
+    --focus: #333 !important;
+    --important: #333 !important;
+    --info: #333 !important;
+    --success: #333 !important;
+    --warning: #333 !important;
+    --danger: #333 !important;
     --border: #999 !important;
+    --selection: #ddd !important;
+    --selection-foreground: #000 !important;
 
     color-scheme: light !important;
   }
@@ -86,7 +98,7 @@
   .app-prose a[href]::after {
     content: " (" attr(href) ")";
     font-size: 0.8em;
-    color: #666;
+    color: var(--text-muted);
     word-break: break-all;
   }
 
@@ -106,7 +118,7 @@
 
   /* Code blocks */
   .astro-code {
-    background: var(--muted) !important;
+    background: var(--surface-muted) !important;
     color: var(--foreground) !important;
     border: 1px solid var(--border) !important;
     white-space: pre-wrap !important;

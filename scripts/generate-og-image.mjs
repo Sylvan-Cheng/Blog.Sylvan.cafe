@@ -1,6 +1,6 @@
 import { readFile, mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
-import { Resvg } from "@resvg/resvg-js";
+import sharp from "sharp";
 import satori from "satori";
 
 const outputPath = resolve("public/og.png");
@@ -214,7 +214,12 @@ async function siteOgImage() {
 }
 
 const svg = await siteOgImage();
-const png = new Resvg(svg).render().asPng();
+const png = await sharp(Buffer.from(svg))
+  .png({
+    compressionLevel: 9,
+    adaptiveFiltering: true,
+  })
+  .toBuffer();
 
 await mkdir(dirname(outputPath), { recursive: true });
 await writeFile(outputPath, png);

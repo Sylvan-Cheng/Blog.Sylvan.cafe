@@ -1,12 +1,13 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, relative, resolve } from "node:path";
 import sharp from "sharp";
+import { buildImgProxyUrl } from "../src/utils/imgProxySigning.ts";
 
 const ROOT_DIR = resolve(import.meta.dirname, "..");
 const CONTENT_GLOBS = ["src/data/blog", "src/data/pages"];
 const METADATA_PATH = resolve(ROOT_DIR, "src/generated/image-metadata.json");
 const S3_ORIGIN = "https://s3.sylvan.cafe/";
-const IMGPROXY_ORIGIN = "https://img.sylvan.cafe/unsafe/";
+const S3_BLOG_BASE = `${S3_ORIGIN}img/blog/`;
 const IMAGE_MARKDOWN_PATTERN =
   /!\[[^\]]*]\((https:\/\/s3\.sylvan\.cafe\/[^)\s]+)(?:\s+["'][^"']*["'])?\)|<img\b[^>]*\bsrc=["'](https:\/\/s3\.sylvan\.cafe\/[^"']+)["'][^>]*>/gi;
 
@@ -44,8 +45,8 @@ function getS3Key(url) {
 }
 
 function buildMetadataFetchUrl(url) {
-  if (!url.startsWith(S3_ORIGIN)) return url;
-  return `${IMGPROXY_ORIGIN}plain/${url.slice(S3_ORIGIN.length)}`;
+  if (!url.startsWith(S3_BLOG_BASE)) return url;
+  return buildImgProxyUrl(`plain/${url.slice(S3_BLOG_BASE.length)}`);
 }
 
 async function readCache() {

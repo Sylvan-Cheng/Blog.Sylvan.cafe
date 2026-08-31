@@ -23,8 +23,8 @@ export const THEME_DEFS = {
       dark: "#2e3440",
     },
     giscus: {
-      light: "nord" as const,
-      dark: "nord" as const,
+      light: "light" as const,
+      dark: "dark_dimmed" as const,
     },
   },
   dracula: {
@@ -41,9 +41,65 @@ export const THEME_DEFS = {
       dark: "dark_dimmed" as const,
     },
   },
-  atom: {
+  catppuccin: {
+    shiki: {
+      light: "catppuccin-latte" as const,
+      dark: "catppuccin-mocha" as const,
+    },
+    themeColor: {
+      light: "#eff1f5",
+      dark: "#1e1e2e",
+    },
+    giscus: {
+      light: "catppuccin_latte" as const,
+      dark: "catppuccin_mocha" as const,
+    },
+  },
+  ayu: {
+    shiki: {
+      light: "ayu-light" as const,
+      dark: "ayu-mirage" as const,
+    },
+    themeColor: {
+      light: "#fafafa",
+      dark: "#1f2430",
+    },
+    giscus: {
+      light: "light" as const,
+      dark: "dark_dimmed" as const,
+    },
+  },
+  solarized: {
+    shiki: {
+      light: "solarized-light" as const,
+      dark: "solarized-dark" as const,
+    },
+    themeColor: {
+      light: "#fdf6e3",
+      dark: "#002b36",
+    },
+    giscus: {
+      light: "light" as const,
+      dark: "dark_dimmed" as const,
+    },
+  },
+  "tokyo-night": {
     shiki: {
       light: "github-light" as const,
+      dark: "tokyo-night" as const,
+    },
+    themeColor: {
+      light: "#e1e2e7",
+      dark: "#1a1b26",
+    },
+    giscus: {
+      light: "light" as const,
+      dark: "dark_dimmed" as const,
+    },
+  },
+  atom: {
+    shiki: {
+      light: "one-light" as const,
       dark: "one-dark-pro" as const,
     },
     themeColor: {
@@ -53,20 +109,6 @@ export const THEME_DEFS = {
     giscus: {
       light: "light" as const,
       dark: "dark_dimmed" as const,
-    },
-  },
-  default: {
-    shiki: {
-      light: "github-light" as const,
-      dark: "github-dark" as const,
-    },
-    themeColor: {
-      light: "#fdfdfd",
-      dark: "#212737",
-    },
-    giscus: {
-      light: "light" as const,
-      dark: "dark" as const,
     },
   },
 } as const;
