@@ -224,8 +224,8 @@ const cjkFontFaceStyle = cjkFont
 
     <ClientRouter />
 
-    <!-- Umami Analytics (Partytown) -->
-    <script is:inline type="text/partytown" src={`${head.analyticsUrl}/script.js`} data-website-id={head.umamiWebsiteId}></script>
+    <!-- Umami automatically observes navigation performed by the client router. -->
+    <script is:inline defer src={`${head.analyticsUrl}/script.js`} data-website-id={head.umamiWebsiteId}></script>
 
     <!-- Minimal inline script to prevent FOUC - sets theme immediately -->
     <script is:inline define:vars={{ themeColors: head.themeColors }}>

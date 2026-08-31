@@ -1,5 +1,4 @@
 import { satteri } from "@astrojs/markdown-satteri";
-import partytown from "@astrojs/partytown";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, envField } from "astro/config";
@@ -29,7 +28,6 @@ export default defineConfig({
     },
   },
   integrations: [
-    partytown(),
     sitemap({
       filter: (page) =>
         SITE.showArchives || !page.replace(/\/$/, "").endsWith("/archives"),

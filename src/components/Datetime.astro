@@ -1,14 +1,9 @@
 ---
-import dayjs from "dayjs";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
 import Icon from "@/components/Icon.astro";
 import { SITE } from "@/config";
 import { UI } from "@/i18n/ui";
 import { resolveLocale, t } from "@/i18n/utils";
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
+import { buildPostDateDisplay } from "@/utils/postDateDisplay";
 
 const locale = resolveLocale(Astro.currentLocale);
 
@@ -28,14 +23,11 @@ const {
   timezone: postTimezone,
 } = Astro.props;
 
-/* ========== Formatted Datetime ========== */
-const isModified = modDatetime && modDatetime > pubDatetime;
-
-const datetime = dayjs(isModified ? modDatetime : pubDatetime).tz(
+const datetime = buildPostDateDisplay(
+  pubDatetime,
+  modDatetime,
   postTimezone || SITE.timezone,
 );
-
-const date = datetime.format("D MMM, YYYY"); // e.g., '22 Mar, 2025'
 ---
 
 <div class:list={["flex items-center gap-x-2 text-text-secondary", className]}>
@@ -46,7 +38,7 @@ const date = datetime.format("D MMM, YYYY"); // e.g., '22 Mar, 2025'
     ]}
   />
   {
-    isModified && (
+    datetime.isModified && (
       <span class:list={["text-sm", { "sm:text-base": size === "lg" }]}>
         {t(UI.post.updated, locale)}
       </span>
@@ -54,6 +46,6 @@ const date = datetime.format("D MMM, YYYY"); // e.g., '22 Mar, 2025'
   }
   <time
     class:list={["text-sm", { "sm:text-base": size === "lg" }]}
-    datetime={datetime.toISOString()}>{date}</time
+    datetime={datetime.isoDateTime}>{datetime.label}</time
   >
 </div>
