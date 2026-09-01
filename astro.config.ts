@@ -9,6 +9,7 @@ import {
   satteriHastPlugins,
   satteriMdastPlugins,
 } from "./src/plugins/satteriMarkdown";
+import { shouldIncludeInSitemap } from "./src/utils/sitemapFilter";
 import { createSylvanShikiTransformers } from "./src/utils/transformers/shikiPreset";
 
 const theme = THEME_DEFS[SITE.themeScheme];
@@ -30,7 +31,8 @@ export default defineConfig({
   integrations: [
     sitemap({
       filter: (page) =>
-        SITE.showArchives || !page.replace(/\/$/, "").endsWith("/archives"),
+        shouldIncludeInSitemap(page) &&
+        (SITE.showArchives || !page.replace(/\/$/, "").endsWith("/archives")),
     }),
     icon(),
   ],

@@ -232,4 +232,18 @@ assert.equal(
   "imgproxy signing normalizes a leading path slash",
 );
 
+const configuredKey = process.env.IMGPROXY_KEY;
+const configuredSalt = process.env.IMGPROXY_SALT;
+delete process.env.IMGPROXY_KEY;
+delete process.env.IMGPROXY_SALT;
+assert.throws(
+  () => buildImgProxyUrl("plain/2026/05/photo.avif"),
+  /IMGPROXY_KEY and IMGPROXY_SALT are required/,
+  "imgproxy never falls back to unsigned URLs",
+);
+if (configuredKey === undefined) delete process.env.IMGPROXY_KEY;
+else process.env.IMGPROXY_KEY = configuredKey;
+if (configuredSalt === undefined) delete process.env.IMGPROXY_SALT;
+else process.env.IMGPROXY_SALT = configuredSalt;
+
 console.log("Markdown rendering regression tests passed.");

@@ -35,7 +35,7 @@ const devSearchWarningDesc = {
 } satisfies Record<(typeof LOCALES)[number], string>;
 ---
 
-<Layout title={`${t(UI.search.title, locale)} | ${SITE.title}`}>
+<Layout title={`${t(UI.search.title, locale)} | ${SITE.title}`} robots="noindex,follow">
   <Header />
   <Main pageTitle={t(UI.search.title, locale)} pageDesc={t(UI.search.desc, locale)}>
     <div

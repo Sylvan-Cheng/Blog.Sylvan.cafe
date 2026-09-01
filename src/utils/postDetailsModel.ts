@@ -37,6 +37,7 @@ function getAdjacentPosts(posts: BlogPost[], post: BlogPost, locale: Locale) {
 function buildLayoutProps(post: BlogPost, postIndex: PostIndex) {
   return {
     title: `${post.data.title} | ${SITE.title}`,
+    articleHeadline: post.data.title,
     author: post.data.author,
     description: post.data.description,
     pubDatetime: post.data.pubDatetime,
