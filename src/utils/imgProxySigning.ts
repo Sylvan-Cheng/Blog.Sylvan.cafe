@@ -47,10 +47,6 @@ function requireSigningMaterial() {
   return material;
 }
 
-export function assertImgProxySigningConfig(): void {
-  requireSigningMaterial();
-}
-
 /** Build an imgproxy URL; every environment must provide signing material. */
 export function buildImgProxyUrl(path: string): string {
   const material = requireSigningMaterial();

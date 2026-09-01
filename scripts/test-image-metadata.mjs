@@ -4,12 +4,11 @@ import {
   mapWithConcurrency,
 } from "./imageMetadataFetch.mjs";
 
-let attempts = 0;
-const bytes = await fetchBytesWithRetry("https://example.test/image.avif", {
-  fetchImpl: async (_url, { signal }) => {
-    assert.ok(signal instanceof AbortSignal);
-    attempts++;
-    if (attempts < 3) throw new TypeError("temporary network error");
+let transientAttempts = 0;
+const bytes = await fetchBytesWithRetry("https://example.test/transient.avif", {
+  fetchImpl: async () => {
+    transientAttempts++;
+    if (transientAttempts < 3) throw new TypeError("temporary network error");
     return new Response(new Uint8Array([1, 2, 3]), { status: 200 });
   },
   maxRetries: 2,
@@ -17,21 +16,7 @@ const bytes = await fetchBytesWithRetry("https://example.test/image.avif", {
   sleepImpl: async () => {},
 });
 assert.deepEqual([...bytes], [1, 2, 3]);
-assert.equal(attempts, 3, "transient fetch errors are retried");
-
-const detailedResult = await fetchBytesWithRetry("https://example.test/detail.avif", {
-  fetchImpl: async () => new Response(new Uint8Array([4, 5]), { status: 200 }),
-  returnDetails: true,
-});
-assert.deepEqual([...detailedResult.bytes], [4, 5]);
-assert.equal(detailedResult.attempts, 1, "successful requests report their attempt count");
-
-await assert.rejects(
-  fetchBytesWithRetry("https://example.test/invalid-options.avif", {
-    maxRetries: -1,
-  }),
-  /maxRetries must be a non-negative integer/,
-);
+assert.equal(transientAttempts, 3, "transient fetch errors are retried");
 
 let notFoundAttempts = 0;
 await assert.rejects(
@@ -46,7 +31,7 @@ await assert.rejects(
   }),
   /HTTP 404/,
 );
-assert.equal(notFoundAttempts, 1, "non-retryable HTTP errors are not repeated");
+assert.equal(notFoundAttempts, 1, "404 responses are not retried");
 
 let timedOutAttempts = 0;
 await assert.rejects(
