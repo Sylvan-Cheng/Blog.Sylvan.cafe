@@ -28,9 +28,14 @@ export async function fetchBytesWithRetry(
     timeoutMs = DEFAULT_TIMEOUT_MS,
     maxRetries = DEFAULT_MAX_RETRIES,
     retryDelayMs = DEFAULT_RETRY_DELAY_MS,
+    returnDetails = false,
     sleepImpl = (delay) => new Promise((resolve) => setTimeout(resolve, delay)),
   } = {},
 ) {
+  if (!Number.isInteger(maxRetries) || maxRetries < 0) {
+    throw new RangeError("maxRetries must be a non-negative integer");
+  }
+
   const maxAttempts = maxRetries + 1;
   let lastError;
   let attempts = 0;
@@ -43,7 +48,8 @@ export async function fetchBytesWithRetry(
         signal: AbortSignal.timeout(timeoutMs),
       });
       if (!response.ok) throw new HttpError(url, response.status);
-      return Buffer.from(await response.arrayBuffer());
+      const bytes = Buffer.from(await response.arrayBuffer());
+      return returnDetails ? { attempts: attempt, bytes } : bytes;
     } catch (error) {
       lastError = error;
       if (!isRetryableError(error) || attempt === maxAttempts) break;

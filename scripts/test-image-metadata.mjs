@@ -19,6 +19,20 @@ const bytes = await fetchBytesWithRetry("https://example.test/image.avif", {
 assert.deepEqual([...bytes], [1, 2, 3]);
 assert.equal(attempts, 3, "transient fetch errors are retried");
 
+const detailedResult = await fetchBytesWithRetry("https://example.test/detail.avif", {
+  fetchImpl: async () => new Response(new Uint8Array([4, 5]), { status: 200 }),
+  returnDetails: true,
+});
+assert.deepEqual([...detailedResult.bytes], [4, 5]);
+assert.equal(detailedResult.attempts, 1, "successful requests report their attempt count");
+
+await assert.rejects(
+  fetchBytesWithRetry("https://example.test/invalid-options.avif", {
+    maxRetries: -1,
+  }),
+  /maxRetries must be a non-negative integer/,
+);
+
 let notFoundAttempts = 0;
 await assert.rejects(
   fetchBytesWithRetry("https://example.test/missing.avif", {

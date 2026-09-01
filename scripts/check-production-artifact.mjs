@@ -11,6 +11,8 @@ const textExtensions = new Set([
   ".txt",
   ".xml",
 ]);
+const UNSIGNED_IMGPROXY_URL_PATTERN =
+  /img\.sylvan\.cafe\/unsafe(?:[/'"\s<]|$)/i;
 
 async function listTextFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -31,7 +33,7 @@ async function listTextFiles(directory) {
 const matches = [];
 for (const file of await listTextFiles(root)) {
   const content = await readFile(file, "utf8");
-  if (content.includes("/unsafe/")) matches.push(file);
+  if (UNSIGNED_IMGPROXY_URL_PATTERN.test(content)) matches.push(file);
 }
 
 if (matches.length > 0) {

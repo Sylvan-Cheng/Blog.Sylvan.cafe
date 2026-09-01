@@ -60,32 +60,40 @@ function buildMetadataFetchUrl(url) {
 
 async function readCache() {
   try {
-    return JSON.parse(await readFile(METADATA_PATH, "utf8"));
+    const cache = JSON.parse(await readFile(METADATA_PATH, "utf8"));
+    return cache && typeof cache === "object" && !Array.isArray(cache)
+      ? cache
+      : {};
   } catch {
     return {};
   }
 }
 
-async function fetchImageMetadata(url) {
-  const metadataUrl = buildMetadataFetchUrl(url);
-  const buffer = await fetchBytesWithRetry(metadataUrl, {
+async function fetchImageMetadata(url, metadataUrl = buildMetadataFetchUrl(url)) {
+  const { attempts, bytes } = await fetchBytesWithRetry(metadataUrl, {
     headers: {
       Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
       "User-Agent":
         "Mozilla/5.0 (compatible; SylvanCafeImageMetadata/1.0; +https://blog.sylvan.cafe/)",
     },
+    returnDetails: true,
   });
-  const metadata = await sharp(buffer).metadata();
-  if (!metadata.width || !metadata.height) {
-    throw new Error("Missing image dimensions");
-  }
+  try {
+    const metadata = await sharp(bytes).metadata();
+    if (!metadata.width || !metadata.height) {
+      throw new Error("Missing image dimensions");
+    }
 
-  return {
-    height: metadata.height,
-    source: url,
-    updatedAt: new Date().toISOString(),
-    width: metadata.width,
-  };
+    return {
+      height: metadata.height,
+      source: url,
+      updatedAt: new Date().toISOString(),
+      width: metadata.width,
+    };
+  } catch (error) {
+    if (error && typeof error === "object") error.attempts = attempts;
+    throw error;
+  }
 }
 
 async function collectImageMetadata() {
@@ -110,7 +118,25 @@ async function collectImageMetadata() {
 
   const sortedUrls = [...urls].sort();
   await mapWithConcurrency(sortedUrls, async (url) => {
-    const key = getS3Key(url);
+    let key;
+    try {
+      key = getS3Key(url);
+    } catch (error) {
+      failed++;
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      failures.push({
+        attempts: 0,
+        error: errorMessage,
+        failedAt: new Date().toISOString(),
+        metadataUrl: url,
+        source: url,
+      });
+      console.warn(
+        `[image-metadata] ${relative(ROOT_DIR, METADATA_PATH)}: ${url} skipped (${errorMessage})`,
+      );
+      return;
+    }
+
     if (!key) return;
 
     if (
@@ -123,15 +149,16 @@ async function collectImageMetadata() {
       return;
     }
 
+    let metadataUrl = url;
     try {
-      nextCache[key] = await fetchImageMetadata(url);
+      metadataUrl = buildMetadataFetchUrl(url);
+      nextCache[key] = await fetchImageMetadata(url, metadataUrl);
       fetched++;
     } catch (error) {
       failed++;
-      const metadataUrl = buildMetadataFetchUrl(url);
       const errorMessage = error instanceof Error ? error.message : String(error);
       failures.push({
-        attempts: error?.attempts ?? 1,
+        attempts: error?.attempts ?? 0,
         error: errorMessage,
         failedAt: new Date().toISOString(),
         metadataUrl,
