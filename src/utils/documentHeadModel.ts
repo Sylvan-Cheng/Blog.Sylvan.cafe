@@ -7,6 +7,7 @@ import {
   buildStructuredData,
   getDefaultOgImage,
 } from "./layoutSeo";
+import { getLocalesWithUrls } from "./localeUrls";
 
 type FontAssetMap = {
   cyrillic400: string;
@@ -16,6 +17,7 @@ type FontAssetMap = {
 
 export type DocumentHeadProps = {
   title?: string;
+  articleHeadline?: string;
   author?: string;
   profile?: string;
   description?: string;
@@ -50,6 +52,7 @@ export function buildDocumentHeadModel({
 }: DocumentHeadModelInput) {
   const {
     title = SITE.title,
+    articleHeadline = title,
     author = SITE.author,
     profile = SITE.profile,
     description = SITE.desc,
@@ -68,6 +71,10 @@ export function buildDocumentHeadModel({
   const scriptFont = getScriptFont(locale, fontAssets);
   const hreflangUrl = (targetLocale: Locale) =>
     buildHreflangPath(currentPath, targetLocale, hreflangs);
+  const alternateLocales = getLocalesWithUrls(LOCALES, hreflangs);
+  const xDefaultLocale = alternateLocales.includes(LOCALES[0])
+    ? LOCALES[0]
+    : alternateLocales[0];
 
   return {
     title,
@@ -80,18 +87,19 @@ export function buildDocumentHeadModel({
     robots,
     generator: astro.generator,
     hreflangLinks: alternateLinks
-      ? LOCALES.map((targetLocale) => ({
+      ? alternateLocales.map((targetLocale) => ({
           locale: targetLocale,
           lang: LOCALE_META[targetLocale].lang,
           url: new URL(hreflangUrl(targetLocale), astro.site),
         }))
       : [],
-    xDefaultUrl: alternateLinks
-      ? new URL(hreflangUrl(LOCALES[0]), astro.site)
-      : null,
+    xDefaultUrl:
+      alternateLinks && xDefaultLocale
+        ? new URL(hreflangUrl(xDefaultLocale), astro.site)
+        : null,
     socialImageURL,
     structuredData: buildStructuredData({
-      title,
+      title: articleHeadline,
       author,
       profile,
       description,

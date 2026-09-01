@@ -2,10 +2,19 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, relative, resolve } from "node:path";
 import sharp from "sharp";
 import { buildImgProxyUrl } from "../src/utils/imgProxySigning.ts";
+import {
+  fetchBytesWithRetry,
+  mapWithConcurrency,
+} from "./imageMetadataFetch.mjs";
 
 const ROOT_DIR = resolve(import.meta.dirname, "..");
 const CONTENT_GLOBS = ["src/data/blog", "src/data/pages"];
 const METADATA_PATH = resolve(ROOT_DIR, "src/generated/image-metadata.json");
+const FAILURE_REPORT_PATH = resolve(
+  ROOT_DIR,
+  "artifacts/image-metadata-failures.json",
+);
+const REQUEST_CONCURRENCY = 4;
 const S3_ORIGIN = "https://s3.sylvan.cafe/";
 const S3_BLOG_BASE = `${S3_ORIGIN}img/blog/`;
 const IMAGE_MARKDOWN_PATTERN =
@@ -59,18 +68,13 @@ async function readCache() {
 
 async function fetchImageMetadata(url) {
   const metadataUrl = buildMetadataFetchUrl(url);
-  const response = await fetch(metadataUrl, {
+  const buffer = await fetchBytesWithRetry(metadataUrl, {
     headers: {
       Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
       "User-Agent":
         "Mozilla/5.0 (compatible; SylvanCafeImageMetadata/1.0; +https://blog.sylvan.cafe/)",
     },
   });
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status} from ${metadataUrl}`);
-  }
-
-  const buffer = Buffer.from(await response.arrayBuffer());
   const metadata = await sharp(buffer).metadata();
   if (!metadata.width || !metadata.height) {
     throw new Error("Missing image dimensions");
@@ -102,10 +106,12 @@ async function collectImageMetadata() {
   let fetched = 0;
   let reused = 0;
   let failed = 0;
+  const failures = [];
 
-  for (const url of [...urls].sort()) {
+  const sortedUrls = [...urls].sort();
+  await mapWithConcurrency(sortedUrls, async (url) => {
     const key = getS3Key(url);
-    if (!key) continue;
+    if (!key) return;
 
     if (
       cache[key]?.source === url &&
@@ -114,7 +120,7 @@ async function collectImageMetadata() {
     ) {
       nextCache[key] = cache[key];
       reused++;
-      continue;
+      return;
     }
 
     try {
@@ -122,19 +128,39 @@ async function collectImageMetadata() {
       fetched++;
     } catch (error) {
       failed++;
+      const metadataUrl = buildMetadataFetchUrl(url);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      failures.push({
+        attempts: error?.attempts ?? 1,
+        error: errorMessage,
+        failedAt: new Date().toISOString(),
+        metadataUrl,
+        source: url,
+      });
       console.warn(
-        `[image-metadata] ${relative(ROOT_DIR, METADATA_PATH)}: ${url} skipped (${error.message})`,
+        `[image-metadata] ${relative(ROOT_DIR, METADATA_PATH)}: ${url} skipped (${errorMessage})`,
       );
     }
-  }
+  }, REQUEST_CONCURRENCY);
+
+  const orderedCache = Object.fromEntries(
+    Object.entries(nextCache).sort(([left], [right]) => left.localeCompare(right)),
+  );
+  failures.sort((left, right) => left.source.localeCompare(right.source));
 
   await mkdir(dirname(METADATA_PATH), { recursive: true });
   await writeFile(
     `${METADATA_PATH}.tmp`,
-    `${JSON.stringify(nextCache, null, 2)}\n`,
+    `${JSON.stringify(orderedCache, null, 2)}\n`,
   );
   await import("node:fs/promises").then(({ rename }) =>
     rename(`${METADATA_PATH}.tmp`, METADATA_PATH),
+  );
+
+  await mkdir(dirname(FAILURE_REPORT_PATH), { recursive: true });
+  await writeFile(
+    FAILURE_REPORT_PATH,
+    `${JSON.stringify({ generatedAt: new Date().toISOString(), failures }, null, 2)}\n`,
   );
 
   console.log(

@@ -28,6 +28,14 @@ jobs:
           IMGPROXY_SALT: ${{ secrets.IMGPROXY_SALT }}
         run: pnpm run build
 
+      - name: Upload image metadata failure report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-metadata-failures
+          path: artifacts/image-metadata-failures.json
+          if-no-files-found: ignore
+
       - name: Deploy to VPS
         uses: easingthemes/ssh-deploy@v6.0.3
         env:
